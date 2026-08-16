@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
 import { basename } from "node:path";
 
+export const FOURIER_ASSET_ORIGIN = "https://fourier.invalid";
 export const FOURIER_IMAGE_ASSET_ROUTE =
-  "https://fourier.invalid/__fourier_image_assets__/**";
+  `${FOURIER_ASSET_ORIGIN}/__fourier_image_assets__/**`;
 
 export const imageAssetExtensions = Object.freeze([
   ".avif",
@@ -53,7 +54,7 @@ export function imageAssetUrlPlugin(
           const bytes = new Uint8Array(await Bun.file(args.path).arrayBuffer());
           const hash = createHash("sha256").update(bytes).digest("hex").slice(0, 24);
           const filename = encodeURIComponent(basename(args.path));
-          const url = `https://fourier.invalid/__fourier_image_assets__/${hash}/${filename}`;
+          const url = `${FOURIER_ASSET_ORIGIN}/__fourier_image_assets__/${hash}/${filename}`;
           onAsset?.(Object.freeze({
             url,
             mimeType,

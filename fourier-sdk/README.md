@@ -367,7 +367,7 @@ fourier-sdk publish ./components/MetricPanel --dry-run
 fourier-sdk publish ./components/MetricPanel
 ```
 
-A dry run compiles the artifact and uses Fourier Render Engine plus FFmpeg to render the same deterministic timeline into a browser-compatible H.264 MP4. A real publish uploads that preview together with the SHA-256-addressed source archive, binds it to the component's `preview` field, and places the component in `review`. Local publishing therefore requires Playwright Chromium and FFmpeg with `libx264`. After approval, install or safely remove it with:
+A dry run compiles the artifact and uses three Fourier Render Engine DOM Timeline pages plus FFmpeg to render the same deterministic timeline into a browser-compatible H.264 MP4. Static artifacts still sample one DOM frame. A real publish uploads that preview together with the SHA-256-addressed source archive, binds it to the component's `preview` field, and places the component in `review`. Local publishing therefore requires Playwright Chromium and FFmpeg with `libx264`. After approval, install or safely remove it with:
 
 ```bash
 fourier-sdk search "cinematic title animation for a product launch" --type motion --style cinematic --json

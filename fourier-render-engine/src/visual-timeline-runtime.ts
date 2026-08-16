@@ -24,7 +24,10 @@ import {
   type LinuxHeadlessProcessMode,
 } from "./browser-platform.ts";
 import { RenderEngineError, fail } from "./errors.ts";
-import { FOURIER_IMAGE_ASSET_ROUTE } from "./image-assets.ts";
+import {
+  FOURIER_ASSET_ORIGIN,
+  FOURIER_IMAGE_ASSET_ROUTE,
+} from "./image-assets.ts";
 import {
   rationalTime,
   rationalTimeKey,
@@ -32,6 +35,7 @@ import {
   type RationalTime,
   type RationalTimeInput,
 } from "./time.ts";
+import { FOURIER_RENDERING_STATUS_URL } from "./rendering-status-page.ts";
 
 export interface TimelineSampleRequest {
   time: RationalTimeInput;
@@ -413,6 +417,8 @@ class BrowserPagePool {
   readonly #contexts = new Set<BrowserContext>();
   readonly #retiredContexts = new Set<BrowserContext>();
   readonly #contextResourceCounts = new Map<BrowserContext, number>();
+  readonly #renderingStatusPages = new Map<BrowserContext, Page>();
+  readonly #renderingStatusUpdates = new Map<BrowserContext, Promise<void>>();
   readonly #idlePages: PooledPage[] = [];
   #initialKeepAlivePage: Page | undefined;
   #activePages = 0;
@@ -473,6 +479,57 @@ class BrowserPagePool {
     }
   }
 
+  async #placeRenderingStatusPageLast(context: BrowserContext): Promise<void> {
+    if (BROWSER_COMMIT_MODE !== "headed-page-capture") return;
+    const previousUpdate = this.#renderingStatusUpdates.get(context) ?? Promise.resolve();
+    const update = previousUpdate.catch(() => undefined).then(async () => {
+      const previousPage = this.#renderingStatusPages.get(context);
+      this.#renderingStatusPages.delete(context);
+      await withTimeout(
+        "Chromium previous rendering status page close",
+        previousPage?.close() ?? Promise.resolve(),
+        5_000,
+      ).catch(() => undefined);
+      if (this.#closed || context.isClosed()) return;
+
+      const statusPage = await withTimeout(
+        "Chromium rendering status page initialization",
+        context.newPage(),
+      );
+      try {
+        await withTimeout(
+          "Chromium rendering status page viewport",
+          statusPage.setViewportSize({ width: 460, height: 240 }),
+        );
+        await withTimeout(
+          "Chromium rendering status document initialization",
+          statusPage.goto(FOURIER_RENDERING_STATUS_URL, { waitUntil: "load" }),
+        );
+        this.#renderingStatusPages.set(context, statusPage);
+        statusPage.once("close", () => {
+          if (this.#renderingStatusPages.get(context) === statusPage) {
+            this.#renderingStatusPages.delete(context);
+          }
+        });
+      } catch (error) {
+        await withTimeout(
+          "Chromium failed rendering status page close",
+          statusPage.close(),
+          5_000,
+        ).catch(() => undefined);
+        throw error;
+      }
+    });
+    this.#renderingStatusUpdates.set(context, update);
+    try {
+      await update;
+    } finally {
+      if (this.#renderingStatusUpdates.get(context) === update) {
+        this.#renderingStatusUpdates.delete(context);
+      }
+    }
+  }
+
   async #createResource(width: number, height: number): Promise<PooledPage> {
     let page: Page | undefined;
     let context: BrowserContext | undefined;
@@ -519,6 +576,7 @@ class BrowserPagePool {
           }),
         );
       }
+      await this.#placeRenderingStatusPageLast(context);
       return resource;
     } catch (error) {
       if (context !== undefined && recoverableBrowserFailure(error)) {
@@ -639,6 +697,8 @@ class BrowserPagePool {
     this.#contexts.delete(context);
     this.#retiredContexts.delete(context);
     this.#contextResourceCounts.delete(context);
+    this.#renderingStatusPages.delete(context);
+    this.#renderingStatusUpdates.delete(context);
     await withTimeout("Chromium retired context close", context.close(), 5_000)
       .catch(() => undefined);
   }
@@ -668,6 +728,8 @@ class BrowserPagePool {
     this.#contexts.clear();
     this.#retiredContexts.clear();
     this.#contextResourceCounts.clear();
+    this.#renderingStatusPages.clear();
+    this.#renderingStatusUpdates.clear();
     await sharedBrowserHost.release();
   }
 }
@@ -734,7 +796,8 @@ async function browserCall<T>(
 }
 
 const transparentSubject = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E";
-const blankDomDocument = "data:text/html,%3C!doctype%20html%3E%3Chtml%3E%3Chead%3E%3C/head%3E%3Cbody%3E%3Cdiv%20id%3Dfourier-root%3E%3C/div%3E%3C/body%3E%3C/html%3E";
+const FOURIER_DOM_DOCUMENT_URL = `${FOURIER_ASSET_ORIGIN}/__fourier_dom_runtime__/index.html`;
+const blankDomDocument = "<!doctype html><html><head></head><body><div id=\"fourier-root\"></div></body></html>";
 
 export class DomTimelineAdapter implements TimelineAdapter {
   readonly #pool: BrowserPagePool;
@@ -767,9 +830,17 @@ export class DomTimelineAdapter implements TimelineAdapter {
         "Chromium document virtual time resume",
         resource.cdp.send("Emulation.setVirtualTimePolicy", { policy: "advance" }),
       );
+      await resource.page.unroute(FOURIER_DOM_DOCUMENT_URL);
+      await resource.page.route(FOURIER_DOM_DOCUMENT_URL, async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "text/html; charset=utf-8",
+          body: blankDomDocument,
+        });
+      });
       await withTimeout(
         "Chromium document initialization",
-        resource.page.goto(blankDomDocument, { waitUntil: "load" }),
+        resource.page.goto(FOURIER_DOM_DOCUMENT_URL, { waitUntil: "load" }),
       );
       await resource.page.unroute(FOURIER_IMAGE_ASSET_ROUTE);
       await resource.page.route(FOURIER_IMAGE_ASSET_ROUTE, async (route) => {

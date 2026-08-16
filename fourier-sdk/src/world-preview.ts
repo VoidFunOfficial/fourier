@@ -8,6 +8,7 @@ import {
 import { sdkFail } from "./errors.ts";
 
 export const MAX_WORLD_PREVIEW_BYTES = 32 * 1024 * 1024;
+const WORLD_PREVIEW_DOM_PAGES = 3;
 
 export interface WorldPreviewVideo {
   readonly bytes: Uint8Array;
@@ -32,6 +33,7 @@ export async function renderWorldPreviewVideo(
       overwrite: true,
       crf: 26,
       preset: "medium",
+      domPages: WORLD_PREVIEW_DOM_PAGES,
       ...(options.ffmpegPath === undefined ? {} : { ffmpegPath: options.ffmpegPath }),
     });
     if (result.byteLength > MAX_WORLD_PREVIEW_BYTES) {

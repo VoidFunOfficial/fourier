@@ -1,0 +1,36 @@
+{
+  "name": "@fourier/MarkerHighlightMotion",
+  "version": "1.0.0",
+  "description": "MarkerHighlightMotion is a reusable visual component from the Fourier SDK example collection.",
+  "license": "MIT",
+  "files": [
+    "example/MarkerHighlightMotion.tsx"
+  ],
+  "fourier": {
+    "entry": "example/MarkerHighlightMotion.tsx",
+    "type": "motion",
+    "subtype": "highlight",
+    "summary": "MarkerHighlightMotion 的可复用 Fourier 示例视觉能力。",
+    "instruction": "需要 MarkerHighlightMotion 所展示的视觉效果时使用；不适合与其构图或动效语义无关的场景。",
+    "useCases": [
+      "产品演示",
+      "品牌视觉",
+      "动态内容制作"
+    ],
+    "negativeUseCases": [
+      "与组件视觉语义无关的场景"
+    ],
+    "tags": [
+      "markerhighlightmotion",
+      "motion",
+      "example"
+    ],
+    "style": [
+      "hand-drawn"
+    ],
+    "languages": [
+      "en",
+      "zh-CN"
+    ]
+  }
+}

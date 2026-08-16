@@ -124,7 +124,7 @@ const result = await renderVisualArtifactVideo(
 console.log(result.sha256, result.totalFrames);
 ```
 
-Dynamic artifacts preserve their declared frame count and frame rate. Static artifacts are encoded as a one-second still video. Transparent pixels are composited over `#101010` by default; `background`, `crf`, `preset`, `ffmpegPath`, cancellation, and progress callbacks are configurable.
+Dynamic artifacts preserve their declared frame count and frame rate. `domPages` controls how many DOM Timeline pages sample dynamic frames in parallel; static artifacts still use one page and are encoded as a one-second still video. Transparent pixels are composited over `#101010` by default; `background`, `crf`, `preset`, `ffmpegPath`, cancellation, and progress callbacks are configurable.
 
 ## Subtitle TTS
 

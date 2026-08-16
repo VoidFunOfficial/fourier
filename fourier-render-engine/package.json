@@ -1,6 +1,6 @@
 {
   "name": "@fourier-video/render-engine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "Bun + FFmpeg renderer and CLI for Fourier TSX projects",
   "module": "./src/index.ts",

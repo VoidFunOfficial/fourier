@@ -1,6 +1,6 @@
 # 发布到 Fourier World
 
-`fourier-sdk publish` 会先在本地用 Fourier Render Engine 把 artifact 逐帧渲染为 H.264 MP4，然后把预览视频、源码归档及其语义元数据一起上传到 Fourier World。发布目录必须包含 `package.json`；CLI 不接受用命令行参数临时补齐必填元数据，以保证源码、版本与语义清单可以一起接受代码审查。
+`fourier-sdk publish` 会先在本地用 Fourier Render Engine 的 3 个 DOM Timeline page 并行把 artifact 逐帧渲染为 H.264 MP4，然后把预览视频、源码归档及其语义元数据一起上传到 Fourier World。静态 artifact 仍只采样一个 DOM frame。发布目录必须包含 `package.json`；CLI 不接受用命令行参数临时补齐必填元数据，以保证源码、版本与语义清单可以一起接受代码审查。
 
 当前 Fourier World 使用 Payload `users` 账号登录。账号角色必须是 `admin` 或 `reviewer`，并且 World 中必须已经存在与包名 scope 相同的发布者 namespace。CLI 根据登录凭据获得写权限，根据 namespace 解析发布者，不允许在 `package.json` 中填写 author ID、发布状态或统计数据。
 

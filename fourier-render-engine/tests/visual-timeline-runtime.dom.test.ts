@@ -98,7 +98,8 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
         secondary.open({ entryPath }),
       ]);
       expect(launches).toBe(1);
-      const expectedPages = process.platform === "darwin" ? 3 : 2;
+      // macOS 每个实际渲染 context 还会包含一个独立的渲染状态标签页。
+      const expectedPages = process.platform === "darwin" ? 5 : 2;
       expect(pages).toBe(expectedPages);
 
       await second.close();
@@ -212,6 +213,20 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
       const frame = await instance.sample({ time: { numerator: 0, denominator: 1 } });
       expect(rgbaAlphaAt(frame.png, 2, 2)).toBe(255);
       expect(rgbaAlphaAt(frame.png, 15, 15)).toBe(0);
+    } finally {
+      await instance.close();
+    }
+  });
+
+  test("本地图片与 DOM 文档同源，允许 Canvas 像素回读", async () => {
+    const instance = await runtime.open({
+      entryPath: join(import.meta.dir, "components/DomCanvasImageReadback.tsx"),
+    });
+    try {
+      const frame = await instance.sample({ time: { numerator: 0, denominator: 1 } });
+      expect(frame.png.slice(0, 8)).toEqual(
+        new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]),
+      );
     } finally {
       await instance.close();
     }

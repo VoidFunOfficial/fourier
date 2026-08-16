@@ -18,6 +18,8 @@ export interface RenderVisualArtifactVideoOptions {
   readonly ffmpegPath?: string;
   readonly crf?: number;
   readonly preset?: string;
+  /** Maximum number of DOM Timeline pages used to sample dynamic artifact frames. */
+  readonly domPages?: number;
   /** Opaque artifact pixels are unchanged; transparent pixels are composited over this color. */
   readonly background?: string;
   readonly signal?: AbortSignal;
@@ -55,6 +57,12 @@ function validateOptions(options: RenderVisualArtifactVideoOptions): void {
   if (options.preset !== undefined && options.preset.trim().length === 0) {
     fail("INVALID_RENDER_OPTION", "preset 必须是非空字符串");
   }
+  if (
+    options.domPages !== undefined &&
+    (!Number.isInteger(options.domPages) || options.domPages <= 0)
+  ) {
+    fail("INVALID_RENDER_OPTION", "domPages 必须是正整数");
+  }
   const background = options.background ?? "#101010";
   if (!/^#[0-9a-fA-F]{6}$/.test(background)) {
     fail("INVALID_RENDER_OPTION", "background 必须是 #RRGGBB 颜色");
@@ -88,32 +96,57 @@ export async function renderVisualArtifactVideo(
   );
   await mkdir(frameDirectory, { recursive: true });
 
-  const runtime = new VisualTimelineRuntime({ maximumDomPages: 1 });
-  let instance: Awaited<ReturnType<VisualTimelineRuntime["open"]>> | undefined;
+  const maximumDomPages = Math.min(
+    artifact.composition.durationInFrames,
+    options.domPages ?? 1,
+  );
+  const runtime = new VisualTimelineRuntime({ maximumDomPages });
+  const instances: Array<Awaited<ReturnType<VisualTimelineRuntime["open"]>>> = [];
   let sourceFrameCount = artifact.composition.durationInFrames;
   let encodedFrameCount = sourceFrameCount;
   try {
     try {
-      instance = await runtime.open(artifact);
-      if (instance.isStatic) {
+      const first = await runtime.open(artifact);
+      instances.push(first);
+      if (first.isStatic) {
         sourceFrameCount = 1;
         encodedFrameCount = artifact.composition.fps;
+      } else {
+        const additional = await Promise.all(
+          Array.from(
+            { length: maximumDomPages - 1 },
+            () => runtime.open(artifact),
+          ),
+        );
+        instances.push(...additional);
       }
       const clock = new SampleClock(artifact.composition.fpsSource);
-      for (let frame = 0; frame < sourceFrameCount; frame += 1) {
-        cancelled(options.signal);
-        const sample = await instance.sample({
-          time: clock.frameStart(frame),
-          ...(options.signal === undefined ? {} : { signal: options.signal }),
-        });
-        await Bun.write(
-          join(frameDirectory, `frame-${String(frame).padStart(8, "0")}.png`),
-          sample.png,
-        );
-        options.onProgress?.({ phase: "rendering", frame: frame + 1, totalFrames: sourceFrameCount });
-      }
+      let nextFrame = 0;
+      let renderedFrames = 0;
+      await Promise.all(instances.map(async (instance) => {
+        while (true) {
+          cancelled(options.signal);
+          const frame = nextFrame;
+          nextFrame += 1;
+          if (frame >= sourceFrameCount) return;
+          const sample = await instance.sample({
+            time: clock.frameStart(frame),
+            ...(options.signal === undefined ? {} : { signal: options.signal }),
+          });
+          await Bun.write(
+            join(frameDirectory, `frame-${String(frame).padStart(8, "0")}.png`),
+            sample.png,
+          );
+          renderedFrames += 1;
+          options.onProgress?.({
+            phase: "rendering",
+            frame: renderedFrames,
+            totalFrames: sourceFrameCount,
+          });
+        }
+      }));
     } finally {
-      await instance?.close().catch(() => undefined);
+      await Promise.allSettled(instances.map((instance) => instance.close()));
       await runtime.close().catch(() => undefined);
     }
 

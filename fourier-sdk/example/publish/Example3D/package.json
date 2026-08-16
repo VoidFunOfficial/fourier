@@ -1,0 +1,37 @@
+{
+  "name": "@fourier/Example3D",
+  "version": "1.0.0",
+  "description": "Example3D is a reusable visual component from the Fourier SDK example collection.",
+  "license": "MIT",
+  "files": [
+    "example/Example3D.tsx",
+    "placeholder/3d_model/Low+Poly+Earth.glb"
+  ],
+  "fourier": {
+    "entry": "example/Example3D.tsx",
+    "type": "graphic",
+    "subtype": "three-dimensional",
+    "summary": "Example3D 的可复用 Fourier 示例视觉能力。",
+    "instruction": "需要 Example3D 所展示的视觉效果时使用；不适合与其构图或动效语义无关的场景。",
+    "useCases": [
+      "产品演示",
+      "品牌视觉",
+      "动态内容制作"
+    ],
+    "negativeUseCases": [
+      "与组件视觉语义无关的场景"
+    ],
+    "tags": [
+      "example3d",
+      "react",
+      "example"
+    ],
+    "style": [
+      "futuristic"
+    ],
+    "languages": [
+      "en",
+      "zh-CN"
+    ]
+  }
+}

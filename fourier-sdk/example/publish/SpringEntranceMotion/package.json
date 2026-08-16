@@ -1,0 +1,37 @@
+{
+  "name": "@fourier/SpringEntranceMotion",
+  "version": "1.0.0",
+  "description": "SpringEntranceMotion is a reusable visual component from the Fourier SDK example collection.",
+  "license": "MIT",
+  "files": [
+    "example/SpringEntranceMotion.tsx",
+    "placeholder/pic/1.png"
+  ],
+  "fourier": {
+    "entry": "example/SpringEntranceMotion.tsx",
+    "type": "motion",
+    "subtype": "entrance",
+    "summary": "SpringEntranceMotion 的可复用 Fourier 示例视觉能力。",
+    "instruction": "需要 SpringEntranceMotion 所展示的视觉效果时使用；不适合与其构图或动效语义无关的场景。",
+    "useCases": [
+      "产品演示",
+      "品牌视觉",
+      "动态内容制作"
+    ],
+    "negativeUseCases": [
+      "与组件视觉语义无关的场景"
+    ],
+    "tags": [
+      "springentrancemotion",
+      "motion",
+      "example"
+    ],
+    "style": [
+      "minimal"
+    ],
+    "languages": [
+      "en",
+      "zh-CN"
+    ]
+  }
+}

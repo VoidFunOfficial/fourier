@@ -21,7 +21,7 @@ describeIntegration("Render Engine artifact MP4", () => {
 
     const result = await renderVisualArtifactVideo({
       entryPath: join(import.meta.dir, "components/DomTimelinePanel.tsx"),
-    }, { output, crf: 30, preset: "ultrafast" });
+    }, { output, crf: 30, preset: "ultrafast", domPages: 3 });
 
     expect(result).toMatchObject({
       output,

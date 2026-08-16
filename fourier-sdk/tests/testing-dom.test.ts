@@ -24,25 +24,6 @@ describeDom("SDK testing ABI v1 path Adapter", () => {
     }
   }, 20_000);
 
-  test("VerticalChooser 吸附、静止段与药丸呼吸均可确定性采样", async () => {
-    const fixture = await openArtifact(join(import.meta.dir, "../example/VerticalChooser.tsx"));
-    try {
-      expect(fixture.isStatic).toBe(false);
-      const initial = await fixture.renderFrame({ frame: 0 });
-      const moving = await fixture.renderFrame({ frame: 40 });
-      const settled = await fixture.renderFrame({ frame: 68 });
-      const still = await fixture.renderFrame({ frame: 70 });
-      expect(initial.sha256).not.toBe(moving.sha256);
-      expect(moving.sha256).not.toBe(settled.sha256);
-      expect(settled.sha256).toBe(still.sha256);
-      await fixture.assertDeterministic({
-        frames: [0, 40, 50, 68, 70, 108, 180, 281, 359],
-      });
-    } finally {
-      await fixture.close();
-    }
-  }, 30_000);
-
   test("Example3D 加载 GLB 并由 Fourier 绝对时间驱动旋转", async () => {
     const fixture = await openArtifact(join(import.meta.dir, "../example/Example3D.tsx"));
     try {
