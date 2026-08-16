@@ -16,7 +16,7 @@ import { MAX_WORLD_PREVIEW_BYTES, type WorldPreviewVideo } from "./world-preview
 
 export const DEFAULT_FOURIER_WORLD_URL = "https://www.fourier.video";
 
-export type WorldUserRole = "admin" | "reviewer";
+export type WorldUserRole = "admin" | "reviewer" | "user";
 
 export interface WorldUser {
   readonly id: string | number;
@@ -209,7 +209,7 @@ function loginResult(value: unknown): WorldLoginResult {
     (typeof user?.id !== "string" && typeof user?.id !== "number") ||
     typeof user.email !== "string" ||
     typeof user.name !== "string" ||
-    (user.role !== "admin" && user.role !== "reviewer")
+    (user.role !== "admin" && user.role !== "reviewer" && user.role !== "user")
   ) {
     throw new FourierWorldApiError(502, "Fourier World 登录响应格式无效", value);
   }
@@ -541,7 +541,7 @@ export class FourierWorldClient {
       (typeof user?.id !== "string" && typeof user?.id !== "number") ||
       typeof user.email !== "string" ||
       typeof user.name !== "string" ||
-      (user.role !== "admin" && user.role !== "reviewer")
+      (user.role !== "admin" && user.role !== "reviewer" && user.role !== "user")
     ) {
       throw new FourierWorldApiError(502, "Fourier World 当前用户响应格式无效", body);
     }

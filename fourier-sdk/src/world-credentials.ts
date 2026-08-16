@@ -30,7 +30,7 @@ function isUser(value: unknown): value is WorldUser {
     (typeof user.id === "string" || typeof user.id === "number") &&
     typeof user.email === "string" &&
     typeof user.name === "string" &&
-    (user.role === "admin" || user.role === "reviewer")
+    (user.role === "admin" || user.role === "reviewer" || user.role === "user")
   );
 }
 

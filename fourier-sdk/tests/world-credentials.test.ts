@@ -23,7 +23,7 @@ describe("Fourier World credentials", () => {
     await saveWorldCredentials("https://www.fourier.video/", {
       token: "secret-token",
       exp: 2_000_000_000,
-      user: { id: 1, email: "author@example.com", name: "Author", role: "reviewer" },
+      user: { id: 1, email: "author@example.com", name: "@author", role: "user" },
     }, environment);
     const path = worldCredentialsPath(environment);
     expect((await stat(path)).mode & 0o777).toBe(0o600);
@@ -33,7 +33,7 @@ describe("Fourier World credentials", () => {
       worldUrl: "https://www.fourier.video",
       token: "secret-token",
       expiresAt: 2_000_000_000,
-      user: { id: 1, email: "author@example.com", name: "Author", role: "reviewer" },
+      user: { id: 1, email: "author@example.com", name: "@author", role: "user" },
     });
     expect(await removeWorldCredentials(environment)).toBe(true);
     expect(await removeWorldCredentials(environment)).toBe(false);

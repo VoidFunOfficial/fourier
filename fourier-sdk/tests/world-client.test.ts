@@ -61,7 +61,7 @@ function previewVideo(): WorldPreviewVideo {
 }
 
 describe("Fourier World Payload client", () => {
-  test("使用 Payload users 登录并解析账号", async () => {
+  test("使用 Payload users 登录并解析普通账号", async () => {
     let received: unknown;
     const fetcher = asFetch(async (request) => {
       expect(new URL(request.url).pathname).toBe("/api/users/login");
@@ -69,7 +69,7 @@ describe("Fourier World Payload client", () => {
       return Response.json({
         token: "test-token",
         exp: 2_000_000_000,
-        user: { id: 7, email: "author@example.com", name: "Author", role: "reviewer" },
+        user: { id: 7, email: "author@example.com", name: "@author", role: "user" },
       });
     });
     const result = await new FourierWorldClient({ worldUrl: "https://world.test", fetch: fetcher }).login(
@@ -80,7 +80,28 @@ describe("Fourier World Payload client", () => {
     expect(result).toEqual({
       token: "test-token",
       exp: 2_000_000_000,
-      user: { id: 7, email: "author@example.com", name: "Author", role: "reviewer" },
+      user: { id: 7, email: "author@example.com", name: "@author", role: "user" },
+    });
+  });
+
+  test("解析普通账号的当前用户响应", async () => {
+    const fetcher = asFetch((request) => {
+      expect(new URL(request.url).pathname).toBe("/api/users/me");
+      expect(request.headers.get("authorization")).toBe("JWT test-token");
+      return Response.json({
+        user: { id: 7, email: "author@example.com", name: "@author", role: "user" },
+      });
+    });
+    const result = await new FourierWorldClient({
+      worldUrl: "https://world.test",
+      token: "test-token",
+      fetch: fetcher,
+    }).currentUser();
+    expect(result).toEqual({
+      id: 7,
+      email: "author@example.com",
+      name: "@author",
+      role: "user",
     });
   });
 
