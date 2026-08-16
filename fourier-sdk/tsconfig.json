@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@fourier-video/sdk": ["./src/index.ts"],
+      "@fourier-video/sdk/*": ["./src/*.ts"]
+    },
+    "lib": ["ES2023", "DOM"],
+    "jsx": "react-jsx",
+    "types": ["bun", "react"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "example/**/*.ts",
+    "example/**/*.tsx",
+    "scripts/**/*.ts"
+  ]
+}

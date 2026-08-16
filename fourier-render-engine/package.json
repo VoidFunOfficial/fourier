@@ -1,0 +1,69 @@
+{
+  "name": "@fourier-video/render-engine",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Bun + FFmpeg renderer and CLI for Fourier TSX projects",
+  "module": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts",
+    "./timeline": "./src/visual-timeline-runtime.ts"
+  },
+  "bin": {
+    "fourier": "./src/cli.ts"
+  },
+  "files": [
+    "src/",
+    "benchmark/benchmark.ts",
+    "benchmark/fixtures/",
+    "benchmark/README.md",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "fourier",
+    "video",
+    "rendering",
+    "ffmpeg",
+    "bun"
+  ],
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "validate": "bun run src/cli.ts validate",
+    "render": "bun run src/cli.ts render",
+    "preview": "bun run src/cli.ts preview",
+    "inspect": "bun run src/cli.ts inspect",
+    "benchmark": "bun run src/cli.ts benchmark",
+    "benchmark:dom": "bun run benchmark/dom-timeline.ts",
+    "typecheck": "bunx tsc --noEmit",
+    "test": "bun test",
+    "prepack": "bun run typecheck && bun test && bun run browser:check && bun run test:dom",
+    "test:integration": "RUN_FFMPEG_TESTS=1 RUN_DOM_TESTS=1 bun test tests/ffmpeg.test.tsx tests/artifact-video-renderer.integration.test.ts",
+    "browser:install": "bunx playwright install chromium",
+    "browser:install:linux": "bunx playwright install --with-deps chromium",
+    "browser:check": "bun run scripts/check-browser.ts",
+    "test:dom": "bun run scripts/test-dom.ts"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "playwright": "1.62.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "satori": "^0.18.3"
+  },
+  "peerDependencies": {
+    "@fourier-video/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@fourier-video/sdk": "workspace:*",
+    "@types/bun": "^1.3.14",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "bun": ">=1.3.0"
+  }
+}

@@ -1,0 +1,62 @@
+/**
+ * React authoring surface owned by the Fourier SDK.
+ *
+ * Artifact authors import React primitives from the SDK so projects do not
+ * need to install or coordinate a separate React runtime.
+ */
+export { default as React } from "react";
+export {
+  Children,
+  Component,
+  Fragment,
+  Profiler,
+  PureComponent,
+  StrictMode,
+  Suspense,
+  cloneElement,
+  createContext,
+  createElement,
+  createRef,
+  forwardRef,
+  isValidElement,
+  lazy,
+  memo,
+  startTransition,
+  use,
+  useActionState,
+  useCallback,
+  useContext,
+  useDebugValue,
+  useDeferredValue,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useInsertionEffect,
+  useLayoutEffect,
+  useMemo,
+  useOptimistic,
+  useReducer,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+  version as reactVersion,
+} from "react";
+export type {
+  ComponentProps,
+  ComponentPropsWithRef,
+  ComponentPropsWithoutRef,
+  CSSProperties,
+  Dispatch,
+  ElementType,
+  FC,
+  JSX,
+  Key,
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+  Ref,
+  RefAttributes,
+  RefObject,
+  SetStateAction,
+} from "react";

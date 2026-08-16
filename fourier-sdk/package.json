@@ -1,0 +1,143 @@
+{
+  "name": "@fourier-video/sdk",
+  "version": "1.1.2",
+  "type": "module",
+  "description": "Typed TSX project, React, and Motion authoring SDK for Fourier",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "bun": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./preview": {
+      "types": "./dist/preview.d.ts",
+      "bun": "./src/preview.ts",
+      "import": "./dist/preview.js",
+      "default": "./dist/preview.js"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "bun": "./src/testing.ts",
+      "import": "./dist/testing.js",
+      "default": "./dist/testing.js"
+    },
+    "./search": {
+      "types": "./dist/search.d.ts",
+      "bun": "./src/search.ts",
+      "import": "./dist/search.js",
+      "default": "./dist/search.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "bun": "./src/react.ts",
+      "import": "./dist/react.js",
+      "default": "./dist/react.js"
+    },
+    "./motion": {
+      "types": "./dist/motion.d.ts",
+      "bun": "./src/motion.ts",
+      "import": "./dist/motion.js",
+      "default": "./dist/motion.js"
+    },
+    "./three": {
+      "types": "./dist/three.d.ts",
+      "bun": "./src/three.ts",
+      "import": "./dist/three.js",
+      "default": "./dist/three.js"
+    },
+    "./universe": {
+      "types": "./dist/universe.d.ts",
+      "bun": "./src/universe.ts",
+      "import": "./dist/universe.js",
+      "default": "./dist/universe.js"
+    },
+    "./phy2d": {
+      "types": "./dist/phy2d.d.ts",
+      "bun": "./src/phy2d.ts",
+      "import": "./dist/phy2d.js",
+      "default": "./dist/phy2d.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "bun": "./src/schema.ts",
+      "import": "./dist/schema.js",
+      "default": "./dist/schema.js"
+    },
+    "./project": {
+      "types": "./dist/project.d.ts",
+      "bun": "./src/project.ts",
+      "import": "./dist/project.js",
+      "default": "./dist/project.js"
+    },
+    "./design-preview": {
+      "types": "./dist/design-preview.d.ts",
+      "bun": "./src/design-preview.ts",
+      "import": "./dist/design-preview.js",
+      "default": "./dist/design-preview.js"
+    },
+    "./react-runtime": {
+      "types": "./dist/react-runtime.d.ts",
+      "bun": "./src/react-runtime.ts",
+      "import": "./dist/react-runtime.js",
+      "default": "./dist/react-runtime.js"
+    },
+    "./jsx-runtime": {
+      "types": "./dist/jsx-runtime.d.ts",
+      "bun": "./src/jsx-runtime.ts",
+      "import": "./dist/jsx-runtime.js",
+      "default": "./dist/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./dist/jsx-dev-runtime.d.ts",
+      "bun": "./src/jsx-dev-runtime.ts",
+      "import": "./dist/jsx-dev-runtime.js",
+      "default": "./dist/jsx-dev-runtime.js"
+    }
+  },
+  "bin": {
+    "fourier-sdk": "./dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "README.md",
+    "docs/",
+    "example/",
+    "placeholder/"
+  ],
+  "scripts": {
+    "build": "bun run scripts/build.ts && bunx tsc -p tsconfig.build.json",
+    "preview": "bun run src/cli.ts preview",
+    "typecheck": "bunx tsc --noEmit",
+    "test": "bun test",
+    "test:dom": "RUN_DOM_TESTS=1 bun test tests/testing-dom.test.ts",
+    "prepack": "bun run typecheck && bun test && bun run test:dom && bun run build"
+  },
+  "dependencies": {
+    "@fourier-video/render-engine": "^1.0.0",
+    "@types/react": "^19.2.18",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.185.4",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "bun": ">=1.3.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "fourier",
+    "react",
+    "motion",
+    "video",
+    "bun"
+  ]
+}

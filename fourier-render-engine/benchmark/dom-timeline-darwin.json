@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "platform": "darwin-arm64",
+  "browser": {
+    "ok": true,
+    "playwright": "1.62.0",
+    "chromium": "151.0.7922.34",
+    "chromiumRevision": "1234",
+    "runtime": "headed-page-capture",
+    "committedPngSha256": "e139d11e36dc3d67412ce54db0cf815cf77c517c97f63e7e76401c315b27573d"
+  },
+  "measurements": {
+    "browserLaunchCommitMs": 546.361,
+    "artifactCompileMs": 25.417,
+    "fontImageBarrierPageInitMs": 521.405,
+    "singleFrameMs": 8.271,
+    "candidates": [
+      {
+        "pages": 1,
+        "pageInitializationMs": 521.405,
+        "sampleMs": 198.512,
+        "totalMs": 719.917,
+        "framesPerSecond": 120.9,
+        "peakRssMb": 195
+      },
+      {
+        "pages": 2,
+        "pageInitializationMs": 575.153,
+        "sampleMs": 111.192,
+        "totalMs": 686.346,
+        "framesPerSecond": 215.842,
+        "peakRssMb": 202.297
+      },
+      {
+        "pages": 3,
+        "pageInitializationMs": 598.686,
+        "sampleMs": 64.832,
+        "totalMs": 663.519,
+        "framesPerSecond": 370.186,
+        "peakRssMb": 216.969
+      }
+    ]
+  },
+  "constraints": {
+    "frameCount": 24,
+    "memoryLimitMb": 1024
+  },
+  "recommendedPages": 3
+}

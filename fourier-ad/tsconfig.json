@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@fourier-video/sdk": ["../fourier-sdk/src/index.ts"],
+      "@fourier-video/sdk/*": ["../fourier-sdk/src/*.ts"]
+    },
+    "lib": ["ES2023", "DOM"],
+    "jsx": "react-jsx",
+    "types": ["bun", "react"],
+    "typeRoots": ["../fourier-sdk/node_modules/@types"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": [
+    "assets.d.ts",
+    "main.tsx",
+    "components/**/*.ts",
+    "components/*.js",
+    "components/**/*.tsx",
+    "motions/**/*.ts",
+    "motions/**/*.tsx",
+    "scenes/**/*.ts",
+    "scenes/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "fourier-workspace",
+  "private": true,
+  "workspaces": [
+    "fourier-render-engine",
+    "fourier-sdk"
+  ],
+  "scripts": {
+    "typecheck": "bun run --cwd fourier-render-engine typecheck && bun run --cwd fourier-sdk typecheck",
+    "test:sdk": "bun run --cwd fourier-sdk test",
+    "build:sdk": "bun run --cwd fourier-sdk build",
+    "prepack:sdk": "bun run --cwd fourier-sdk prepack",
+    "test:dom": "bun run --cwd fourier-render-engine test:dom && bun run --cwd fourier-sdk test:dom"
+  },
+  "devDependencies": {
+    "@fourier-video/sdk": "workspace:*"
+  }
+}
