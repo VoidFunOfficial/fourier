@@ -13,11 +13,24 @@
   <img alt="TypeScript 5.9" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&amp;logo=typescript&amp;logoColor=white" />
   <img alt="React 19" src="https://img.shields.io/badge/React-19-4CC3D9?style=flat-square&amp;logo=react&amp;logoColor=20201F" />
   <img alt="FFmpeg required" src="https://img.shields.io/badge/FFmpeg-required-007808?style=flat-square&amp;logo=ffmpeg&amp;logoColor=white" />
+  <img alt="100% agent-generated production" src="https://img.shields.io/badge/Production-100%25_Agent_generated-F16745?style=flat-square" />
  </p>
 
 <p align="center">English · <a href="./README.zh-CN.md">简体中文</a></p>
 
 Fourier treats video as a readable, composable, and verifiable project rather than a one-shot black-box output. Agents interpret intent and organize content, developers build reusable visual capabilities, and the Render Engine executes the result reliably.
+
+## Made entirely with Fourier
+
+<div align="center">
+  <video src="./ad.mp4" controls playsinline preload="metadata" width="100%">
+    Your browser does not support embedded video. Use the link below to watch the film.
+  </video>
+</div>
+
+<p align="center"><a href="./ad.mp4"><strong>▶ Watch or download the Fourier promotional film</strong></a></p>
+
+This film is the rendered result of the [Fourier Ad project](./fourier-ad/README.md). Its concept, script, scene breakdown, visual-component selection, TSX authoring, asset orchestration, animation, audio timing, validation, and final rendering were completed autonomously by agents. **No human intervention was involved in the creative or production process.**
 
 ## Why Fourier
 

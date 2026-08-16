@@ -13,11 +13,24 @@
   <img alt="TypeScript 5.9" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&amp;logo=typescript&amp;logoColor=white" />
   <img alt="React 19" src="https://img.shields.io/badge/React-19-4CC3D9?style=flat-square&amp;logo=react&amp;logoColor=20201F" />
   <img alt="需要 FFmpeg" src="https://img.shields.io/badge/FFmpeg-required-007808?style=flat-square&amp;logo=ffmpeg&amp;logoColor=white" />
+  <img alt="制作过程完全由 Agent 自主完成" src="https://img.shields.io/badge/Production-100%25_Agent_generated-F16745?style=flat-square" />
 </p>
 
 <p align="center"><a href="./README.md">English</a> · 简体中文</p>
 
 Fourier 不把视频当作一次性生成的黑盒文件，而是把它表示成可读、可组合、可验证的工程：Agent 负责理解意图与组织内容，开发者负责沉淀视觉能力，Render Engine 负责稳定执行。
+
+## 完全使用 Fourier 制作
+
+<div align="center">
+  <video src="./ad-zh.mp4" controls playsinline preload="metadata" width="100%">
+    当前浏览器不支持嵌入式视频，请使用下方链接观看。
+  </video>
+</div>
+
+<p align="center"><a href="./ad-zh.mp4"><strong>▶ 播放或下载 Fourier 中文宣传片</strong></a></p>
+
+这支宣传片是 [Fourier Ad 工程](./fourier-ad/README.zh-CN.md) 的最终渲染结果。从创意策划、脚本、分镜、视觉组件选择、TSX 编写、素材编排、动画、音频时间设计、工程校验到最终渲染，全部由 Agent 自主完成。**整个创作与生产过程无人类干预。**
 
 ## 为什么选择 Fourier
 
