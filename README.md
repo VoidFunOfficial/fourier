@@ -100,7 +100,11 @@ On macOS, FFmpeg is installed with Homebrew; the script installs Homebrew first 
 
 ### Windows
 
-Open PowerShell in the repository root and run:
+For Windows users, we recommend developing directly in [CNB](https://cnb.cool/voidfun/fourier). Its browser-based cloud environment requires no local toolchain configuration, so you can open the project and start coding immediately.
+
+#### Local installation (optional)
+
+Use the PowerShell one-click installer only when you need Fourier installed and rendered locally. Open PowerShell in the repository root and run:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1

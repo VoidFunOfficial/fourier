@@ -100,7 +100,11 @@ macOS 使用 Homebrew 安装 FFmpeg；如果还没有 Homebrew，脚本会先安
 
 ### Windows
 
-在仓库根目录打开 PowerShell，然后运行：
+建议所有 Windows 用户直接通过 [CNB](https://cnb.cool/voidfun/fourier) 在线开发。CNB 提供浏览器中的云端开发环境，无需配置本地工具链，打开项目即可开始编写代码。
+
+#### 本地安装（可选）
+
+只有需要在本机安装和渲染 Fourier 时，才需要使用 PowerShell 一键安装脚本。在仓库根目录打开 PowerShell，然后运行：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1
