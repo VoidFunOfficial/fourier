@@ -14,9 +14,18 @@ describe("fourier-sdk CLI arguments", () => {
       entryPath: resolve("./components"),
       hostname: "127.0.0.1",
       port: 3211,
+      publicPort: 3212,
       open: false,
       watch: false,
     });
+
+    expect(parseCliInvocation(["preview", "--public-port", "4321"])).toMatchObject({
+      command: "preview",
+      publicPort: 4321,
+    });
+    expect(() => parseCliInvocation(["preview", "--public-port", "65536"])).toThrow(
+      "--public-port 必须是 0—65535 的整数",
+    );
   });
 
   test("解析 login", () => {

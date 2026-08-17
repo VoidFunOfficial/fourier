@@ -322,6 +322,10 @@ bunx fourier-sdk preview
 
 bunx fourier-sdk preview ./components
 # 也可以加载一个目录或单个 artifact
+
+# CLI 还会在 0.0.0.0:3212 暴露允许 CORS 的监听端口
+bunx fourier-sdk preview ./components --public-port 4321
+
 fourier check ./components/MetricPanel.tsx
 ```
 

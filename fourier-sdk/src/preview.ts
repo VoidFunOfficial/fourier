@@ -30,6 +30,8 @@ export interface StartPreviewServerOptions {
   configPath?: string;
   hostname?: string;
   port?: number;
+  /** Also expose the preview on `0.0.0.0` with permissive CORS headers. */
+  publicPort?: number;
   watch?: boolean;
 }
 
@@ -37,6 +39,8 @@ export interface PreviewServerHandle {
   readonly url: string;
   readonly hostname: string;
   readonly port: number;
+  readonly publicUrl?: string;
+  readonly publicPort?: number;
   reload(): Promise<void>;
   stop(): Promise<void>;
 }
@@ -101,6 +105,26 @@ function json(value: unknown, status = 200): Response {
   return Response.json(value, {
     status,
     headers: { "cache-control": "no-store" },
+  });
+}
+
+function corsResponse(request: Request, response: Response): Response {
+  const headers = new Headers(response.headers);
+  headers.set("access-control-allow-origin", "*");
+  headers.set("access-control-allow-methods", "GET, OPTIONS");
+  headers.set(
+    "access-control-allow-headers",
+    request.headers.get("access-control-request-headers") ?? "*",
+  );
+  headers.set("access-control-max-age", "86400");
+  headers.append("vary", "access-control-request-headers");
+  if (request.headers.get("access-control-request-private-network") === "true") {
+    headers.set("access-control-allow-private-network", "true");
+  }
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
   });
 }
 
@@ -311,6 +335,13 @@ export async function startPreviewServer(
   if (!Number.isInteger(port) || port < 0 || port > 65_535) {
     throw new TypeError("port 必须是 0—65535 的整数");
   }
+  const publicPort = options.publicPort;
+  if (
+    publicPort !== undefined &&
+    (!Number.isInteger(publicPort) || publicPort < 0 || publicPort > 65_535)
+  ) {
+    throw new TypeError("publicPort 必须是 0—65535 的整数");
+  }
 
   const clients = new Set<EventClient>();
   const assetVersion = randomUUID();
@@ -422,10 +453,7 @@ export async function startPreviewServer(
     return records.values().next().value as PreviewRecord | undefined;
   };
 
-  const server = Bun.serve({
-    hostname,
-    port,
-    async fetch(request) {
+  const handleRequest = async (request: Request): Promise<Response> => {
       const url = new URL(request.url);
       if (request.method === "GET" && url.pathname === "/") {
         return new Response(playerHtml, {
@@ -565,8 +593,34 @@ export async function startPreviewServer(
         );
       }
       return json({ error: { code: "NOT_FOUND", message: "route not found" } }, 404);
-    },
+  };
+
+  const server = Bun.serve({
+    hostname,
+    port,
+    fetch: handleRequest,
   });
+  let publicServer: ReturnType<typeof Bun.serve> | undefined;
+  try {
+    publicServer = publicPort === undefined
+      ? undefined
+      : Bun.serve({
+        hostname: "0.0.0.0",
+        port: publicPort,
+        async fetch(request) {
+          if (request.method === "OPTIONS") {
+            return corsResponse(request, new Response(null, { status: 204 }));
+          }
+          return corsResponse(request, await handleRequest(request));
+        },
+      });
+  } catch (error) {
+    server.stop(true);
+    const active = [...records.values()].map((record) => record.current);
+    records.clear();
+    await Promise.all(active.map(closeSession));
+    throw error;
+  }
 
   if (options.watch ?? true) {
     const queueReload = (changedPath?: string): void => {
@@ -600,10 +654,17 @@ export async function startPreviewServer(
   }
 
   const actualPort = server.port ?? port;
+  const actualPublicPort = publicServer?.port ?? publicPort;
   return Object.freeze({
     hostname,
     port: actualPort,
     url: `http://${hostname}:${actualPort}`,
+    ...(actualPublicPort === undefined
+      ? {}
+      : {
+          publicPort: actualPublicPort,
+          publicUrl: `http://0.0.0.0:${actualPublicPort}`,
+        }),
     reload: () => reload(),
     async stop() {
       if (stopped) return;
@@ -624,6 +685,7 @@ export async function startPreviewServer(
       records.clear();
       await Promise.all(active.map(closeSession));
       server.stop(true);
+      publicServer?.stop(true);
     },
   });
 }

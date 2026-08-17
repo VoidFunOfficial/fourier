@@ -327,6 +327,9 @@ bunx fourier-sdk preview
 bunx fourier-sdk preview ./components
 # Also accepts a directory or one artifact
 
+# The CLI also exposes a CORS-enabled listener on 0.0.0.0:3212
+bunx fourier-sdk preview ./components --public-port 4321
+
 fourier check ./components/MetricPanel.tsx
 ```
 

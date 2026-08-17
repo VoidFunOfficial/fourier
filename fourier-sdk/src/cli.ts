@@ -25,7 +25,7 @@ import { defaultPreviewSourcePath, startPreviewServer } from "./preview.ts";
 const HELP = `Fourier React/Motion SDK
 
 用法:
-  fourier-sdk preview [artifact.tsx|directory] [--host <host>] [--port <port>] [--open] [--no-watch]
+  fourier-sdk preview [artifact.tsx|directory] [--host <host>] [--port <port>] [--public-port <port>] [--open] [--no-watch]
   fourier-sdk login [--world <url>] [--email <email>] [--password-stdin]
   fourier-sdk whoami [--world <url>]
   fourier-sdk logout
@@ -45,6 +45,7 @@ export interface PreviewInvocation {
   readonly entryPath: string;
   readonly hostname: string;
   readonly port: number;
+  readonly publicPort: number;
   readonly open: boolean;
   readonly watch: boolean;
 }
@@ -128,6 +129,7 @@ function parsePreview(argv: readonly string[]): PreviewInvocation {
   let hasEntryPath = false;
   let hostname = "127.0.0.1";
   let port = 3211;
+  let publicPort = 3212;
   let open = false;
   let watch = true;
   for (let index = 0; index < argv.length; index += 1) {
@@ -140,6 +142,12 @@ function parsePreview(argv: readonly string[]): PreviewInvocation {
       index += 1;
       if (!Number.isInteger(port) || port < 0 || port > 65_535) {
         throw new TypeError("--port 必须是 0—65535 的整数");
+      }
+    } else if (arg === "--public-port") {
+      publicPort = Number(optionValue(argv, index, arg));
+      index += 1;
+      if (!Number.isInteger(publicPort) || publicPort < 0 || publicPort > 65_535) {
+        throw new TypeError("--public-port 必须是 0—65535 的整数");
       }
     } else if (arg === "--open") {
       open = true;
@@ -154,7 +162,7 @@ function parsePreview(argv: readonly string[]): PreviewInvocation {
       throw new TypeError(`多余位置参数: ${arg}`);
     }
   }
-  return { command: "preview", entryPath, hostname, port, open, watch };
+  return { command: "preview", entryPath, hostname, port, publicPort, open, watch };
 }
 
 function parseLogin(argv: readonly string[]): LoginInvocation {
@@ -483,9 +491,13 @@ async function runPreview(invocation: PreviewInvocation): Promise<never> {
     entryPath: invocation.entryPath,
     hostname: invocation.hostname,
     port: invocation.port,
+    publicPort: invocation.publicPort,
     watch: invocation.watch,
   });
   console.log(`Fourier SDK preview: ${handle.url}`);
+  if (handle.publicUrl !== undefined) {
+    console.log(`Fourier SDK preview (public, CORS): ${handle.publicUrl}`);
+  }
   if (invocation.open) void openBrowser(handle.url);
   const stop = async (): Promise<void> => {
     await handle.stop();

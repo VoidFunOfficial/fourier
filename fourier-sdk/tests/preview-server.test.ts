@@ -56,15 +56,38 @@ describe("browser DOM preview server", () => {
     const server = await startPreviewServer({
       entryPath: path,
       port: 0,
+      publicPort: 0,
       watch: false,
     });
     servers.push(server);
 
     const player = await fetch(server.url);
     expect(player.status).toBe(200);
+    expect(player.headers.get("access-control-allow-origin")).toBeNull();
     const playerHtml = await player.text();
     expect(playerHtml).toContain("Fourier Studio");
     expect(playerHtml).toContain("/preview-app.js?v=");
+
+    expect(server.publicPort).toBeNumber();
+    const publicUrl = `http://127.0.0.1:${server.publicPort}`;
+    const publicArtifacts = await fetch(`${publicUrl}/api/artifacts`, {
+      headers: { origin: "https://studio.example" },
+    });
+    expect(publicArtifacts.status).toBe(200);
+    expect(publicArtifacts.headers.get("access-control-allow-origin")).toBe("*");
+    const preflight = await fetch(`${publicUrl}/api/session`, {
+      method: "OPTIONS",
+      headers: {
+        origin: "https://studio.example",
+        "access-control-request-method": "GET",
+        "access-control-request-headers": "x-fourier-preview",
+        "access-control-request-private-network": "true",
+      },
+    });
+    expect(preflight.status).toBe(204);
+    expect(preflight.headers.get("access-control-allow-methods")).toContain("GET");
+    expect(preflight.headers.get("access-control-allow-headers")).toBe("x-fourier-preview");
+    expect(preflight.headers.get("access-control-allow-private-network")).toBe("true");
 
     const app = await fetch(`${server.url}/preview-app.js`);
     expect(app.status).toBe(200);

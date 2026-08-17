@@ -441,8 +441,10 @@ time 输入进入 runtime 时立即转成约分后的 bigint 有理秒。`assert
 
 ```bash
 bunx fourier-sdk preview [./Artifact.tsx|./components] \
-  [--host 127.0.0.1] [--port 3211] [--open] [--no-watch]
+  [--host 127.0.0.1] [--port 3211] [--public-port 3212] [--open] [--no-watch]
 ```
+
+CLI 会同时保留本地 preview 地址，并默认在 `0.0.0.0:3212` 启动允许任意来源读取的 CORS 端口；可用 `--public-port` 修改端口。`0.0.0.0` 是监听地址，其他设备应使用运行 preview 的主机 IP，且仍需确保防火墙、容器或 NAT 已放行该端口。程序化调用 `startPreviewServer()` 时只有显式传入 `publicPort` 才会创建公网监听器，返回 handle 的 `publicUrl` / `publicPort` 也只在此时存在。
 
 不传入口时，preview 默认发现 SDK `example` 目录中的所有 `.tsx`/`.jsx` 组件。传入目录时以可搜索、可筛选的 React 卡片列表展示其中的组件；接近视口的卡片才挂载 runtime 并自动循环播放，离开视口或页面进入后台后暂停采样。点击卡片进入带逐帧时间轴的详情页。传入单个 artifact 时仍使用同一套组件库界面。
 
