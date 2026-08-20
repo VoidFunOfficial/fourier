@@ -1,6 +1,7 @@
 {
   "name": "@fourier-video/render-engine",
-  "version": "1.0.1",
+  "version": "1.1.1",
+  "license": "MIT",
   "type": "module",
   "description": "Bun + FFmpeg renderer and CLI for Fourier TSX projects",
   "module": "./src/index.ts",
@@ -40,13 +41,14 @@
     "typecheck": "bunx tsc --noEmit",
     "test": "bun test",
     "prepack": "bun run typecheck && bun test && bun run browser:check && bun run test:dom",
-    "test:integration": "RUN_FFMPEG_TESTS=1 RUN_DOM_TESTS=1 bun test tests/ffmpeg.test.tsx tests/artifact-video-renderer.integration.test.ts",
+    "test:integration": "RUN_FFMPEG_TESTS=1 RUN_DOM_TESTS=1 bun test tests/ffmpeg.test.tsx tests/preview.integration.test.tsx",
     "browser:install": "bunx playwright install chromium",
     "browser:install:linux": "bunx playwright install --with-deps chromium",
     "browser:check": "bun run scripts/check-browser.ts",
     "test:dom": "bun run scripts/test-dom.ts"
   },
   "dependencies": {
+    "@fourier-video/core": "^1.0.0",
     "@resvg/resvg-js": "^2.6.2",
     "playwright": "1.62.0",
     "react": "19.2.8",
@@ -54,7 +56,7 @@
     "satori": "^0.18.3"
   },
   "peerDependencies": {
-    "@fourier-video/sdk": "^1.0.0"
+    "@fourier-video/sdk": "^1.1.5"
   },
   "devDependencies": {
     "@fourier-video/sdk": "workspace:*",

@@ -1,3 +1,5 @@
+import { SUPPORTED_SDK_ABI_VERSIONS } from "./artifact-protocol.ts";
+
 export function createDomBootstrapSource(entryPath: string): string {
   return `
 import React from "react";
@@ -12,15 +14,21 @@ import {
 import artifact from ${JSON.stringify(entryPath)};
 
 const metadata = artifact?.[SDK_ARTIFACT];
-if (metadata?.sdkAbiVersion !== 1 || !["dom-timeline", "dom-timeline-ffmpeg-video"].includes(metadata?.renderer)) {
-  throw Object.assign(new Error("browser bundle 需要 SDK ABI v1 dom-timeline artifact"), {
+const supportedSdkAbiVersions = ${JSON.stringify([...SUPPORTED_SDK_ABI_VERSIONS])};
+if (!supportedSdkAbiVersions.includes(metadata?.sdkAbiVersion) || !["dom-timeline", "dom-timeline-ffmpeg-video"].includes(metadata?.renderer)) {
+  throw Object.assign(new Error("browser bundle 需要受支持的 SDK ABI dom-timeline artifact"), {
     code: "ARTIFACT_RUNTIME_MISMATCH",
   });
 }
 
 const rootNode = document.getElementById("fourier-root");
 if (rootNode === null) throw new Error("missing #fourier-root");
-const root = createRoot(rootNode);
+const uncaughtRootErrors = [];
+const root = createRoot(rootNode, {
+  onUncaughtError(error) {
+    uncaughtRootErrors.push(error);
+  },
+});
 let controller;
 let animations = [];
 let mediaElements = [];
@@ -33,6 +41,11 @@ let observer;
 
 function fail(code, message, details) {
   throw Object.assign(new Error(message), { code, details });
+}
+
+function throwUncaughtRootError() {
+  if (uncaughtRootErrors.length === 0) return;
+  throw uncaughtRootErrors.shift();
 }
 
 function synchronous(value, operation) {
@@ -264,10 +277,13 @@ async function initialize(config) {
     }),
   ));
   forceLayout();
+  throwUncaughtRootError();
+  await Promise.resolve();
+  throwUncaughtRootError();
 
   const lifecycle = controller.getLifecycle();
   if (metadata.kind === "motion" && lifecycle === undefined) {
-    fail("FOURIER_LIFECYCLE_REQUIRED", "ABI v1 Motion 必须恰好注册一个 lifecycle");
+    fail("FOURIER_LIFECYCLE_REQUIRED", "SDK ABI Motion 必须恰好注册一个 lifecycle");
   }
   if (lifecycle !== undefined) {
     lifecycleCommit(() => lifecycle.fourierStart(), metadata.name + ".fourierStart()");

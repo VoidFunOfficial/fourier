@@ -27,7 +27,9 @@ import {
   bindSdkArtifactProps,
   createMotionContext,
   createRenderContext,
+  isSupportedSdkAbiVersion,
   readSdkArtifact,
+  type SupportedSdkAbiVersion,
 } from "./artifact-protocol.ts";
 import { compileVisualArtifact } from "./artifact-compiler.ts";
 import { fail } from "./errors.ts";
@@ -99,7 +101,7 @@ export interface PreparedTimelineArtifact {
   readonly nodeId: string;
   readonly kind: "react" | "motion";
   readonly name: string;
-  readonly sdkAbiVersion: 1;
+  readonly sdkAbiVersion: SupportedSdkAbiVersion;
   readonly renderer: "dom-timeline" | "dom-timeline-ffmpeg-video";
   readonly snapshotId: string;
   readonly dependencyDigest: string;
@@ -111,17 +113,17 @@ function timelineArtifactRecord(
   artifact: CompiledVisualArtifact,
 ): PreparedTimelineArtifact {
   if (
-    artifact.sdkAbiVersion !== 1 ||
+    !isSupportedSdkAbiVersion(artifact.sdkAbiVersion) ||
     !["dom-timeline", "dom-timeline-ffmpeg-video"].includes(artifact.renderer)
   ) {
-    fail("ARTIFACT_RUNTIME_MISMATCH", "timeline manifest 只记录 ABI v1 DOM artifact");
+    fail("ARTIFACT_RUNTIME_MISMATCH", "timeline manifest 只记录受支持 SDK ABI DOM artifact");
   }
   const renderer = artifact.renderer as PreparedTimelineArtifact["renderer"];
   return Object.freeze({
     nodeId,
     kind: artifact.kind,
     name: artifact.name,
-    sdkAbiVersion: 1,
+    sdkAbiVersion: artifact.sdkAbiVersion,
     renderer,
     snapshotId: artifact.snapshotId,
     dependencyDigest: artifact.dependencyDigest,
@@ -779,9 +781,9 @@ async function renderReactNode(
   });
   const seed = hashSeed(`${project.metadata.id}:${node.id}`);
   const metadata = readSdkArtifact(component, "react");
-  if (metadata?.sdkAbiVersion === 1) {
+  if (metadata !== undefined && isSupportedSdkAbiVersion(metadata.sdkAbiVersion)) {
     if (node.exportName !== "default") {
-      fail("ARTIFACT_EXPORT_INVALID", "SDK ABI v1 React production entry 必须是 default export");
+      fail("ARTIFACT_EXPORT_INVALID", "SDK ABI React production entry 必须是 default export");
     }
     const compiled = await traceOperation(
       diagnosticTarget,
@@ -1078,7 +1080,8 @@ async function renderSparseFfmpegVideoMotion(
   }
   const metadata = readSdkArtifact(component, "motion");
   if (
-    metadata?.sdkAbiVersion !== 1 ||
+    metadata === undefined ||
+    !isSupportedSdkAbiVersion(metadata.sdkAbiVersion) ||
     metadata.renderer !== "dom-timeline-ffmpeg-video"
   ) {
     fail("ARTIFACT_RUNTIME_MISMATCH", `Motion "${motion.id}" 不是 FFmpeg Video Motion`);
@@ -1202,9 +1205,9 @@ async function renderReactFrame(
     ...(node.propTypes === undefined ? {} : { declarations: node.propTypes }),
   });
   const metadata = readSdkArtifact(component, "react");
-  if (metadata?.sdkAbiVersion === 1) {
+  if (metadata !== undefined && isSupportedSdkAbiVersion(metadata.sdkAbiVersion)) {
     if (node.exportName !== "default") {
-      fail("ARTIFACT_EXPORT_INVALID", "SDK ABI v1 React preview entry 必须是 default export");
+      fail("ARTIFACT_EXPORT_INVALID", "SDK ABI React preview entry 必须是 default export");
     }
     const runtime = new VisualTimelineRuntime({
       maximumDomPages: effectiveDomPageCount(domPages ?? 1),
@@ -1313,7 +1316,7 @@ async function renderDomMotionSamples(
   onDiagnostic?: RenderOptions["onDiagnostic"],
 ): Promise<PreparedTimelineArtifact | undefined> {
   const metadata = readSdkArtifact(component, "motion");
-  if (metadata?.sdkAbiVersion !== 1) return undefined;
+  if (metadata === undefined || !isSupportedSdkAbiVersion(metadata.sdkAbiVersion)) return undefined;
   if (subject.kind === "text" && !metadata.supportsTextMotion) {
     fail(
       "TEXT_MOTION_UNSUPPORTED",
@@ -1322,7 +1325,7 @@ async function renderDomMotionSamples(
     );
   }
   if (motion.exportName !== "default") {
-    fail("ARTIFACT_EXPORT_INVALID", "SDK ABI v1 Motion production entry 必须是 default export");
+    fail("ARTIFACT_EXPORT_INVALID", "SDK ABI Motion production entry 必须是 default export");
   }
   const { width, height } = motionSubjectSize(subject);
   const props = bindSdkArtifactProps(component, motion.props, {
@@ -1515,7 +1518,8 @@ export async function renderSparseVisualFrame(
     );
     const metadata = readSdkArtifact(candidate, "motion");
     if (
-      metadata?.sdkAbiVersion === 1 &&
+      metadata !== undefined &&
+      isSupportedSdkAbiVersion(metadata.sdkAbiVersion) &&
       metadata.renderer === "dom-timeline-ffmpeg-video"
     ) {
       if (node.kind !== "video") {
@@ -1752,7 +1756,8 @@ async function renderFfmpegVideoMotion(
 ): Promise<RenderedFfmpegVideoMotion> {
   const metadata = readSdkArtifact(component, "motion");
   if (
-    metadata?.sdkAbiVersion !== 1 ||
+    metadata === undefined ||
+    !isSupportedSdkAbiVersion(metadata.sdkAbiVersion) ||
     metadata.renderer !== "dom-timeline-ffmpeg-video"
   ) {
     fail(
@@ -2431,7 +2436,8 @@ export async function prepareGeneratedVisuals(
     );
     const metadata = readSdkArtifact(component, "motion");
     if (
-      metadata?.sdkAbiVersion === 1 &&
+      metadata !== undefined &&
+      isSupportedSdkAbiVersion(metadata.sdkAbiVersion) &&
       metadata.renderer === "dom-timeline-ffmpeg-video"
     ) {
       if (node.kind !== "video") {

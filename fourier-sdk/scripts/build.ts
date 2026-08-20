@@ -8,6 +8,7 @@ const result = await Bun.build({
     "./src/motion.ts",
     "./src/three.ts",
     "./src/universe.ts",
+    "./src/universe-3d.ts",
     "./src/phy2d.ts",
     "./src/schema.ts",
     "./src/project.ts",
@@ -29,8 +30,10 @@ const result = await Bun.build({
     "react/jsx-dev-runtime",
     "three",
     "three/addons/loaders/GLTFLoader.js",
-    "@fourier-video/render-engine",
-    "@fourier-video/render-engine/artifact",
+    "@fourier-video/core",
+    "@fourier-video/core/artifact",
+    "@fourier-video/core/timeline",
+    "@fourier-video/core/protocol",
   ],
 });
 

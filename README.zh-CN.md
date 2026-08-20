@@ -49,13 +49,14 @@ Fourier 的目标不是再做一个“文本转视频”入口，而是为 Agent
 
 | 子项目 | 定位 | 当前重点 |
 | --- | --- | --- |
+| [Fourier Core](./fourier-core/README.md) | Artifact 基础层 | 提供 ABI 集成、artifact 编译、精确时间、确定性 DOM 采样与独立 MP4 渲染 |
 | [Fourier Render Engine](./fourier-render-engine/README.zh-CN.md) | 确定性执行层 | 编译 TSX 工程，通过增量缓存、并行视觉准备与 FFmpeg 高效输出视频 |
 | [Fourier SDK](./fourier-sdk/README.zh-CN.md) | 开发者接口层 | 创建类型安全的 Project、React、Motion、Three.js、Scene 与 Template |
 | [Fourier Tools](./fourier-tools/README.zh-CN.md) | 素材能力层 | 本地抠图、背景移除、图片超分与模型能力接入 |
 | [Fourier World](./fourier-world/README.zh-CN.md) | 视频组件与视觉资产资源库 | 让 Agent 发现、理解和复用经过设计与验证的动态视觉能力 |
 | [Fourier Ad](./fourier-ad/README.zh-CN.md) | 参考工程 | 展示多 Scene、组件、素材与音频如何组成完整视频 |
 
-其中 Render Engine 与 SDK 是根目录 Bun workspace 的核心包，Tools 是可独立扩展的素材能力层，Ad 是使用核心包的真实视频工程示例。World 则是 Fourier 面向 Agent 的资源网络：它沉淀组件、Motion、Scene、Template、3D 场景和品牌视觉系统，让优秀能力可以被持续发现与复用。
+其中 Core、Render Engine 与 SDK 是根目录 Bun workspace 的三个公开包。Core 是 SDK/render 共用的基础集成模块，普通 artifact 作者仍然使用 SDK。Tools 是可独立扩展的素材能力层，Ad 是使用这些公开包的真实视频工程示例。World 则是 Fourier 面向 Agent 的资源网络：它沉淀组件、Motion、Scene、Template、3D 场景和品牌视觉系统，让优秀能力可以被持续发现与复用。
 
 ## 系统如何协作
 
@@ -66,7 +67,9 @@ flowchart LR
   A --> W["World：发现与复用视觉资源"]
   T --> S
   W --> S
-  S --> R["Render Engine：编译、缓存与增量渲染"]
+  S --> C["Core：编译 artifact 与确定性时间线采样"]
+  R["Render Engine：编译工程、缓存并用 FFmpeg 合成"] --> C
+  R -. "SDK peer/runtime" .-> S
   R --> V["可复现的视频结果"]
 ```
 
@@ -130,7 +133,7 @@ fourier-sdk --help
 如果要开发本仓库，请继续在仓库根目录安装 workspace 依赖：
 
 ```bash
-# 安装 Render Engine 与 SDK 的 workspace 依赖
+# 安装 Core、Render Engine 与 SDK 的 workspace 依赖
 bun install
 
 # 安装真实 DOM 渲染所需的 Chromium 及系统依赖

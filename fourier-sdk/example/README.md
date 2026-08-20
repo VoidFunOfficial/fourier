@@ -1,6 +1,6 @@
-# SDK ABI v1 Examples
+# SDK ABI v1.1 Examples
 
-示例都生成 ABI v1 marker，并由标准 path runtime 在浏览器中直接渲染。
+示例都生成 ABI v1.1 marker，并由标准 path runtime 在浏览器中直接渲染。
 
 示例中的 React hook 和类型全部从 SDK 子路径导入；把文件复制到没有 `package.json`/`node_modules` 的视频工程也无需安装 React。
 
@@ -25,6 +25,15 @@ fourier check ./example/Example3D.tsx
 
 ```bash
 bun run preview ./example/UniverseArchitecture.tsx --open
+```
+
+## Universe3D Camera Example
+
+[Universe3DCameraExample.tsx](./Universe3DCameraExample.tsx) 在黑色透视空间中依次展开 `This is `、`Fourier`、`3D-Camera`、`Example`。`This is` 先在初始朝向出现；前三段文字退场后，Camera3D 才向当时的后方大幅旋转约 158—192 度，越过目标角度并回弹，随后下一段文字出现。四个带 Expand2LR 与 LightEffectCard 视觉的 React 平面使用不同半径与错开的后向射线，Camera3D 的 `x/y/z` 始终不变；更远处另有固定的低亮环、光条和方形装饰，只通过相机旋转产生视差，并避开文字中心射线。
+
+```bash
+bun run preview ./example/Universe3DCameraExample.tsx --open
+fourier check ./example/Universe3DCameraExample.tsx
 ```
 
 ## Hitchcock Poster Montage 3D

@@ -2,7 +2,9 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { renderVisualArtifactVideo } from "../src/artifact-video-renderer.ts";
+import { artifactHost, componentFixture } from "./test-host.ts";
+
+const { renderVisualArtifactVideo } = artifactHost;
 
 const directories: string[] = [];
 const run = Bun.env.RUN_DOM_TESTS === "1" && Bun.env.RUN_FFMPEG_TESTS === "1";
@@ -13,14 +15,14 @@ afterEach(async () => {
     rm(directory, { recursive: true, force: true })));
 });
 
-describeIntegration("Render Engine artifact MP4", () => {
+describeIntegration("Core artifact MP4", () => {
   test("通过确定性 DOM timeline 渲染并编码 H.264 MP4", async () => {
     const directory = await mkdtemp(join(tmpdir(), "fourier-artifact-video-test-"));
     directories.push(directory);
     const output = join(directory, "preview.mp4");
 
     const result = await renderVisualArtifactVideo({
-      entryPath: join(import.meta.dir, "components/DomTimelinePanel.tsx"),
+      entryPath: componentFixture("DomTimelinePanel.tsx"),
     }, { output, crf: 30, preset: "ultrafast", domPages: 3 });
 
     expect(result).toMatchObject({

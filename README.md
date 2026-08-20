@@ -8,6 +8,7 @@
 
 <p align="center">
   <a href="./fourier-render-engine/README.md"><img alt="Render Engine 1.0.0" src="https://img.shields.io/badge/Render_Engine-1.0.0-C6D900?style=flat-square" /></a>
+  <a href="./fourier-core/README.md"><img alt="Core 1.0.0" src="https://img.shields.io/badge/Core-1.0.0-8B7CF6?style=flat-square" /></a>
   <a href="./fourier-sdk/README.md"><img alt="SDK 1.1.2" src="https://img.shields.io/badge/SDK-1.1.2-63B931?style=flat-square" /></a>
   <img alt="Bun 1.3 or newer" src="https://img.shields.io/badge/Bun-%3E%3D1.3-20201F?style=flat-square&amp;logo=bun&amp;logoColor=white" />
   <img alt="TypeScript 5.9" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&amp;logo=typescript&amp;logoColor=white" />
@@ -49,13 +50,14 @@ Fourier is not another text-to-video prompt box. It is infrastructure for agents
 
 | Project | Role | Focus |
 | --- | --- | --- |
+| [Fourier Core](./fourier-core/README.md) | Shared artifact foundation | Owns ABI integration, artifact compilation, exact time, deterministic DOM sampling, and standalone MP4 rendering |
 | [Fourier Render Engine](./fourier-render-engine/README.md) | Deterministic execution | Compiles TSX projects and uses incremental caching, parallel visual preparation, and FFmpeg to render efficiently |
 | [Fourier SDK](./fourier-sdk/README.md) | Developer interface | Authors typed Projects, React artifacts, Motion, Three.js, Scenes, and Templates |
 | [Fourier Tools](./fourier-tools/README.md) | Media capability layer | Local matting, background removal, image upscaling, and model integration |
 | [Fourier World](./fourier-world/README.md) | Video component and visual-asset library | Helps agents discover, understand, and reuse designed and validated dynamic visual capabilities |
 | [Fourier Ad](./fourier-ad/README.md) | Reference project | Demonstrates how Scenes, components, media, and audio form a complete video |
 
-The Render Engine and SDK are the core packages in the root Bun workspace. Tools is an independently extensible media-processing layer, and Ad is a real video project built with the core packages. World is Fourier's visual-resource network for components, Motion, Scenes, Templates, 3D scenes, and brand systems that agents can discover and reuse.
+Core, the Render Engine, and the SDK are the three published packages in the root Bun workspace. Core is the foundation integration module; artifact authors still use the SDK. Tools is an independently extensible media-processing layer, and Ad is a real video project built with the published packages. World is Fourier's visual-resource network for components, Motion, Scenes, Templates, 3D scenes, and brand systems that agents can discover and reuse.
 
 ## How the system fits together
 
@@ -66,7 +68,9 @@ flowchart LR
   A --> W["World: discover and reuse visual resources"]
   T --> S
   W --> S
-  S --> R["Render Engine: compile, cache, and render incrementally"]
+  S --> C["Core: compile artifacts and sample deterministic timelines"]
+  R["Render Engine: compile projects, cache, and compose with FFmpeg"] --> C
+  R -. "SDK peer/runtime" .-> S
   R --> V["Reproducible video output"]
 ```
 
@@ -130,7 +134,7 @@ fourier-sdk --help
 To work on this repository, install the workspace dependencies from the repository root:
 
 ```bash
-# Install the Render Engine and SDK workspace dependencies
+# Install Core, Render Engine, and SDK workspace dependencies
 bun install
 
 # Install Chromium and its system dependencies for real DOM rendering
@@ -162,6 +166,7 @@ The Python and model dependencies used by Tools are not installed by the root wo
 ## Where to start
 
 - To make a video, begin with the [Fourier Ad](./fourier-ad/README.md) project structure.
+- To integrate artifact compilation or deterministic timeline sampling into an SDK/renderer, read [Fourier Core](./fourier-core/README.md).
 - To build a component, animation, or 3D scene, read the [Fourier SDK](./fourier-sdk/README.md).
 - To integrate rendering into a service or automation pipeline, see the [Render Engine](./fourier-render-engine/README.md) CLI, HTTP API, and `--ai` protocol.
 - To extend media processing, read [Fourier Tools](./fourier-tools/README.md).

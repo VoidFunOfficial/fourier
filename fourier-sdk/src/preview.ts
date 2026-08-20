@@ -2,10 +2,8 @@ import { watch, type FSWatcher } from "node:fs";
 import { readdir, stat } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import { basename, dirname, relative, resolve, sep } from "node:path";
-import {
-  compileVisualArtifact,
-  type CompiledVisualArtifact,
-} from "@fourier-video/render-engine";
+import type { CompiledVisualArtifact } from "@fourier-video/core/artifact";
+import { sdkArtifactHost } from "./artifact-host.ts";
 import { resolveDesignPreview } from "./preview-config.ts";
 import { PLAYER_CSS, PLAYER_HTML } from "./player.ts";
 import {
@@ -16,6 +14,8 @@ import {
 
 export { definePreview } from "./preview-config.ts";
 export type { PreviewConfig } from "./types.ts";
+
+const { compileVisualArtifact } = sdkArtifactHost;
 
 export interface PreviewDiagnostic {
   code: string;
@@ -586,7 +586,7 @@ export async function startPreviewServer(
           {
             error: {
               code: "DOM_PREVIEW_DIRECT",
-              message: "ABI v1 preview 由浏览器直接渲染，不提供 PNG 帧接口",
+              message: "ABI v1.1 preview 由浏览器直接渲染，不提供 PNG 帧接口",
             },
           },
           404,

@@ -186,7 +186,7 @@ describe("Fourier CLI AI JSONL", () => {
       checkArtifact: async (entryPath) => ({
         valid: true,
         entryPath,
-        sdkAbiVersion: 1,
+        sdkAbiVersion: 1.1,
         renderer: "dom-timeline",
         snapshotId: "snapshot-v1",
         warnings: [],
@@ -198,7 +198,7 @@ describe("Fourier CLI AI JSONL", () => {
       command: "check",
       data: {
         valid: true,
-        sdkAbiVersion: 1,
+        sdkAbiVersion: 1.1,
         warnings: [],
       },
     });

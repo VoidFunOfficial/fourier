@@ -1,6 +1,4 @@
 const files = [
-  "tests/dom-timeline.integration.test.ts",
-  "tests/visual-timeline-runtime.dom.test.ts",
   "tests/visual-consumers.dom.test.tsx",
 ] as const;
 

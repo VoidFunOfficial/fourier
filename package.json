@@ -2,17 +2,21 @@
   "name": "fourier-workspace",
   "private": true,
   "workspaces": [
+    "fourier-core",
     "fourier-render-engine",
     "fourier-sdk"
   ],
   "scripts": {
-    "typecheck": "bun run --cwd fourier-render-engine typecheck && bun run --cwd fourier-sdk typecheck",
+    "typecheck": "bun run --cwd fourier-core typecheck && bun run --cwd fourier-render-engine typecheck && bun run --cwd fourier-sdk typecheck",
+    "test:core": "bun run --cwd fourier-core test",
     "test:sdk": "bun run --cwd fourier-sdk test",
     "build:sdk": "bun run --cwd fourier-sdk build",
     "prepack:sdk": "bun run --cwd fourier-sdk prepack",
-    "test:dom": "bun run --cwd fourier-render-engine test:dom && bun run --cwd fourier-sdk test:dom"
+    "test:dom": "bun run --cwd fourier-core test:dom && bun run --cwd fourier-render-engine test:dom && bun run --cwd fourier-sdk test:dom",
+    "test:integration": "bun run --cwd fourier-core test:integration && bun run --cwd fourier-render-engine test:integration && bun run --cwd fourier-sdk test:integration"
   },
   "devDependencies": {
+    "@fourier-video/core": "workspace:*",
     "@fourier-video/sdk": "workspace:*"
   }
 }

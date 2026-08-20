@@ -1,12 +1,12 @@
+import type { CompiledVisualArtifact } from "@fourier-video/core/artifact";
 import {
-  compileVisualArtifact,
   SampleClock,
-  VisualTimelineRuntime,
-  type CompiledVisualArtifact,
   type RationalTimeInput,
   type TimelineInstance,
   type TimelineSampleResult,
-} from "@fourier-video/render-engine";
+  type VisualTimelineRuntime,
+} from "@fourier-video/core/timeline";
+import { sdkArtifactHost } from "./artifact-host.ts";
 import { SdkError } from "./errors.ts";
 import {
   SDK_ARTIFACT,
@@ -14,6 +14,8 @@ import {
   type MotionPreviewContext,
   type MotionPreviewDescriptor,
 } from "./types.ts";
+
+const { compileVisualArtifact, createTimelineRuntime } = sdkArtifactHost;
 
 export type FrameResult = TimelineSampleResult & { readonly frame: number };
 export type TimeResult = TimelineSampleResult;
@@ -170,7 +172,7 @@ function timelineFixture(
   });
 }
 
-/** Opens an ABI v1 artifact from its source entry path. */
+/** Opens an ABI v1.1 artifact from its source entry path. */
 export async function openArtifact(
   entryPath: string,
   options: { exportName?: "default" } = {},
@@ -179,7 +181,7 @@ export async function openArtifact(
     entryPath,
     ...(options.exportName === undefined ? {} : { exportName: options.exportName }),
   });
-  const runtime = new VisualTimelineRuntime();
+  const runtime = createTimelineRuntime();
   try {
     const instance = await runtime.open(artifact);
     return timelineFixture(artifact, runtime, instance);

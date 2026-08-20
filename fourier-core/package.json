@@ -1,0 +1,72 @@
+{
+  "name": "@fourier-video/core",
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "description": "Shared artifact compilation and deterministic timeline runtime for Fourier",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "bun": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./artifact": {
+      "types": "./dist/artifact.d.ts",
+      "bun": "./src/artifact.ts",
+      "import": "./dist/artifact.js",
+      "default": "./dist/artifact.js"
+    },
+    "./timeline": {
+      "types": "./dist/timeline.d.ts",
+      "bun": "./src/timeline.ts",
+      "import": "./dist/timeline.js",
+      "default": "./dist/timeline.js"
+    },
+    "./protocol": {
+      "types": "./dist/protocol.d.ts",
+      "bun": "./src/protocol.ts",
+      "import": "./dist/protocol.js",
+      "default": "./dist/protocol.js"
+    }
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "bun run scripts/build.ts && bunx tsc -p tsconfig.build.json",
+    "typecheck": "bunx tsc --noEmit",
+    "test": "bun test",
+    "test:dom": "RUN_DOM_TESTS=1 bun test tests/visual-timeline-runtime.dom.test.ts tests/dom-timeline.integration.test.ts",
+    "test:integration": "RUN_DOM_TESTS=1 RUN_FFMPEG_TESTS=1 bun test tests/artifact-video-renderer.integration.test.ts",
+    "prepack": "bun run typecheck && bun test && bun run test:dom && bun run build"
+  },
+  "dependencies": {
+    "playwright": "1.62.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/bun": "^1.3.14",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "bun": ">=1.3.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "fourier",
+    "video",
+    "artifact",
+    "timeline",
+    "bun"
+  ]
+}

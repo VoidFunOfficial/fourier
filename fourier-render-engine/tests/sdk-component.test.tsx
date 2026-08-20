@@ -138,7 +138,7 @@ export default defineReact({
     expect(readSdkArtifact(module.default, "react")).toMatchObject({
       kind: "react",
       name: "BundledPanel",
-      sdkAbiVersion: 1,
+      sdkAbiVersion: 1.1,
     });
 
     const projectPath = join(directory, "main.tsx");

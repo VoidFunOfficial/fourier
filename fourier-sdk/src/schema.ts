@@ -1,8 +1,11 @@
 import type { ReactNode } from "react";
+import {
+  SDK_SCHEMA_FIELD_PACKAGE,
+  SDK_SCHEMA_VERSION,
+} from "@fourier-video/core/protocol";
 import { sdkFail } from "./errors.ts";
 
-export const SDK_SCHEMA_FIELD_PACKAGE = "@fourier-video/sdk/schema-field" as const;
-export const SDK_SCHEMA_VERSION = 1 as const;
+export { SDK_SCHEMA_FIELD_PACKAGE, SDK_SCHEMA_VERSION };
 
 export interface TimeValue {
   source: string;

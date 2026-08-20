@@ -23,7 +23,7 @@ describe("render manifest", () => {
       nodeId: "panel",
       kind: "react" as const,
       name: "Panel",
-      sdkAbiVersion: 1 as const,
+      sdkAbiVersion: 1.1 as const,
       renderer: "dom-timeline" as const,
       snapshotId: "snapshot-1",
       dependencyDigest: "dependency-1",
@@ -41,7 +41,7 @@ describe("render manifest", () => {
     expect(result.manifest.profiles).toHaveLength(1);
     expect(result.manifest).toMatchObject({
       schemaVersion: 1,
-      sdk: { version: "1.1.0", abiVersion: 1 },
+      sdk: { version: "1.1.0", abiVersion: 1.1 },
       playwright: { version: "1.62.0" },
       chromium: { version: "151.0.7922.34", revision: "1234" },
       profiles: [{ runtimeRevision: "5" }],

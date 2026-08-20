@@ -31,7 +31,7 @@ describe("Fourier declarative Motion interface", () => {
       expect(artifact[SDK_ARTIFACT]).toMatchObject({
         kind: "motion",
         renderer: "dom-timeline",
-        sdkAbiVersion: 1,
+        sdkAbiVersion: 1.1,
       });
       expect(artifact[SDK_ARTIFACT].designPreview().composition.durationSeconds)
         .toBeGreaterThan(0);

@@ -37,10 +37,10 @@ Project main.tsx
   -> 原子提交输出 + render manifest
 
 ReactLayer / Motion artifact
-  -> import 与确定性策略校验
-  -> SDK ABI/schema/props 校验
-  -> browser bundle + dependency/snapshot digest
-  -> VisualTimelineRuntime 绝对时间采样
+  -> Core host 的 import 与确定性策略校验
+  -> Core 的 SDK ABI/schema/props 校验
+  -> Core browser bundle + dependency/snapshot digest
+  -> Core VisualTimelineRuntime 绝对时间采样
   -> PNG、无损 Alpha 媒体或 FFmpeg Video 投影数据
 ```
 
@@ -51,18 +51,18 @@ ReactLayer / Motion artifact
 - `src/project-module-loader.ts`：只接受 `main.tsx`；校验本地静态 import，绑定 SDK/React author runtime，并生成 bundle 指纹。
 - `src/project-compiler.ts`：把 SDK branded JSX 编译为 `ResolvedProject`；负责节点结构、时间锚点、资源作用域、Scene/Template 递归加载和 TTS 预处理。
 - `src/types.ts`：IR、渲染选项、进度/诊断和 Preview 的核心类型。
-- `src/time.ts`、`src/modifiers.ts`：精确时间换算、半开区间、Motion fill、Transform 插值和最终视觉位置。
-- `src/artifact-protocol.ts`：SDK ABI v1 marker、artifact kind、schema/props 和 preview adapter 的兼容性边界。
-- `src/artifact-compiler.ts`、`src/author-runtime.ts`、`src/image-assets.ts`：artifact import 策略、metadata/browser bundle、字体与图片内嵌、snapshot identity。
-- `src/dom-bootstrap-source.ts`：注入浏览器的 DOM runtime；准备媒体/lifecycle、设置绝对时间并暴露稳定 snapshot。
-- `src/browser-platform.ts`、`src/browser-check.ts`、`src/visual-timeline-runtime.ts`：固定 Chromium 配置、compositor commit、共享 browser/page pool、绝对时间采样和恢复/关闭逻辑。
+- `src/core-host.ts`：render 的 Core host facade；通过 `Bun.resolveSync(specifier, import.meta.dir)` 注入 author-runtime adapter。
+- `src/time.ts`、`src/artifact-protocol.ts`、`src/artifact-compiler.ts`、`src/browser-platform.ts`、`src/visual-timeline-runtime.ts`：保留旧引擎路径的 Core 兼容 facade；实现和主测试在 `../fourier-core`。
+- `src/modifiers.ts`：工程 Motion fill、Transform 插值和最终视觉位置。
+- `src/author-runtime.ts`：Project/legacy 视觉 bundler 的 render-side author-runtime adapter。
+- `src/browser-check.ts`：面向 render CLI/prepack 的浏览器能力检查。
 - `src/visual-renderer.ts`：文本/React/Motion/Video Motion 的视觉准备，legacy Satori 路径与 DOM artifact 路径在这里汇合。
 - `src/visual-cache.ts`：持久视觉缓存、内容摘要、完整性验证、隔离和原子提交。
 - `src/render-module-renderer.ts`：递归准备 Scene/Template 的 raw 与 derived 无损单元及内容寻址缓存。
 - `src/ffmpeg.ts`：将 IR、视觉素材和模块单元编成 filter graph，执行 FFmpeg 并原子提交最终文件。
 - `src/media-probe.ts`、`src/tts.ts`：FFmpeg 能力检查、媒体覆盖校验、字幕批量合成和 TTS 缓存。
 - `src/preview.ts`：稀疏采样选中节点、递归模块预览和 Motion/Transform 标注。
-- `src/render-manifest.ts`、`src/render-profile.ts`：输出摘要、artifact snapshot、固定工具版本和像素运行时身份。
+- `src/render-manifest.ts`：输出摘要、artifact snapshot、固定工具版本和像素运行时身份；render profile 来自 Core facade。
 - `src/cli.ts`、`src/server.ts`、`src/project-summary.ts`：面向用户和自动化的入口；`src/index.ts` 是包公开导出面。
 - `benchmark/`：生成 TSX 压测工程并测量渲染；`scripts/` 包含浏览器和 DOM suite 入口。
 - `tests/`：单元、合同和条件启用的真实浏览器/FFmpeg 测试。
@@ -95,8 +95,8 @@ ReactLayer / Motion artifact
 
 ### Artifact ABI 与确定性
 
-- SDK artifact 只认 `Symbol.for("@fourier-video/sdk/artifact")`、ABI v1、`react | motion` kind 和 `dom-timeline | dom-timeline-ffmpeg-video` renderer。marker、schema、renderer 名、错误码和 manifest 字段都是兼容性合同。
-- ABI v1 生产入口只支持 default export；`component`、`designPreview()` 和 Motion 的 Text/Video 能力声明必须通过 `artifact-protocol.ts` 校验。不要悄悄兼容异步 render 或旧 `render` 字段。
+- SDK artifact 只认 Core 定义的 `Symbol.for("@fourier-video/sdk/artifact")`、受支持的 ABI 1/1.1、`react | motion` kind 和 `dom-timeline | dom-timeline-ffmpeg-video` renderer。marker、schema、renderer 名、错误码和 manifest 字段都是兼容性合同。
+- ABI 生产入口只支持 default export；`component`、`designPreview()` 和 Motion 的 Text/Video 能力声明必须通过 Core protocol 校验。不要悄悄兼容异步 render 或旧 `render` 字段。
 - Project 传入的 props 必须和 artifact schema 重新绑定：拒绝未知字段、补默认值、校验声明类型；`node` schema 字段不能从 Project props 注入。
 - 被采样的 artifact/组件禁止网络、墙钟时间、`Math.random()`、timer、运行时全局对象和不受控 bare import。React 能力必须从 SDK 公开入口导入，不能直接从 `react` 导入。
 - 动态效果必须是绝对时间的纯函数；随机性使用稳定 seed。禁止依赖上一帧、采样顺序或真实等待时间。
@@ -133,7 +133,7 @@ ReactLayer / Motion artifact
 - TTS 是 `loadProject` 的编译前置步骤：先收集所有启用字幕需求，批量请求服务/命中 v3 缓存，再用真实采样数编译时间线。启用 TTS 的字幕禁止手工 `duration`。
 - Preview 是稀疏采样和设计标注，不是第二个正式 renderer。它应复用编译器、视觉采样、Motion preview adapter、资源作用域和媒体校验。
 - `--ai` 模式的 stdout 是稳定 JSONL 协议，只能输出 `start/progress/diagnostic/result/error` 事件；人类日志写 stderr。不要用任意 `console.log` 污染 stdout。
-- `RenderEngineError.code`、CLI exit code、HTTP 400/422 结构和 job 状态是调用方可观察合同。边界失败使用 `fail(code, message, details)`；不要迫使测试或用户解析模糊字符串。
+- `RenderEngineError` 是 Core `CoreError` 的同一构造器兼容别名；`name`、`code`、`details`、CLI exit code、HTTP 400/422 结构和 job 状态是调用方可观察合同。边界失败使用 `fail(code, message, details)`；不要迫使测试或用户解析模糊字符串。
 - `onProgress` 面向总体进度，`onDiagnostic` 面向可选的细粒度追踪。新增长操作时同时考虑取消信号、进度、诊断和 cleanup。
 
 ## TypeScript 与实现风格
@@ -152,9 +152,9 @@ ReactLayer / Motion artifact
 | 改动范围 | 最小验证 |
 | --- | --- |
 | Project JSX、资源作用域、Scene/Template | `bun test tests/project-compiler.test.tsx` |
-| 时间、TTS 时长、Transform/FFmpeg 表达式 | `bun test tests/time.test.ts tests/subtitle-tts.test.tsx tests/ffmpeg.test.tsx` |
-| Artifact ABI、schema、import 策略 | `bun test tests/artifact-protocol.test.ts tests/sdk-component.test.tsx tests/component-image-assets.test.ts` |
-| Browser 参数、BeginFrame、DOM page 并发 | `bun test tests/browser-platform.test.ts tests/visual-timeline-runtime.test.ts`，再跑 `bun run test:dom` |
+| 时间、TTS 时长、Transform/FFmpeg 表达式 | Core `bun test tests/time.test.ts` + render `bun test tests/subtitle-tts.test.tsx tests/ffmpeg.test.tsx` |
+| Artifact ABI、schema、import 策略 | Core `bun test tests/artifact-protocol.test.ts tests/artifact-host.test.ts` + render `bun test tests/sdk-component.test.tsx tests/component-image-assets.test.ts` |
+| Browser 参数、BeginFrame、DOM page 并发 | Core `bun test tests/browser-platform.test.ts tests/visual-timeline-runtime.test.ts`，再分别跑 Core/render `bun run test:dom` |
 | 视觉缓存或 render manifest | `bun test tests/visual-cache.test.ts tests/render-manifest.test.ts` |
 | CLI、HTTP、summary | `bun test tests/cli.test.ts tests/server.test.ts` |
 | TTS HTTP 与缓存 | `bun test tests/tts.test.tsx tests/subtitle-tts.test.tsx` |
@@ -209,7 +209,7 @@ bun run prepack
 - `README.md`：用户可见的 TSX、CLI、TTS、Scene/Template、HTTP 和开发命令。
 - `package.json`：公开 exports、CLI bin、依赖版本和验证脚本。
 - `src/types.ts` 与 `src/index.ts`：当前 IR 和包公开 API。
-- `src/project-compiler.ts`、`src/artifact-protocol.ts`、`src/visual-timeline-runtime.ts`、`src/ffmpeg.ts`：声明、ABI、采样与合成的主要实现合同。
+- `src/project-compiler.ts` 与 `src/ffmpeg.ts`：工程声明和合成的主要实现合同；Core 的 `src/artifact-protocol.ts` 与 `src/visual-timeline-runtime.ts` 是 ABI/采样事实来源。
 - `tests/`：可执行行为和稳定错误码；真实浏览器合同以 DOM suite 为准。
 - `../fourier-sdk/AGENTS.md` 及其公开文档：SDK 本体和 artifact 作者侧规则。
 

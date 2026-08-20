@@ -4,7 +4,7 @@ English | [简体中文](./README.zh-CN.md)
 
 **Turn frontend visual capabilities into video components that agents can understand, configure, and reuse.**
 
-Fourier SDK is the typed interface between the Render Engine and the developer ecosystem. It declares Projects, Scenes, and Templates, and it authors React, Motion, Text Motion, Three.js, and other programmatic visual artifacts. SDK ABI v1 uses real DOM/CSS/WAAPI, sampled by Playwright Chromium at an absolute rational time supplied by the host.
+Fourier SDK is the typed authoring interface between Fourier hosts and the developer ecosystem. It declares Projects, Scenes, and Templates, and it authors React, Motion, Text Motion, Three.js, and other programmatic visual artifacts. SDK ABI v1.1 uses real DOM/CSS/WAAPI, sampled through Fourier Core at an absolute rational time supplied by the host; Core and the Render Engine remain able to read ABI v1 artifacts.
 
 ## Why Fourier SDK
 
@@ -14,11 +14,11 @@ Fourier SDK is the typed interface between the Render Engine and the developer e
 - **Build once, reuse across projects:** components, Scenes, Templates, and brand systems can be previewed and tested independently, then published to Fourier World.
 - **The SDK owns the runtime:** artifacts do not manage their own React, Three.js, or JSX runtime versions, reducing host/component version drift.
 
-Developers use the SDK to create high-quality visual capabilities; agents choose parameters and organize them into videos. The [Render Engine](../fourier-render-engine/README.md) executes the result, and [Fourier World](../fourier-world/README.md) makes components discoverable and reusable.
+Developers use the SDK to create high-quality visual capabilities; agents choose parameters and organize them into videos. [Fourier Core](../fourier-core/README.md) supplies the SDK's local preview/testing/World artifact host, the [Render Engine](../fourier-render-engine/README.md) executes complete projects, and [Fourier World](../fourier-world/README.md) makes components discoverable and reusable.
 
 ## Installation
 
-Requires Bun `>= 1.3`. The SDK owns React, its JSX runtime, and React types, so a video project does not need to install or declare React. The DOM Timeline also requires the Chromium build pinned to Playwright `1.62.0`:
+Requires Bun `>= 1.3`. Installing the SDK transitively installs `@fourier-video/core`; users do not install Core explicitly. The SDK owns React, its JSX runtime, and React types, so a video project does not need to install or declare React. The DOM Timeline also requires the Chromium build pinned to Playwright `1.62.0`:
 
 ```bash
 bun add @fourier-video/sdk
@@ -73,9 +73,9 @@ export default defineProject(
 
 Authoring properties use native booleans, object-valued `props`, `tts`, and `keyframes`, and string `content`. `after` and `with` reference bare IDs. Trimming and artifact export selection use `sourceIn`/`sourceOut` and `exportName`. Declarations compile into the engine IR and are ultimately rendered by FFmpeg.
 
-## ABI v1 React artifacts
+## ABI v1.1 React artifacts
 
-An artifact uses `component`, with the ABI v1 marker. `component` reads props; stable width, height, and seed values come from hooks. Frame, FPS, progress, and time are deliberately absent from the component interface.
+An artifact uses `component`, with the ABI v1.1 marker. `component` reads props; stable width, height, and seed values come from hooks. Frame, FPS, progress, and time are deliberately absent from the component interface.
 
 ```tsx
 import {
@@ -119,9 +119,9 @@ export default defineReact({
 
 A React artifact with no lifecycle, animation, media, SMIL, or render driver is static and can reuse one sampled PNG. React artifacts may register zero or one lifecycle; Motion artifacts must register exactly one.
 
-React hooks and types such as `ReactNode`, `CSSProperties`, and `RefObject` must come from `@fourier-video/sdk` or its `/react`, `/motion`, and `/three` entry points. Do not import `react`, `react/jsx-runtime`, or `three` directly from artifact source. The compiler aliases the implicit JSX runtime and SDK to the single versions owned by the renderer, so an artifact directory does not need its own `package.json` or `node_modules`.
+React hooks and types such as `ReactNode`, `CSSProperties`, and `RefObject` must come from `@fourier-video/sdk` or its `/react`, `/motion`, and `/three` entry points. Do not import `react`, `react/jsx-runtime`, or `three` directly from artifact source. The host aliases the implicit JSX runtime and SDK to the versions resolved from the integrating SDK/render package, so an artifact directory does not need its own `package.json` or `node_modules`.
 
-## ABI v1 Motion
+## ABI v1.1 Motion
 
 A Motion explicitly declares whether it supports text. Image, video, and React subjects enter `component` at the current time. Text never enters that interface; a text-capable Motion implements a separate `textComponent` that receives the source string.
 
@@ -300,6 +300,26 @@ function SpatialDiagram() {
 
 Camera coordinates use a center position, logical width and height, zoom, and clockwise rotation. World bounds support camera fitting and safe clipping. Camera Motion supports pose/fit targets, time expressions, several path types, and deterministic custom paths. `defineCameraProgram` adds multiple cameras and cuts; multiple Universe instances can form split-screen or picture-in-picture layouts.
 
+For perspective React worlds, ABI v1.1 adds `@fourier-video/sdk/universe-3d`. `Universe3D` and `World3D` preserve ordinary DOM/Motion children while Three.js calculates the perspective and inverse camera matrices:
+
+```tsx
+import { Universe3D, World3D, defineCamera3D } from "@fourier-video/sdk/universe-3d";
+
+const camera = defineCamera3D({
+  fov: 48,
+  initial: { x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0 },
+  moves: [{ at: "90f", duration: "45f", to: { rx: -3, ry: 18 }, ease: "ease-in-out" }],
+});
+
+<Universe3D camera={camera}>
+  <World3D id="title" x={420} y={-80} z={-1350} width={900} height={320}>
+    <Title />
+  </World3D>
+</Universe3D>;
+```
+
+Positions use `x/y/z`; Euler rotations use degree-valued `rx/ry/rz`. Omitted move axes hold their previous values. Camera3D moves share the host absolute timeline and only expose standard CSS easing or cubic-bezier tuples; authored overshoot is expressed as two consecutive moves.
+
 ## Placeholder assets and fonts
 
 The [`placeholder`](./placeholder) directory contains local images, transparent subjects, video, fonts, and 3D models for reproducible previews. Copy any placeholder required by a publishable component into that component's own `assets/` or `fonts/` directory and include it in the package `files` list.
@@ -370,7 +390,7 @@ fourier-sdk publish ./components/MetricPanel --dry-run
 fourier-sdk publish ./components/MetricPanel
 ```
 
-A dry run compiles the artifact and uses three Fourier Render Engine DOM Timeline pages plus FFmpeg to render the same deterministic timeline into a browser-compatible H.264 MP4. Static artifacts still sample one DOM frame. A real publish uploads that preview together with the SHA-256-addressed source archive, binds it to the component's `preview` field, and places the component in `review`. Local publishing therefore requires Playwright Chromium and FFmpeg with `libx264`. After approval, install or safely remove it with:
+A dry run compiles the artifact and uses three Fourier Core DOM Timeline pages plus FFmpeg to render the same deterministic timeline into a browser-compatible H.264 MP4. Static artifacts still sample one DOM frame. A real publish uploads that preview together with the SHA-256-addressed source archive, binds it to the component's `preview` field, and places the component in `review`. Local publishing therefore requires Playwright Chromium and FFmpeg with `libx264`. After approval, install or safely remove it with:
 
 ```bash
 fourier-sdk search "cinematic title animation for a product launch" --type motion --style cinematic --json
@@ -388,6 +408,7 @@ fourier-sdk del @studio/MetricPanel
 - [Fourier World publishing](./docs/PUBLISHING.md)
 - [Declarative Motion and component examples](./example/README.md)
 - [Render Engine](../fourier-render-engine/README.md)
+- [Fourier Core](../fourier-core/README.md)
 
 ## Maintenance commands
 

@@ -18,7 +18,7 @@ Fourier Render Engine is Fourier's deterministic execution layer. It loads an SD
 
 If all you need is a one-off, non-editable result, a general video model may be more direct. Fourier is a better fit when the video must remain editable, repeatable, batchable, component-based, and verifiable.
 
-This package owns execution. Use the [Fourier SDK](../fourier-sdk/README.md) to declare projects and build visual capabilities, [Fourier Tools](../fourier-tools/README.md) to prepare media, and [Fourier World](../fourier-world/README.md) to discover reusable visual resources.
+This package owns project execution, caching, TTS, Preview, CLI/HTTP, and project-level FFmpeg composition. Shared artifact compilation and deterministic DOM sampling come from [Fourier Core](../fourier-core/README.md). Use the [Fourier SDK](../fourier-sdk/README.md) to declare projects and build visual capabilities, [Fourier Tools](../fourier-tools/README.md) to prepare media, and [Fourier World](../fourier-world/README.md) to discover reusable visual resources.
 
 ## Incremental and efficient rendering
 
@@ -123,6 +123,8 @@ const result = await renderVisualArtifactVideo(
 
 console.log(result.sha256, result.totalFrames);
 ```
+
+This import remains compatible and is a resolver-bound facade over `@fourier-video/core`. New SDK/render integrations should create a Core artifact host; existing Render Engine callers do not need to change imports.
 
 Dynamic artifacts preserve their declared frame count and frame rate. `domPages` controls how many DOM Timeline pages sample dynamic frames in parallel; static artifacts still use one page and are encoded as a one-second still video. Transparent pixels are composited over `#101010` by default; `background`, `crf`, `preset`, `ffmpegPath`, cancellation, and progress callbacks are configurable.
 
@@ -241,6 +243,8 @@ main.tsx + local static imports
   -> media output
 ```
 
+The package dependency direction is `render-engine → core` plus the existing `render-engine → SDK` peer/runtime relationship. Core never imports the SDK package; render binds author-runtime imports through its local Core host. The SDK has no dependency on render-engine.
+
 Scene and Template bundle content participates in the project fingerprint, and the rendering cache schema changes when entry-point semantics change. Resource scoping, node ordering, time anchors, cycle detection, TTS, and FFmpeg behavior remain centralized in the engine.
 
 ## Development and verification
@@ -252,6 +256,8 @@ bun test
 bun run browser:check
 bun run test:dom
 ```
+
+Core owns the protocol/time/browser/timeline suites. When changing a render facade or shared artifact behavior, also run the corresponding commands from `../fourier-core`.
 
 Run a real FFmpeg integration smoke test with:
 

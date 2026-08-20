@@ -1,8 +1,5 @@
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
-import { chromium } from "../../fourier-render-engine/node_modules/playwright/index.js";
-import { chromiumLaunchOptions } from "../../fourier-render-engine/src/browser-platform.ts";
-import { startPreviewServer } from "../src/preview.ts";
 import { openArtifact } from "../src/testing.ts";
 
 const describeDom = Bun.env.RUN_DOM_TESTS === "1" ? describe : describe.skip;
@@ -108,5 +105,28 @@ describeDom("SDK testing ABI v1 path Adapter", () => {
       await fixture.close();
     }
   }, 40_000);
+
+  test("Universe3D 固定 xyz 并在每次大幅转镜后依次显隐四张卡片", async () => {
+    const fixture = await openArtifact(join(import.meta.dir, "../example/Universe3DCameraExample.tsx"));
+    try {
+      const black = await fixture.renderFrame({ frame: 0 });
+      const thisIs = await fixture.renderFrame({ frame: 76 });
+      const fourier = await fixture.renderFrame({ frame: 252 });
+      const camera = await fixture.renderFrame({ frame: 428 });
+      const example = await fixture.renderFrame({ frame: 610 });
+      expect(thisIs.sha256).not.toBe(black.sha256);
+      expect(fourier.sha256).not.toBe(thisIs.sha256);
+      expect(camera.sha256).not.toBe(fourier.sha256);
+      expect(example.sha256).not.toBe(camera.sha256);
+      await fixture.assertDeterministic({ frames: [610, 76, 428, 252, 0] });
+    } finally {
+      await fixture.close();
+    }
+  }, 60_000);
+
+  test("ABI v1.1 在调用原生 animate 前拒绝倒序 keyframe offset", async () => {
+    await expect(openArtifact(join(import.meta.dir, "fixtures/InvalidMotionOffsets.tsx")))
+      .rejects.toMatchObject({ code: "INVALID_TIMELINE_KEYFRAME_OFFSETS" });
+  }, 20_000);
 
 });

@@ -1,4 +1,4 @@
-# SDK ABI v1 Artifact 开发规范
+# SDK ABI v1.1 Artifact 开发规范
 
 ## 新代码使用 component
 
@@ -20,7 +20,7 @@ component 只读取 props/subject。不要建立逐帧 Context；稳定尺寸与
 
 ## React 由 SDK 持有
 
-作者只能从 `@fourier-video/sdk`、`@fourier-video/sdk/react`、`@fourier-video/sdk/motion` 或 `@fourier-video/sdk/three` 导入 React hook 和类型：
+作者只能从 `@fourier-video/sdk`、`@fourier-video/sdk/react`、`@fourier-video/sdk/motion` 或 `@fourier-video/sdk/three` 导入 React hook 和类型；透视 React 世界 interface 另从 `@fourier-video/sdk/universe-3d` 导入：
 
 ```tsx
 import {
@@ -32,7 +32,7 @@ import {
 } from "@fourier-video/sdk/motion";
 ```
 
-不要从 `react`、`react/jsx-runtime` 或 `react/jsx-dev-runtime` 直接导入。JSX 编译产生的隐式 runtime 由引擎自动绑定到 SDK 自带版本，视频工程不需要安装 React，也不需要维护 React peer version。
+不要从 `react`、`react/jsx-runtime` 或 `react/jsx-dev-runtime` 直接导入。JSX 编译产生的隐式 runtime 由 SDK 或 render 的 Core host adapter 绑定到 SDK 自带版本，视频工程不需要安装 React，也不需要维护 React peer version。
 
 3D artifact 的 Three.js class、loader 和类型也只能从 `@fourier-video/sdk/three` 导入，不直接导入 `three` 或 `three/addons/*`。这保证所有组件与渲染器使用 SDK 持有的同一 Three.js 版本。
 
@@ -85,7 +85,7 @@ CSS transition/keyframes 受支持；SDK WAAPI 必须通过 `useFourierTimeline(
 - Artifact 组合节点用 `field.node()`；Project Template schema 不支持该字段。
 - `designPreview().props` 覆盖所有必填字段。
 - composition 声明 width/height/durationSeconds；静态为 0，动态为 1—30 整数秒，不声明 fps。
-- 生产画面不随时间变化的 ABI v1 React 声明 `static: true`；它不能注册 lifecycle、animation、media、SMIL 或 render driver。
+- 生产画面不随时间变化的 ABI v1.1 React 声明 `static: true`；它不能注册 lifecycle、animation、media、SMIL 或 render driver。
 - Motion designPreview 必须提供本地或 data URI subject。
 
 ## 字体、CSS 与素材
@@ -111,7 +111,7 @@ image/video/react subject 会变成引擎持有的当前时刻 PNG，再传给�
 
 ## 测试
 
-ABI v1 必须从路径打开：
+ABI v1.1 必须从路径打开：
 
 ```ts
 const fixture = await openArtifact(new URL("./MetricPanel.tsx", import.meta.url).pathname);
@@ -147,6 +147,6 @@ bun run test:dom
 bun run build
 ```
 
-`fourier check` 会验证 ABI v1、DOM bundle 和浏览器环境；非法 marker、浏览器缺失或版本不匹配会稳定失败。prepack 必须运行真实 DOM Adapter 测试，浏览器未安装时不允许 skip。
+`fourier check` 会验证 ABI v1.1、DOM bundle 和浏览器环境；非法 marker、浏览器缺失或版本不匹配会稳定失败。prepack 必须运行真实 DOM Adapter 测试，浏览器未安装时不允许 skip。
 
 发布到 Fourier World 的目录还必须包含 `package.json`，具体字段与账号流程见 [Fourier World 发布规范](./PUBLISHING.md)。

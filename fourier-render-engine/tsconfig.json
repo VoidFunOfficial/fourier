@@ -5,6 +5,8 @@
     "moduleResolution": "Bundler",
     "baseUrl": ".",
     "paths": {
+      "@fourier-video/core": ["../fourier-core/src/index.ts"],
+      "@fourier-video/core/*": ["../fourier-core/src/*.ts"],
       "@fourier-video/sdk": ["../fourier-sdk/src/index.ts"],
       "@fourier-video/sdk/*": ["../fourier-sdk/src/*.ts"]
     },

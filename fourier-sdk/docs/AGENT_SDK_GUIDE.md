@@ -2,7 +2,7 @@
 
 本文供编程 Agent 在 Fourier 工程中开发、修改和验收 React、Motion、Three.js 视觉 artifact。目标不是罗列所有 API，而是规定一条可重复执行的工程流程。完整类型与边界条件仍以 [API 文档](./API.md) 和 [开发规范](./DEVELOPMENT.md) 为准。
 
-> SDK ABI v1 统一使用 `defineReact({ component })` 或 `defineMotion({ component })`。
+> SDK ABI v1.1 统一使用 `defineReact({ component })` 或 `defineMotion({ component })`；render engine 保持 ABI v1 读取兼容。
 
 ## 1. Agent 的完成标准
 
@@ -101,6 +101,7 @@ import { /* React API */ } from "@fourier-video/sdk";
 import { /* React API */ } from "@fourier-video/sdk/react";
 import { /* Motion API */ } from "@fourier-video/sdk/motion";
 import { /* Three.js + React API */ } from "@fourier-video/sdk/three";
+import { Universe3D, World3D, defineCamera3D } from "@fourier-video/sdk/universe-3d";
 ```
 
 禁止：
@@ -539,6 +540,18 @@ return () => {
 
 该模式不能声明 `supportsTextMotion`、`textComponent` 或 `overlay`，`designPreview()` 也不提供 subject。完整实现参考 [VideoPanel.tsx](../example/VideoPanel.tsx)。
 
+### 7.4 Universe3D React 空间
+
+需要把已有 React/Motion 视觉放进透视空间时，使用 `@fourier-video/sdk/universe-3d` 的 `Universe3D`、`World3D` 和 `defineCamera3D()`；不要为 DOM 卡片重建 WebGL texture。
+
+- Camera3D 和 World3D 使用 `x/y/z` 位置与角度制 `rx/ry/rz`；Camera Move 只声明需要改变的轴。
+- Three.js 在 module 内计算 camera/object matrix 和透视焦距，artifact 不直接导入 `three`。
+- Move 仍由宿主绝对时间采样，不能重叠或使用增量状态。
+- 过冲/回弹用两个连续 Move 表达：先越过目标姿态，再返回目标；不要把示例 easing 写进规范 interface。
+- 普通 React children 保持 DOM 语义，可以在一个 `FourierMotion` 根下复用 `motion.*` 效果。
+
+参考 [Universe3DCameraExample.tsx](../example/Universe3DCameraExample.tsx)。
+
 ## 8. 素材、字体和样式
 
 - 预览素材优先从 [`placeholder`](../placeholder) 复制到组件自己的 `assets/` 或 `fonts/`。
@@ -568,9 +581,9 @@ bunx fourier-sdk preview ./components
 5. Motion 的普通 subject 与 Text Motion 的 string subject。
 6. 3D 模型加载、相机裁切、灯光、材质和循环首尾。
 
-### 9.2 ABI v1 确定性测试
+### 9.2 ABI v1.1 确定性测试
 
-ABI v1 必须从路径打开 artifact：
+ABI v1.1 必须从路径打开 artifact：
 
 ```ts
 import { test } from "bun:test";

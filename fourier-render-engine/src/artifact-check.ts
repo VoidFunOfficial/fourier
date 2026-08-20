@@ -1,11 +1,12 @@
 import { resolve } from "node:path";
 import { compileVisualArtifact } from "./artifact-compiler.ts";
+import type { SupportedSdkAbiVersion } from "./artifact-protocol.ts";
 import { checkBrowserRuntime, type BrowserCheckResult } from "./browser-check.ts";
 
 export interface ArtifactCheckResult {
   readonly valid: true;
   readonly entryPath: string;
-  readonly sdkAbiVersion: 1;
+  readonly sdkAbiVersion: SupportedSdkAbiVersion;
   readonly renderer: "dom-timeline" | "dom-timeline-ffmpeg-video";
   readonly snapshotId: string;
   readonly warnings: readonly never[];
@@ -19,7 +20,7 @@ export async function checkArtifact(entryPath: string): Promise<ArtifactCheckRes
   return Object.freeze({
     valid: true,
     entryPath: resolvedEntryPath,
-    sdkAbiVersion: 1,
+    sdkAbiVersion: artifact.sdkAbiVersion,
     renderer: artifact.renderer,
     snapshotId: artifact.snapshotId,
     warnings: Object.freeze([]),

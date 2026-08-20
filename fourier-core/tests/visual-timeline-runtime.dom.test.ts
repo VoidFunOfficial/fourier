@@ -1,12 +1,13 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { inflateSync } from "node:zlib";
 import { Resvg } from "@resvg/resvg-js";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
-import { compileVisualArtifact } from "../src/artifact-compiler.ts";
 import { SampleClock } from "../src/time.ts";
-import { VisualTimelineRuntime } from "../src/visual-timeline-runtime.ts";
+import type { VisualTimelineRuntime } from "../src/visual-timeline-runtime.ts";
+import { artifactHost, componentFixture } from "./test-host.ts";
+
+const { compileVisualArtifact, createTimelineRuntime } = artifactHost;
 
 const run = Bun.env.RUN_DOM_TESTS === "1";
 const describeDom = run ? describe : describe.skip;
@@ -62,7 +63,7 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
   let runtime: VisualTimelineRuntime;
 
   beforeAll(() => {
-    runtime = new VisualTimelineRuntime({ maximumDomPages: 2 });
+    runtime = createTimelineRuntime({ maximumDomPages: 2 });
   });
 
   afterAll(async () => {
@@ -88,11 +89,11 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
       }) as Browser["newContext"];
       return browser;
     }) as typeof chromium.launch;
-    const secondary = new VisualTimelineRuntime({ maximumDomPages: 1 });
+    const secondary = createTimelineRuntime({ maximumDomPages: 1 });
     let first: Awaited<ReturnType<VisualTimelineRuntime["open"]>> | undefined;
     let second: Awaited<ReturnType<VisualTimelineRuntime["open"]>> | undefined;
     try {
-      const entryPath = join(import.meta.dir, "components/DomStaticPanel.tsx");
+      const entryPath = componentFixture("DomStaticPanel.tsx");
       [first, second] = await Promise.all([
         runtime.open({ entryPath }),
         secondary.open({ entryPath }),
@@ -122,7 +123,7 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
   }, 30_000);
 
   test("同一 snapshot/time 在乱序、重复和新 page 中逐字节一致", async () => {
-    const entryPath = join(import.meta.dir, "components/DomTimelinePanel.tsx");
+    const entryPath = componentFixture("DomTimelinePanel.tsx");
     const first = await runtime.open({ entryPath });
       expect(first.isStatic).toBe(false);
       const expected = new Map<string, string>();
@@ -162,7 +163,7 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
 
   test("静态 React v1 跨时间复用同一 PNG", async () => {
     const instance = await runtime.open({
-        entryPath: join(import.meta.dir, "components/DomStaticPanel.tsx"),
+        entryPath: componentFixture("DomStaticPanel.tsx"),
       });
       try {
         expect(instance.isStatic).toBe(true);
@@ -176,7 +177,7 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
   });
 
   test("media 与 SMIL 分别由宿主绝对时间暂停采样并支持乱序循环", async () => {
-    const entryPath = join(import.meta.dir, "components/DomMediaSmilTimeline.tsx");
+    const entryPath = componentFixture("DomMediaSmilTimeline.tsx");
     for (const mode of ["media", "smil"] as const) {
       const instance = await runtime.open({ entryPath, props: { mode } });
       try {
@@ -200,13 +201,13 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
 
   test("显式 static React 注册 timeline 时稳定拒绝", async () => {
     await expect(runtime.open({
-      entryPath: join(import.meta.dir, "components/DomStaticTimelineViolation.tsx"),
+      entryPath: componentFixture("DomStaticTimelineViolation.tsx"),
     })).rejects.toMatchObject({ code: "STATIC_REACT_TIMELINE_VIOLATION" });
   });
 
   test("透明 DOM 截图保留 alpha，不与 Chromium 默认白底合成", async () => {
     const instance = await runtime.open({
-      entryPath: join(import.meta.dir, "components/DomTransparentPanel.tsx"),
+      entryPath: componentFixture("DomTransparentPanel.tsx"),
     });
     try {
       expect(instance.isStatic).toBe(true);
@@ -220,7 +221,7 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
 
   test("本地图片与 DOM 文档同源，允许 Canvas 像素回读", async () => {
     const instance = await runtime.open({
-      entryPath: join(import.meta.dir, "components/DomCanvasImageReadback.tsx"),
+      entryPath: componentFixture("DomCanvasImageReadback.tsx"),
     });
     try {
       const frame = await instance.sample({ time: { numerator: 0, denominator: 1 } });
@@ -242,7 +243,7 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
       let failure: unknown;
       try {
         await runtime.open({
-          entryPath: join(import.meta.dir, `components/${filename}`),
+          entryPath: componentFixture(filename),
         });
       } catch (error) {
         failure = error;
@@ -252,7 +253,7 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
   }, 20_000);
 
   test("Motion dynamic subject 与 none/backwards/forwards/both 使用连续局部时间", async () => {
-    const entryPath = join(import.meta.dir, "components/DomMotion.tsx");
+    const entryPath = componentFixture("DomMotion.tsx");
     const clock = new SampleClock(30);
     const subject = (frame: number): Uint8Array => new Resvg(
       `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="12"><rect width="16" height="12" fill="${frame % 2 === 0 ? "#ef4444" : "#2563eb"}"/></svg>`,
@@ -302,7 +303,7 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
   }, 30_000);
 
   test("Text Motion 走独立 textComponent，并拒绝未声明支持的组件", async () => {
-    const textEntry = join(import.meta.dir, "components/DomTextMotion.tsx");
+    const textEntry = componentFixture("DomTextMotion.tsx");
     const compiled = await compileVisualArtifact({
       entryPath: textEntry,
       composition: { width: 80, height: 24, fps: 30, durationInFrames: 30 },
@@ -323,7 +324,7 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
     }
 
     await expect(compileVisualArtifact({
-      entryPath: join(import.meta.dir, "components/DomMotion.tsx"),
+      entryPath: componentFixture("DomMotion.tsx"),
       composition: { width: 16, height: 12, fps: 30, durationInFrames: 30 },
       textSubject: "unsupported",
     })).rejects.toMatchObject({ code: "TEXT_MOTION_UNSUPPORTED" });

@@ -10,6 +10,7 @@ const SDK_AUTHOR_IMPORTS = new Set([
   "@fourier-video/sdk/motion",
   "@fourier-video/sdk/three",
   "@fourier-video/sdk/universe",
+  "@fourier-video/sdk/universe-3d",
   "@fourier-video/sdk/phy2d",
   "@fourier-video/sdk/schema",
   "@fourier-video/sdk/project",
@@ -57,7 +58,7 @@ export function authorRuntimeAliasPlugin(
     name,
     setup(build) {
       build.onResolve(
-        { filter: /^(?:react(?:\/jsx-(?:dev-)?runtime)?|react-dom(?:\/client)?|@fourier-video\/sdk(?:\/(?:react|motion|three|universe|phy2d|schema|project|react-runtime|jsx-runtime|jsx-dev-runtime))?)$/ },
+        { filter: /^(?:react(?:\/jsx-(?:dev-)?runtime)?|react-dom(?:\/client)?|@fourier-video\/sdk(?:\/(?:react|motion|three|universe|universe-3d|phy2d|schema|project|react-runtime|jsx-runtime|jsx-dev-runtime))?)$/ },
         (args) => ({ path: aliases.get(args.path)! }),
       );
     },

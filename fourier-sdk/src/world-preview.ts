@@ -1,11 +1,11 @@
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import {
-  renderVisualArtifactVideo,
-  type CompiledVisualArtifact,
-} from "@fourier-video/render-engine";
+import type { CompiledVisualArtifact } from "@fourier-video/core/artifact";
+import { sdkArtifactHost } from "./artifact-host.ts";
 import { sdkFail } from "./errors.ts";
+
+const { renderVisualArtifactVideo } = sdkArtifactHost;
 
 export const MAX_WORLD_PREVIEW_BYTES = 32 * 1024 * 1024;
 const WORLD_PREVIEW_DOM_PAGES = 3;

@@ -1,17 +1,18 @@
 import type React from "react";
+import {
+  SDK_ABI_VERSION,
+  SDK_ARTIFACT,
+  SDK_ARTIFACT_SYMBOL_KEY,
+} from "@fourier-video/core/protocol";
 import type {
   FieldsSchema,
   InferFieldInputs,
   InferFields,
 } from "./schema.ts";
 
-export const SDK_ARTIFACT_SYMBOL_KEY = "@fourier-video/sdk/artifact";
-export const SDK_ABI_VERSION = 1 as const;
+export { SDK_ABI_VERSION, SDK_ARTIFACT, SDK_ARTIFACT_SYMBOL_KEY };
 export const DESIGN_PREVIEW_FPS = 60 as const;
 export const MAX_DESIGN_PREVIEW_SECONDS = 30 as const;
-export const SDK_ARTIFACT: unique symbol = Symbol.for(
-  SDK_ARTIFACT_SYMBOL_KEY,
-) as never;
 
 export type ModifierFill = "none" | "forwards" | "backwards" | "both";
 export type ModifierPhase = "before" | "active" | "after";
@@ -28,7 +29,7 @@ export interface RenderContext {
   seed: number;
 }
 
-/** Values that never change while one ABI v1 timeline instance is open. */
+/** Values that never change while one ABI v1.1 timeline instance is open. */
 export interface FourierStableContext {
   readonly width: number;
   readonly height: number;

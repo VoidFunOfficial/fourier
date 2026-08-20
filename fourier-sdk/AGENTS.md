@@ -6,19 +6,19 @@
 
 这个仓库同时承担两种不同工作，规则不要混用：
 
-1. **维护 SDK 本体**：修改 `src/`、`tests/`、构建、CLI、预览服务或 World 集成。SDK 内部可以直接依赖 `react`、`three` 和 `@fourier-video/render-engine`。
+1. **维护 SDK 本体**：修改 `src/`、`tests/`、构建、CLI、预览服务或 World 集成。SDK 内部可以直接依赖 `react`、`three` 和 `@fourier-video/core`，但不得依赖 render-engine。
 2. **编写或修改视觉 artifact**：通常修改 `example/`，或创建供用户复制、预览、测试、发布的 React/Motion/Three.js 组件。artifact 必须通过 SDK 的公开入口导入 React/Three.js API，并遵守确定性渲染合同。
 
 如果用户只说“写组件”“做动效”“做 3D 场景”，默认按 artifact 任务处理。如果用户要求改 API、runtime、preview、testing、CLI、World 或 package exports，按 SDK 本体任务处理。
 
 ## 开始工作
 
-1. 从本目录执行 `git status --short`，保留用户已有改动。这个包位于 Bun workspace 中；相邻的 `../fourier-render-engine` 可能已有独立改动，不要清理、回退或顺手修改。
+1. 从本目录执行 `git status --short`，保留用户已有改动。这个包位于 Bun workspace 中；相邻的 `../fourier-core` 与 `../fourier-render-engine` 可能已有独立改动，不要清理、回退或顺手修改。
 2. 阅读目标文件、相邻实现和直接相关测试。先用 `rg` 定位符号，不要根据文件名猜行为。
 3. 确认改动属于公开 ABI、内部实现、artifact 示例、World 流程还是文档；据此选择验证范围。
 4. 只修改任务所需文件。不要更新版本号、锁文件、生成物或跨包接口，除非任务确实要求。
 
-首次安装依赖时从 workspace 根目录执行 `bun install`。要求 Bun `>=1.3`。真实 DOM 测试还需要与 render engine 固定版本匹配的 Playwright Chromium；缺失时使用：
+首次安装依赖时从 workspace 根目录执行 `bun install`。要求 Bun `>=1.3`。真实 DOM 测试还需要与 Core 固定版本匹配的 Playwright Chromium；缺失时使用：
 
 ```bash
 bunx playwright install chromium
@@ -39,6 +39,7 @@ bunx playwright install chromium
 - `src/project.ts`：`Project`、`Scene`、`Template`、`Motion` 等数据型 TSX 工程声明。
 - `src/preview-config.ts`、`src/preview.ts`、`src/preview-app.tsx`、`src/player.ts`：设计预览解析、开发服务器和播放器。
 - `src/testing.ts`：从源码路径打开 artifact、采样与确定性断言的公开测试入口。
+- `src/artifact-host.ts`：SDK 的 Core host facade；只在这里用 `Bun.resolveSync(specifier, import.meta.dir)` 注入 author-runtime adapter。
 - `src/world-*.ts`、`src/cli.ts`：World 清单、归档、认证、客户端、安装/删除/发布和 CLI。
 - `src/index.ts` 及各子路径文件：公开导出面。
 - `scripts/build.ts`：JavaScript bundle 入口；`tsconfig.build.json` 生成声明文件。
@@ -47,7 +48,7 @@ bunx playwright install chromium
 - `placeholder/`：可复现的本地预览素材。
 - `dist/`：生成物。不要手工编辑。
 
-`@fourier-video/render-engine` 是 workspace 依赖，负责 artifact 编译和真实时间轴运行。SDK 改动只有在现有引擎接口无法承载时才应跨到 `../fourier-render-engine`；跨包改动必须明确说明，并分别验证两个包。
+`@fourier-video/core` 是 SDK 的基础 workspace 依赖，负责 artifact 编译、真实时间轴和独立 MP4。SDK preview、testing 与 World 必须通过本地 Core host，不能导入 render-engine。工程编译、缓存、TTS、CLI/HTTP 与工程级 FFmpeg 合成仍属于 `../fourier-render-engine`；跨包改动必须明确说明并分别验证涉及的包。
 
 ## SDK 本体修改规则
 
@@ -126,7 +127,7 @@ bun run prepack
 注意：
 
 - `bun test` 中的浏览器 DOM suite 默认 skip；只有 `bun run test:dom` 才会设置 `RUN_DOM_TESTS=1`。
-- DOM 测试依赖 sibling render engine 及其固定 Chromium。若浏览器、系统能力或依赖缺失，记录失败原文和未验证范围，不要把 skip 或环境失败写成 PASS。
+- DOM 测试依赖 Core 及其固定 Chromium。若浏览器、系统能力或依赖缺失，记录失败原文和未验证范围，不要把 skip 或环境失败写成 PASS。
 - 测试创建的 fixture、server、browser 和临时目录必须在 `finally` / cleanup 中关闭。
 - `openArtifact()` 接收源码绝对路径；`assertDeterministic()` 每次必须且只能提供非空 `frames` 或 `times` 之一。
 - 只有需要人工视觉检查时才启动长驻 preview。不要把“服务器能启动”当成像素或确定性测试。

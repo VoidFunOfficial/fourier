@@ -1,6 +1,6 @@
 # @fourier-video/sdk API
 
-本文对应 `@fourier-video/sdk@1.1.0`。当前 `SDK_ABI_VERSION` 为 `1`。
+本文对应 `@fourier-video/sdk@1.1.4`。当前 `SDK_ABI_VERSION` 为 `1.1`；render engine 继续读取 ABI v1 artifact。
 
 ## Project declarations
 
@@ -39,12 +39,12 @@ defineMotion({
 
 省略能力声明会抛出 `TEXT_MOTION_CAPABILITY_REQUIRED`；声明支持但缺少对应实现会抛出 `TEXT_MOTION_IMPLEMENTATION_REQUIRED`。文本宿主使用不支持 Text Motion 的 artifact 时，引擎抛出 `TEXT_MOTION_UNSUPPORTED`。
 
-ABI v1 marker 固定包含：
+ABI v1.1 marker 固定包含：
 
 ```ts
 {
   package: "@fourier-video/sdk";
-  sdkAbiVersion: 1;
+  sdkAbiVersion: 1.1;
   renderer: "dom-timeline";
   kind: "react" | "motion";
   component: Function;
@@ -199,7 +199,7 @@ const loader = new TextureLoader(undefined, { colorSpace: SRGBColorSpace });
 const textures = await loader.loadManyAsync([poster1Url, poster2Url]);
 ```
 
-Render Engine 会把 `.png`、`.jpg`、`.jpeg`、`.webp`、`.avif`、`.gif`、`.bmp` 和 `.svg` import 作为二进制依赖打包；不会再把图片内容误当 TSX 扫描。
+Core artifact compiler 会把 `.png`、`.jpg`、`.jpeg`、`.webp`、`.avif`、`.gif`、`.bmp` 和 `.svg` import 作为二进制依赖打包；不会再把图片内容误当 TSX 扫描。
 
 ```ts
 interface FourierThreeContext {
@@ -308,6 +308,37 @@ const camera = defineCamera({
 - `overscan` 默认 0.25。World 离开旋转 frustum 与 near-visible 区域时由离散 visibility animation 跳过绘制，但 React 子树保持挂载；边界不保守的节点使用 `cull="never"`。
 - `defineCameraProgram()` 接收命名 cameras、initialCamera 和严格递增的 cuts。Cut 从指定 frame 开始切换 Active Camera，不允许用零 duration Move 代替。
 - Camera 逻辑尺寸与 artifact viewport 必须同宽高比，否则抛 `CAMERA_ASPECT_MISMATCH`。Universe 不进入 Project JSX/FFmpeg IR。
+
+### `Universe3D` / `World3D` / `Camera3D`
+
+`@fourier-video/sdk/universe-3d` 把普通 React 子树放到 Three.js 数学驱动的透视空间，因此已有 DOM/Motion 效果不需要转成 WebGL texture：
+
+```tsx
+import { Universe3D, World3D, defineCamera3D } from "@fourier-video/sdk/universe-3d";
+
+const camera = defineCamera3D({
+  fov: 48,
+  initial: { x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0 },
+  moves: [{
+    at: "90f",
+    duration: "45f",
+    to: { rx: -3, ry: 18 },
+    ease: "ease-in-out",
+  }],
+});
+
+<Universe3D camera={camera}>
+  <World3D id="title" x={420} y={-80} z={-1350} width={900} height={320}>
+    <Title />
+  </World3D>
+</Universe3D>;
+```
+
+- Camera3D 与 World3D 的位置使用 `x/y/z`，Euler 旋转使用角度制 `rx/ry/rz`；未出现在 `move.to` 中的轴保持上一姿态。
+- `fov` 默认 50°。Three.js 负责 camera inverse matrix、object matrix 与焦距，Universe3D 把结果编译为宿主管理的 CSS 3D WAAPI timeline。
+- Camera3D Move 使用时间表达式和通用 `linear`、`ease*` 或 cubic-bezier easing；Move 不得重叠或超出 composition。过冲/回弹应写成“越过目标、再返回目标”的两个 Move，而不是扩充规范 easing。
+- World3D 的 `id` 在同一 Universe3D 中唯一；anchor 默认中心，rotation 默认 0，scale 默认 1。children 保持普通 React DOM，可直接组合 FourierMotion。
+- `@fourier-video/sdk/universe-3d` 是 ABI v1.1 允许的 artifact author import；ABI v1 render engine 不会静默接受未知 bare import。
 
 ## Schema
 

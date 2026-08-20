@@ -14,7 +14,7 @@ afterEach(async () => {
 });
 
 describeIntegration("Fourier World publish preparation", () => {
-  test("在本地用 Render Engine 生成 MP4，并与源码归档一起准备上传", async () => {
+  test("在本地用 Core 生成 MP4，并与源码归档一起准备上传", async () => {
     const directory = await mkdtemp(join(tmpdir(), "fourier-world-publish-test-"));
     directories.push(directory);
     await Bun.write(

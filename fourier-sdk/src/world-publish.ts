@@ -1,8 +1,10 @@
-import { compileVisualArtifact } from "@fourier-video/render-engine";
+import { sdkArtifactHost } from "./artifact-host.ts";
 import { createWorldPackageArchive, type WorldPackageArchive } from "./world-archive.ts";
 import { FourierWorldClient, type WorldPublishResult } from "./world-client.ts";
 import { loadWorldPackage, type LoadedWorldPackage } from "./world-manifest.ts";
 import { renderWorldPreviewVideo, type WorldPreviewVideo } from "./world-preview.ts";
+
+const { compileVisualArtifact } = sdkArtifactHost;
 
 export interface PreparedWorldPackage {
   readonly componentPackage: LoadedWorldPackage;
@@ -11,7 +13,7 @@ export interface PreparedWorldPackage {
   readonly artifact: {
     readonly name: string;
     readonly kind: "react" | "motion";
-    readonly sdkAbiVersion: 1;
+    readonly sdkAbiVersion: 1 | 1.1;
     readonly renderer:
       | "dom-timeline"
       | "dom-timeline-ffmpeg-video";

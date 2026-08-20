@@ -18,7 +18,7 @@ Fourier Render Engine 是 Fourier 的确定性执行层。它读取 SDK 声明�
 
 如果你只需要一次性的不可编辑视频结果，通用生成模型可能更直接；如果视频需要持续修改、批量生成、组件复用和可验证交付，Fourier 的工程化执行模型更合适。
 
-本包负责“如何执行”。工程声明与视觉能力开发见 [Fourier SDK](../fourier-sdk/README.zh-CN.md)，素材处理见 [Fourier Tools](../fourier-tools/README.zh-CN.md)，组件发现见 [Fourier World](../fourier-world/README.zh-CN.md)。
+本包负责工程执行、缓存、TTS、Preview、CLI/HTTP 与工程级 FFmpeg 合成。共用的 artifact 编译与确定性 DOM 采样来自 [Fourier Core](../fourier-core/README.md)。工程声明与视觉能力开发见 [Fourier SDK](../fourier-sdk/README.zh-CN.md)，素材处理见 [Fourier Tools](../fourier-tools/README.zh-CN.md)，组件发现见 [Fourier World](../fourier-world/README.zh-CN.md)。
 
 ## 增量渲染与高效渲染
 
@@ -105,7 +105,7 @@ fourier --ai render /path/to/project/main.tsx -o /tmp/output.mp4
 
 ## Artifact MP4 API
 
-组件发布工具可以直接渲染一个已编译的 React 或 Motion artifact，不需要把它包装成视频工程。`renderVisualArtifactVideo` 会驱动 Render Engine 的确定性 DOM timeline，采样全部帧，再由 FFmpeg 编码为浏览器兼容的 H.264/yuv420p MP4：
+组件发布工具可以直接渲染一个已编译的 React 或 Motion artifact，不需要把它包装成视频工程。`renderVisualArtifactVideo` 是 Core 实现的兼容 facade，会驱动同一条确定性 DOM timeline，采样全部帧，再由 FFmpeg 编码为浏览器兼容的 H.264/yuv420p MP4：
 
 ```ts
 import { renderVisualArtifactVideo } from "@fourier-video/render-engine";

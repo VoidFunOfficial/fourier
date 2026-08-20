@@ -213,6 +213,28 @@ function validateKeyframeComposite(
   }
 }
 
+function validateKeyframeOffsets(
+  keyframes: Keyframe[] | PropertyIndexedKeyframes,
+): void {
+  const rawOffsets = Array.isArray(keyframes)
+    ? keyframes.map((frame) => frame.offset)
+    : Array.isArray(keyframes.offset)
+      ? keyframes.offset
+      : [keyframes.offset];
+  let previous = 0;
+  for (const [index, value] of rawOffsets.entries()) {
+    if (value === undefined || value === null) continue;
+    if (!Number.isFinite(value) || value < 0 || value > 1 || value < previous) {
+      throw new SdkError(
+        "INVALID_TIMELINE_KEYFRAME_OFFSETS",
+        "FourierTimeline keyframe offset 必须位于 0—1 且单调不递减",
+        { index, previous, value },
+      );
+    }
+    previous = value;
+  }
+}
+
 export function createFourierRuntimeController(
   stableContext: FourierRuntimeContextInput,
   hostDurationMilliseconds: number,
@@ -430,6 +452,7 @@ export function useFourierTimeline(): FourierTimeline {
       }
       validateOptions(options);
       validateKeyframeComposite(keyframes);
+      validateKeyframeOffsets(keyframes);
       const animation = target.animate(keyframes, {
         duration: finiteNonNegative(
           options.duration ?? runtime.hostDurationMilliseconds,

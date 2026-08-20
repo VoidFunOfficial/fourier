@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { RenderEngineError } from "../src/errors.ts";
+import { CoreError } from "../src/errors.ts";
 import {
   framesToFfmpegSeconds,
   framesToSamples,
@@ -26,7 +26,7 @@ describe("V1 时间解析", () => {
   test("拒绝非法时间", () => {
     for (const source of ["", "1", "1sec", "1s 2f", "1.5f", "1s2s"]) {
       expect(() => parseTimeToFrames(source, "30")).toThrow(
-        RenderEngineError,
+        CoreError,
       );
     }
   });

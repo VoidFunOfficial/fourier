@@ -4,7 +4,7 @@
 
 **把前端视觉能力变成 Agent 可理解、可配置、可复用的视频组件。**
 
-Fourier SDK 是 Render Engine 与开发者生态之间的类型化接口。它既用于声明 Project、Scene 和 Template，也用于开发 React、Motion、Text Motion、Three.js 与程序化视觉 artifact。SDK ABI v1 使用真实 DOM/CSS/WAAPI，由 Playwright Chromium 在宿主给定的绝对有理时间采样。
+Fourier SDK 是 Fourier 宿主与开发者生态之间的类型化创作接口。它既用于声明 Project、Scene 和 Template，也用于开发 React、Motion、Text Motion、Three.js 与程序化视觉 artifact。SDK ABI v1.1 使用真实 DOM/CSS/WAAPI，由 Fourier Core 在宿主给定的绝对有理时间采样；Core/render 继续兼容读取 ABI v1。
 
 ## 为什么选择 Fourier SDK
 
@@ -14,11 +14,11 @@ Fourier SDK 是 Render Engine 与开发者生态之间的类型化接口。它�
 - **能力开发一次、跨项目复用**：组件、Scene、Template 和品牌视觉系统可以独立预览、测试，并发布到 Fourier World。
 - **运行环境由 SDK 持有**：artifact 不必自行管理 React、Three.js 和 JSX runtime 版本，减少组件与宿主版本漂移。
 
-Fourier SDK 的分工是让开发者创造高质量视觉能力，让 Agent 选择参数并组织视频；最终执行由 [Render Engine](../fourier-render-engine/README.zh-CN.md) 完成，组件可通过 [Fourier World](../fourier-world/README.zh-CN.md) 发布和发现。
+Fourier SDK 的分工是让开发者创造高质量视觉能力，让 Agent 选择参数并组织视频；SDK 的 preview/testing/World 使用 [Fourier Core](../fourier-core/README.md)，完整工程执行由 [Render Engine](../fourier-render-engine/README.zh-CN.md) 完成，组件可通过 [Fourier World](../fourier-world/README.zh-CN.md) 发布和发现。
 
 ## 安装
 
-要求 Bun `>=1.3`。React、JSX runtime 与 React 类型由 SDK 持有，视频工程不需要安装或声明 React。DOM Timeline 还需要安装与 Playwright `1.62.0` 对应的 Chromium：
+要求 Bun `>=1.3`。安装 SDK 会传递安装 `@fourier-video/core`，无需显式安装 Core。React、JSX runtime 与 React 类型由 SDK 持有，视频工程不需要安装或声明 React。DOM Timeline 还需要安装与 Playwright `1.62.0` 对应的 Chromium：
 
 ```bash
 bun add @fourier-video/sdk
@@ -93,7 +93,7 @@ export default defineReact({
 
 没有 lifecycle、animation、media、SMIL 和 render driver 的 React artifact 是静态 artifact，只采样一次并复用 PNG。React 可注册零或一个 lifecycle；Motion 必须恰好注册一个。
 
-Artifact 源码中的 React hook、`ReactNode`、`CSSProperties`、`RefObject` 等必须从 `@fourier-video/sdk` 或对应的 `/react`、`/motion`、`/three` 入口导入，不直接导入 `react`、`react/jsx-runtime`。3D 组件同样只能从 `@fourier-video/sdk/three` 导入 Three.js class、loader 和类型，不直接依赖 `three`。编译器会把隐式 JSX runtime 和 SDK 都 alias 到渲染器持有的唯一版本，因此 artifact 所在视频目录可以完全没有 `package.json` 和 `node_modules`。
+Artifact 源码中的 React hook、`ReactNode`、`CSSProperties`、`RefObject` 等必须从 `@fourier-video/sdk` 或对应的 `/react`、`/motion`、`/three` 入口导入，不直接导入 `react`、`react/jsx-runtime`。3D 组件同样只能从 `@fourier-video/sdk/three` 导入 Three.js class、loader 和类型，不直接依赖 `three`。Core host 会把隐式 JSX runtime 和 SDK alias 到 SDK/render adapter 解析出的版本，因此 artifact 所在视频目录可以完全没有 `package.json` 和 `node_modules`。
 
 ## ABI v1 Motion
 
@@ -341,7 +341,7 @@ fourier-sdk publish ./components/MetricPanel --dry-run
 fourier-sdk publish ./components/MetricPanel
 ```
 
-`--dry-run` 会编译 artifact，并调用 Fourier Render Engine 与 FFmpeg，把同一条确定性时间线渲染为浏览器兼容的 H.264 MP4。真实发布会把该预览视频与带 SHA-256 的源码归档一起上传，将视频绑定到组件的 `preview` 字段，并强制进入 `review`。因此本地发布环境需要 Playwright Chromium 和带 `libx264` 的 FFmpeg。发布者身份来自包名的 namespace 和 World 账号，不从本地清单接受 author ID 或 `published` 状态。审核通过后，可以把组件下载到项目或安全移除：
+`--dry-run` 会编译 artifact，并调用 Fourier Core 与 FFmpeg，把同一条确定性时间线渲染为浏览器兼容的 H.264 MP4。真实发布会把该预览视频与带 SHA-256 的源码归档一起上传，将视频绑定到组件的 `preview` 字段，并强制进入 `review`。因此本地发布环境需要 Playwright Chromium 和带 `libx264` 的 FFmpeg。发布者身份来自包名的 namespace 和 World 账号，不从本地清单接受 author ID 或 `published` 状态。审核通过后，可以把组件下载到项目或安全移除：
 
 ```bash
 fourier-sdk search "产品发布的电影感标题动画" --type motion --style cinematic --json
@@ -384,6 +384,7 @@ try {
 - [Fourier World 发布规范](./docs/PUBLISHING.md)
 - [声明式 Motion、GlitchMotion 与 Windows7Window 示例](./example/README.md)
 - [Render Engine](../fourier-render-engine/README.zh-CN.md)
+- [Fourier Core](../fourier-core/README.md)
 
 ## 维护命令
 

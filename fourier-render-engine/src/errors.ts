@@ -1,38 +1,12 @@
-export type ErrorDetails = Record<string, unknown>;
+import { CoreError } from "@fourier-video/core";
 
-export class RenderEngineError extends Error {
-  readonly code: string;
-  readonly details?: ErrorDetails;
-
-  constructor(code: string, message: string, details?: ErrorDetails) {
-    super(message);
-    this.name = "RenderEngineError";
-    this.code = code;
-    if (details !== undefined) this.details = details;
-  }
-}
+export { CoreError as RenderEngineError, toErrorResponse } from "@fourier-video/core";
+export type { ErrorDetails } from "@fourier-video/core";
 
 export function fail(
   code: string,
   message: string,
-  details?: ErrorDetails,
+  details?: Readonly<Record<string, unknown>>,
 ): never {
-  throw new RenderEngineError(code, message, details);
-}
-
-export function toErrorResponse(error: unknown): {
-  error: { code: string; message: string; details?: ErrorDetails };
-} {
-  if (error instanceof RenderEngineError) {
-    return {
-      error: {
-        code: error.code,
-        message: error.message,
-        ...(error.details === undefined ? {} : { details: error.details }),
-      },
-    };
-  }
-
-  const message = error instanceof Error ? error.message : String(error);
-  return { error: { code: "INTERNAL_ERROR", message } };
+  throw new CoreError(code, message, details);
 }

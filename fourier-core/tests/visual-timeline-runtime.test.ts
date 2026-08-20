@@ -2,7 +2,6 @@ import { describe, expect, test } from "bun:test";
 import {
   defaultDomPageCount,
   effectiveDomPageCount,
-  VisualTimelineRuntime,
 } from "../src/visual-timeline-runtime.ts";
 
 describe("DOM page concurrency", () => {

@@ -14,7 +14,7 @@ function artifact(
   Object.defineProperty(value, SDK_ARTIFACT_SYMBOL, {
     value: {
       package: "@fourier-video/sdk",
-      sdkAbiVersion: 1,
+      sdkAbiVersion: 1.1,
       renderer: "dom-timeline",
       kind,
       name: "TestArtifact",
@@ -49,9 +49,16 @@ describe("SDK ABI Adapter", () => {
     }))).toThrow("缺少强制 designPreview");
   });
 
+  test("ABI v1.1 为当前 marker，同时继续读取 ABI v1 artifact", () => {
+    expect(readSdkArtifact(artifact("react")))
+      .toMatchObject({ sdkAbiVersion: 1.1 });
+    expect(readSdkArtifact(artifact("react", { sdkAbiVersion: 1 })))
+      .toMatchObject({ sdkAbiVersion: 1 });
+  });
+
   test("ABI v1 只接受 dom-timeline component 且不携带 render", () => {
     expect(readSdkArtifact(artifact("react")))
-      .toMatchObject({ sdkAbiVersion: 1, renderer: "dom-timeline" });
+      .toMatchObject({ sdkAbiVersion: 1.1, renderer: "dom-timeline" });
     expect(() => readSdkArtifact(artifact("react", {
       render: () => null,
     }))).toThrow("不能包含 render");
@@ -65,7 +72,7 @@ describe("SDK ABI Adapter", () => {
       supportsTextMotion: undefined,
     }), "motion");
     expect(metadata).toMatchObject({
-      sdkAbiVersion: 1,
+      sdkAbiVersion: 1.1,
       renderer: "dom-timeline-ffmpeg-video",
       videoComposition: "ffmpeg",
     });

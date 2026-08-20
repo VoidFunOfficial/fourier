@@ -35,7 +35,7 @@ export default defineReact({
     const result = await checkArtifact(join(import.meta.dir, "components/DomStaticPanel.tsx"));
     expect(result).toMatchObject({
       valid: true,
-      sdkAbiVersion: 1,
+      sdkAbiVersion: 1.1,
       renderer: "dom-timeline",
       warnings: [],
     });
@@ -72,7 +72,7 @@ export default defineReact({
 });`);
       const artifact = await compileVisualArtifact({ entryPath });
       expect(artifact).toMatchObject({
-        sdkAbiVersion: 1,
+        sdkAbiVersion: 1.1,
         renderer: "dom-timeline",
         name: "SdkOwnedReactPanel",
       });
@@ -124,6 +124,30 @@ export default defineReact({
         code: "INVALID_COMPONENT_IMPORT",
         details: { specifier: "three" },
       });
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  test("作者可以从 SDK universe-3d 入口导入 3D World interface", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "fourier-universe-3d-import-"));
+    try {
+      const entryPath = join(directory, "Universe3DPanel.tsx");
+      await Bun.write(entryPath, `import { defineReact } from "@fourier-video/sdk";
+import { Universe3D, World3D, defineCamera3D } from "@fourier-video/sdk/universe-3d";
+const camera = defineCamera3D({ initial: { x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0 } });
+export default defineReact({
+  name: "Universe3DPanel",
+  schema: {},
+  component() {
+    return <Universe3D camera={camera}><World3D id="card" x={0} y={0} z={-100} width={50} height={20}>3D</World3D></Universe3D>;
+  },
+  designPreview() {
+    return { props: {}, composition: { width: 64, height: 32, durationSeconds: 1 } };
+  },
+});`);
+      const artifact = await compileVisualArtifact({ entryPath });
+      expect(artifact).toMatchObject({ name: "Universe3DPanel", renderer: "dom-timeline" });
     } finally {
       await rm(directory, { recursive: true, force: true });
     }

@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import { createReadStream, existsSync } from "node:fs";
 import { mkdir, readdir, rename, rm } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
+import { isSupportedSdkAbiVersion } from "./artifact-protocol.ts";
 import { emitDiagnostic, type DiagnosticTarget } from "./render-diagnostics.ts";
 import type {
   PreparedTimelineArtifact,
@@ -95,7 +96,7 @@ function isTimelineArtifact(value: unknown): value is PreparedTimelineArtifact {
   return typeof artifact.nodeId === "string" &&
     (artifact.kind === "react" || artifact.kind === "motion") &&
     typeof artifact.name === "string" &&
-    artifact.sdkAbiVersion === 1 &&
+    isSupportedSdkAbiVersion(artifact.sdkAbiVersion) &&
     (artifact.renderer === "dom-timeline" ||
       artifact.renderer === "dom-timeline-ffmpeg-video") &&
     typeof artifact.snapshotId === "string" &&
