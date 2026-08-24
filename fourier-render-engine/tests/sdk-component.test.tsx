@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { readSdkArtifact } from "../src/artifact-protocol.ts";
 import { loadProject } from "../src/project-compiler.ts";
 import {
-  bundleReactModule,
+  inspectSdkArtifact,
   collectComponentDependencies,
   renderSparseVisualFrame,
 } from "../src/visual-renderer.ts";
@@ -99,16 +99,21 @@ describe("SDK component production Adapter", () => {
   test("组件 import policy 允许 SDK，并在 bundle 后保留 ABI marker", async () => {
     const directory = await mkdtemp(join(import.meta.dir, ".sdk-component-"));
     directories.push(directory);
-    const components = join(directory, "components");
+    const components = join(directory, "scenes", "scene3", "components");
+    const sharedAssets = join(directory, "pic", "svg");
     const bundles = join(directory, "bundles");
     await Promise.all([
       mkdir(components, { recursive: true }),
+      mkdir(sharedAssets, { recursive: true }),
       mkdir(bundles, { recursive: true }),
     ]);
     const componentPath = join(components, "Panel.tsx");
-    await Bun.write(
-      componentPath,
-      `import { defineReact, field } from "@fourier-video/sdk";
+    await Promise.all([
+      Bun.write(join(sharedAssets, "default.svg"), `<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><path d="M0 0h1v1H0z" /></svg>`),
+      Bun.write(
+        componentPath,
+        `import { defineReact, field } from "@fourier-video/sdk";
+import iconUrl from "../../../pic/svg/default.svg";
 export default defineReact({
   name: "BundledPanel",
   schema: {
@@ -116,26 +121,27 @@ export default defineReact({
     accent: field.color({ default: "#ff0000" }),
   },
   component({ props }) {
-    return <div style={{ width: "100%", height: "100%", display: "flex", background: props.value === 42 ? props.accent : "#0000ff" }} />;
+    return <div style={{ width: "100%", height: "100%", display: "flex", background: props.value === 42 ? props.accent : "#0000ff" }}><img src={iconUrl} /></div>;
   },
   designPreview() {
     return { props: { value: 42 }, composition: { width: 32, height: 24, durationSeconds: 0 } };
   },
 });`,
-    );
+      ),
+    ]);
 
-    const module = await bundleReactModule(
+    const component = await inspectSdkArtifact(
       {
         id: "panel",
         kind: "react",
-        component: "components/Panel.tsx",
+        component: "scenes/scene3/components/Panel.tsx",
         componentPath,
         exportName: "default",
       },
       bundles,
-      directory,
+      [components, directory],
     );
-    expect(readSdkArtifact(module.default, "react")).toMatchObject({
+    expect(readSdkArtifact(component, "react")).toMatchObject({
       kind: "react",
       name: "BundledPanel",
       sdkAbiVersion: 1.1,
@@ -149,7 +155,7 @@ export default defineProject(
   <Project id="sdk-component" version="1.0" audioSampleRate={48000}>
     <Canvas width={32} height={24} fps={10} background="#000000" colorSpace="sRGB" />
     <Timeline>
-      <ReactLayer id="panel" at="0f" duration="1f" component="components/Panel.tsx"
+      <ReactLayer id="panel" at="0f" duration="1f" component="scenes/scene3/components/Panel.tsx"
         x={16} y={12} width={32} height={24} layer={0} props={{ value: 42 }} />
     </Timeline>
   </Project>,
@@ -214,5 +220,21 @@ export default defineProject(
       join(directory, "wrong.png"),
       { bundleDirectory: bundles, fonts: [] },
     )).rejects.toMatchObject({ code: "ARTIFACT_KIND_MISMATCH" });
+  });
+
+  test("普通 React 函数稳定拒绝且没有可信回退", async () => {
+    const directory = await mkdtemp(join(import.meta.dir, ".legacy-component-"));
+    directories.push(directory);
+    const componentPath = join(directory, "Legacy.tsx");
+    await Bun.write(componentPath, `export default function Legacy() { return <div>legacy</div>; }`);
+    await expect(inspectSdkArtifact({
+      id: "legacy",
+      kind: "react",
+      component: "Legacy.tsx",
+      componentPath,
+      exportName: "default",
+    }, directory, [directory])).rejects.toMatchObject({
+      code: "LEGACY_COMPONENT_UNSUPPORTED",
+    });
   });
 });

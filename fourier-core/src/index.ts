@@ -28,3 +28,10 @@ export type {
   SdkSchemaField,
   SupportedSdkAbiVersion,
 } from "./artifact-protocol.ts";
+export { PROJECT_EXECUTION_REVISION } from "./project-materializer.ts";
+export type {
+  AuthorElementWireV1,
+  MaterializeProjectModuleOptions,
+  MaterializedProjectModule,
+  ProjectDefinitionSnapshotV1,
+} from "./project-materializer.ts";

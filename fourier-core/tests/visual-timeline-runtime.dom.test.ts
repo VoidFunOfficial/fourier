@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
+import { dirname } from "node:path";
 import { inflateSync } from "node:zlib";
 import { Resvg } from "@resvg/resvg-js";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
@@ -75,8 +76,11 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
     let launches = 0;
     let pages = 0;
     chromium.launch = (async (...arguments_: Parameters<typeof chromium.launch>) => {
-      launches += 1;
+      const launchOptions = arguments_[0];
+      const isVisualRenderer = launchOptions?.args?.includes("--run-all-compositor-stages-before-draw") === true;
+      if (isVisualRenderer) launches += 1;
       const browser = await originalLaunch(...arguments_);
+      if (!isVisualRenderer) return browser;
       const originalNewContext = browser.newContext.bind(browser);
       browser.newContext = (async (...contextArguments: Parameters<Browser["newContext"]>) => {
         const context = await originalNewContext(...contextArguments);
@@ -179,7 +183,12 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
   test("media 与 SMIL 分别由宿主绝对时间暂停采样并支持乱序循环", async () => {
     const entryPath = componentFixture("DomMediaSmilTimeline.tsx");
     for (const mode of ["media", "smil"] as const) {
-      const instance = await runtime.open({ entryPath, props: { mode } });
+      const instance = await runtime.open({
+        entryPath,
+        sourceRoot: dirname(dirname(entryPath)),
+        resourceRoots: [dirname(dirname(entryPath))],
+        props: { mode },
+      });
       try {
         expect(instance.isStatic).toBe(false);
         const start = await instance.sample({ time: { numerator: 0, denominator: 1 } });
@@ -270,9 +279,8 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
         entryPath,
         composition: { width: 16, height: 12, fps: 30, durationInFrames: 6 },
         motion: { startFrame: 2, durationInFrames: 2, fill: "none" },
-        dynamicSubjectProvider: provider,
       });
-      const none = await runtime.open(noneArtifact);
+      const none = await runtime.open(noneArtifact, { dynamicSubjectProvider: provider });
       try {
         const before = await none.sample({ time: clock.frameStart(0) });
         const active = await none.sample({ time: clock.frameStart(2) });
@@ -289,9 +297,8 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
           entryPath,
           composition: { width: 16, height: 12, fps: 30, durationInFrames: 6 },
           motion: { startFrame: 2, durationInFrames: 2, fill },
-          dynamicSubjectProvider: provider,
         });
-        const instance = await runtime.open(compiled);
+        const instance = await runtime.open(compiled, { dynamicSubjectProvider: provider });
         try {
           const frame = fill === "forwards" ? 4 : 0;
           const sampled = await instance.sample({ time: clock.frameStart(frame) });

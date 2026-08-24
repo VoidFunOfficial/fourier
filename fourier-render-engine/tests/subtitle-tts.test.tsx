@@ -4,6 +4,7 @@ import {
   defineProject,
   Image,
   Project,
+  serializeProjectDefinition,
   Subtitle,
   Timeline,
 } from "@fourier-video/sdk/project";
@@ -36,7 +37,7 @@ function project(duration?: string) {
 }
 
 function compile(duration?: string, prepared = true) {
-  return compileProjectDeclaration(project(duration), {
+  return compileProjectDeclaration(serializeProjectDefinition(project(duration)), {
     projectDir: "/tmp/project",
     validateAssets: false,
     ...(prepared ? { ttsArtifacts: new Map([["line-1", artifact]]) } : {}),

@@ -212,7 +212,7 @@ function subjectFromConfig(config, preview) {
       style: { width: "100%", height: "100%", display: "block" },
     });
   }
-  return preview?.subject;
+  return config.useDesignPreview === true ? preview?.subject : undefined;
 }
 
 async function initialize(config) {

@@ -9,6 +9,7 @@ import {
   defineProject,
   Project,
   ReactLayer,
+  serializeProjectDefinition,
   Timeline,
 } from "@fourier-video/sdk/project";
 import { compileProjectDeclaration } from "../src/project-compiler.ts";
@@ -25,10 +26,12 @@ describeDom("DOM timeline TSX consumer conformance", () => {
     const originalLaunch = chromium.launch.bind(chromium);
     let launches = 0;
     chromium.launch = ((...arguments_: Parameters<typeof chromium.launch>) => {
-      launches += 1;
+      if (arguments_[0]?.args?.includes("--run-all-compositor-stages-before-draw") === true) {
+        launches += 1;
+      }
       return originalLaunch(...arguments_);
     }) as typeof chromium.launch;
-    const project = compileProjectDeclaration(defineProject(
+    const project = compileProjectDeclaration(serializeProjectDefinition(defineProject(
       <Project id="dom-consumer-reuse" version="1.0" audioSampleRate={48_000}>
         <Canvas width={32} height={24} fps={60} background="#000000" colorSpace="sRGB" />
         <Timeline>
@@ -39,7 +42,7 @@ describeDom("DOM timeline TSX consumer conformance", () => {
           ))}
         </Timeline>
       </Project>,
-    ), { projectDir: import.meta.dir, validateAssets: true });
+    )), { projectDir: import.meta.dir, validateAssets: true });
     try {
       const prepared = await prepareGeneratedVisuals(project, {
         temporaryDirectory,
@@ -66,7 +69,7 @@ describeDom("DOM timeline TSX consumer conformance", () => {
       mkdir(sparseDirectory, { recursive: true }),
       mkdir(join(sparseDirectory, "bundles"), { recursive: true }),
     ]);
-    const project = compileProjectDeclaration(defineProject(
+    const project = compileProjectDeclaration(serializeProjectDefinition(defineProject(
       <Project id="dom-consumer" version="1.0" audioSampleRate={48_000}>
         <Canvas width={64} height={64} fps={60} background="#000000" colorSpace="sRGB" />
         <Timeline>
@@ -75,7 +78,7 @@ describeDom("DOM timeline TSX consumer conformance", () => {
             width={64} height={64} layer={0} preview />
         </Timeline>
       </Project>,
-    ), { projectDir: import.meta.dir, validateAssets: true });
+    )), { projectDir: import.meta.dir, validateAssets: true });
     const node = project.nodes[0];
     if (node?.kind !== "react") throw new Error("expected React node");
     try {

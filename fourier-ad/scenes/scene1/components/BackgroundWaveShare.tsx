@@ -19,6 +19,7 @@ import {
 } from "@fourier-video/sdk/motion";
 
 export const BACKGROUND_WAVE_DURATION_SECONDS = 4;
+const PREVIEW_DURATION_SECONDS = 6;
 
 export const backgroundWaveShareSchema = defineSchema({
   backgroundColor: field.color({
@@ -395,7 +396,7 @@ export const BackgroundWaveShare = defineReact({
       composition: {
         width: 1920,
         height: 1080,
-        durationSeconds: 163 / 30,
+        durationSeconds: PREVIEW_DURATION_SECONDS,
       },
       player: { background: "#ffffff", loop: true },
     };

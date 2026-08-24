@@ -1,3 +1,7 @@
+import { rm } from "node:fs/promises";
+
+await rm("./dist", { recursive: true, force: true });
+
 const result = await Bun.build({
   entrypoints: [
     "./src/index.ts",
@@ -12,6 +16,8 @@ const result = await Bun.build({
   splitting: true,
   sourcemap: "external",
   external: [
+    "esbuild",
+    "es-module-lexer",
     "playwright",
     "react",
     "react-dom",

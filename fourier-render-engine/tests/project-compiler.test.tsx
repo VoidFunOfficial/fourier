@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import { mkdir, mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -10,6 +10,7 @@ import {
   Motion,
   Project,
   ReactLayer,
+  serializeProjectDefinition,
   Subtitle,
   Template,
   Timeline,
@@ -55,7 +56,7 @@ describe("Project JSX compiler", () => {
         </Timeline>
       </Project>,
     );
-    const project = compileProjectDeclaration(definition, {
+    const project = compileProjectDeclaration(serializeProjectDefinition(definition), {
       projectDir: "/tmp/fourier-project-jsx",
       validateAssets: false,
     });
@@ -87,7 +88,7 @@ describe("Project JSX compiler", () => {
         </Timeline>
       </Project>,
     );
-    const project = compileProjectDeclaration(definition, {
+    const project = compileProjectDeclaration(serializeProjectDefinition(definition), {
       projectDir: "/tmp/fourier-project-tsx-tts",
       validateAssets: false,
       ttsArtifacts: new Map([["voice", {
@@ -189,6 +190,32 @@ describe("Project JSX compiler", () => {
       code: "PROJECT_IMPORT_NOT_ALLOWED",
     });
   });
+
+  test("Project snapshot 支持根内 symlink 并拒绝逃逸 symlink", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "fourier-project-symlink-"));
+    const outside = await mkdtemp(join(tmpdir(), "fourier-project-outside-"));
+    temporaryDirectories.push(directory, outside);
+    const definition = `import { Canvas, defineProject, Project, Timeline, Text } from "@fourier-video/sdk/project";
+import { label } from "./label-link";
+export default defineProject(<Project id="symlink-project" version="1.0" audioSampleRate={48000}>
+  <Canvas width={32} height={32} fps={10} background="#000" colorSpace="sRGB" />
+  <Timeline><Text id="label" at="0f" duration="1f" role="body" content={label}
+    font="Arial" fontSize={12} lineHeight={1.2} color="#FFF" align="center"
+    x={16} y={16} width={32} height={16} layer={1} /></Timeline>
+</Project>);`;
+    await Bun.write(join(directory, "label.ts"), `export const label = "inside";`);
+    await symlink("label.ts", join(directory, "label-link.ts"));
+    await Bun.write(join(directory, "definition.tsx"), definition);
+    await symlink("definition.tsx", join(directory, "main.tsx"));
+    expect((await loadProject(join(directory, "main.tsx"), { validateAssets: false })).metadata.id)
+      .toBe("symlink-project");
+
+    await Bun.write(join(outside, "outside.ts"), `export const label = "outside";`);
+    await rm(join(directory, "label-link.ts"));
+    await symlink(join(outside, "outside.ts"), join(directory, "label-link.ts"));
+    await expect(loadProject(join(directory, "main.tsx"), { validateAssets: false }))
+      .rejects.toMatchObject({ code: "PROJECT_IMPORT_OUTSIDE_ROOT" });
+  }, 15_000);
 
   test("递归 Template 与跨模块私有资源保持稳定错误码", async () => {
     const recursion = await mkdtemp(join(tmpdir(), "fourier-project-recursion-"));

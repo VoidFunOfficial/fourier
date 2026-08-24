@@ -1,4 +1,5 @@
 import type { ResolveAuthorImport } from "./integration-types.ts";
+import type { Plugin } from "esbuild";
 
 const REACT_RUNTIME_IMPORTS = new Set([
   "react",
@@ -40,7 +41,7 @@ export function authorRuntimeAliasPlugin(
   name: string,
   resolveAuthorImport: ResolveAuthorImport,
   options: { reactDom?: boolean } = {},
-): Bun.BunPlugin {
+): Plugin {
   const specifiers = [
     ...REACT_RUNTIME_IMPORTS,
     ...SDK_AUTHOR_IMPORTS,

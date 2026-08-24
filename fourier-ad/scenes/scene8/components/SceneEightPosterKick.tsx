@@ -8,6 +8,7 @@ import {
 import videoCursorUrl from "../assets/cursor-video.svg";
 
 const DURATION_SECONDS = 1.2;
+const PREVIEW_DURATION_SECONDS = 2;
 const PAPER = "#f6f0e4";
 const GOLD = "#b79a52";
 const FRAME_WIDTH = 1382;
@@ -96,7 +97,7 @@ export default defineReact({
   designPreview() {
     return {
       props: {},
-      composition: { width: 1920, height: 1080, durationSeconds: DURATION_SECONDS },
+      composition: { width: 1920, height: 1080, durationSeconds: PREVIEW_DURATION_SECONDS },
       player: { background: "#17281f", loop: true },
     };
   },

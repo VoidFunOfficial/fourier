@@ -1,4 +1,4 @@
-import { isValidElement, type ReactElement, type ReactNode } from "react";
+import { Fragment, isValidElement, type ReactElement, type ReactNode } from "react";
 import { sdkFail } from "./errors.ts";
 import {
   defineSchema,
@@ -247,6 +247,22 @@ export interface TemplateDefinition<Schema extends FieldsSchema = FieldsSchema> 
 
 export type AnyProjectDefinition = ProjectDefinition | TemplateDefinition<any>;
 
+export interface AuthorElementWireV1 {
+  readonly revision: 1;
+  readonly tag: string;
+  readonly props: Readonly<Record<string, unknown>>;
+  readonly children: readonly AuthorElementWireV1[];
+}
+
+export interface ProjectDefinitionSnapshotV1 {
+  readonly revision: 1;
+  readonly kind: "project" | "template";
+  readonly root: AuthorElementWireV1;
+  readonly parameters: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
+  readonly bindings: Readonly<Record<string, TemplatePropValue>>;
+  readonly bindingSources: Readonly<Record<string, "explicit" | "default">>;
+}
+
 function definitionBase<Kind extends "project" | "template">(kind: Kind) {
   return {
     package: "@fourier-video/sdk" as const,
@@ -378,4 +394,85 @@ export function bindTemplateProps(
     sources[name] = explicit ? "explicit" : "default";
   }
   return { props: Object.freeze(props), sources: Object.freeze(sources) };
+}
+
+function jsonValue(value: unknown, path: string): unknown {
+  if (value === null || typeof value === "string" || typeof value === "boolean") return value;
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (Array.isArray(value)) return Object.freeze(value.map((entry, index) => jsonValue(entry, `${path}[${index}]`)));
+  if (typeof value === "object" && value !== null) {
+    const result: Record<string, unknown> = {};
+    for (const [key, entry] of Object.entries(value)) result[key] = jsonValue(entry, `${path}.${key}`);
+    return Object.freeze(result);
+  }
+  sdkFail("INVALID_PROJECT_DEFINITION", `${path} 必须是 JSON-safe 数据`);
+}
+
+function collectProjectChildren(value: unknown, path: string): readonly unknown[] {
+  const result: unknown[] = [];
+
+  function append(child: unknown, containerDepth: number): void {
+    if (containerDepth > 64) {
+      sdkFail("INVALID_PROJECT_DEFINITION", `${path} 的 JSX children 容器深度超过 64`);
+    }
+    if (child === null || child === undefined || typeof child === "boolean") return;
+    if (Array.isArray(child)) {
+      for (const nested of child) append(nested, containerDepth + 1);
+      return;
+    }
+    if (isValidElement<{ readonly children?: ReactNode }>(child) && child.type === Fragment) {
+      append(child.props.children, containerDepth + 1);
+      return;
+    }
+    result.push(child);
+  }
+
+  append(value, 0);
+  return result;
+}
+
+function materializeProjectElement(value: unknown, path: string, depth: number): AuthorElementWireV1 {
+  if (depth > 64) sdkFail("INVALID_PROJECT_DEFINITION", "Project JSX 深度超过 64");
+  const element = readProjectElement(value);
+  if (element === undefined) sdkFail("INVALID_PROJECT_DEFINITION", `${path} 不是 Fourier Project JSX 节点`);
+  const { children, ...rawProps } = element.props;
+  const childElements = collectProjectChildren(children, `${path}.children`);
+  return Object.freeze({
+    revision: 1,
+    tag: element.tag,
+    props: jsonValue(rawProps, `${path}.props`) as Readonly<Record<string, unknown>>,
+    children: Object.freeze(childElements.map((child, index) => materializeProjectElement(child, `${path}.children[${index}]`, depth + 1))),
+  });
+}
+
+/**
+ * Materializes Project JSX to versioned data. Callers execute this helper only
+ * inside the secure Chromium project-materialize Worker.
+ */
+export function serializeProjectDefinition(
+  definition: AnyProjectDefinition,
+  bindings: Readonly<Record<string, TemplatePropValue>> = {},
+): ProjectDefinitionSnapshotV1 {
+  const recognized = readProjectDefinition(definition);
+  if (recognized === undefined) sdkFail("INVALID_PROJECT_DEFINITION", "default export 必须由 defineProject/defineTemplate 创建");
+  const bound = recognized.kind === "template"
+    ? bindTemplateProps(recognized, bindings)
+    : (() => {
+        if (Object.keys(bindings).length > 0) sdkFail("UNKNOWN_TEMPLATE_PROP", "Project 不能接收 Template bindings");
+        return { props: Object.freeze({}), sources: Object.freeze({}) };
+      })();
+  const declaration = recognized.kind === "template"
+    ? recognized.render(bound.props)
+    : recognized.declaration;
+  const parameters = recognized.kind === "template"
+    ? jsonValue(recognized.schema, "template.schema") as Readonly<Record<string, Readonly<Record<string, unknown>>>>
+    : Object.freeze({});
+  return Object.freeze({
+    revision: 1,
+    kind: recognized.kind,
+    root: materializeProjectElement(declaration, "project", 0),
+    parameters,
+    bindings: bound.props,
+    bindingSources: bound.sources,
+  });
 }

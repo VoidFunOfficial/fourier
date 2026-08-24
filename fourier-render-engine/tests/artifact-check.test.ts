@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, realpath, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { checkArtifact } from "../src/artifact-check.ts";
 import { compileVisualArtifact } from "../src/artifact-compiler.ts";
 
@@ -25,11 +25,49 @@ export default defineReact({
 });`),
       ]);
       const artifact = await compileVisualArtifact({ entryPath });
-      expect(artifact.dependencies).toContain(helperPath);
+      expect(artifact.dependencies).toContain(await realpath(helperPath));
     } finally {
       await rm(directory, { recursive: true, force: true });
     }
   });
+
+  test("immutable snapshot 支持根内 symlink 并拒绝逃逸 symlink", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "fourier-artifact-symlink-"));
+    const outside = await mkdtemp(join(tmpdir(), "fourier-artifact-outside-"));
+    try {
+      const entryPath = join(directory, "Panel.tsx");
+      await Bun.write(join(directory, "helper.ts"), `export const label = "inside";`);
+      await symlink("helper.ts", join(directory, "helper-link.ts"));
+      await Bun.write(entryPath, `import { defineReact } from "@fourier-video/sdk";
+import { label } from "./helper-link";
+export default defineReact({
+  name: "SymlinkPanel",
+  schema: {},
+  component() { return <div>{label}</div>; },
+  designPreview() { return { props: {}, composition: { width: 16, height: 16, durationSeconds: 0 } }; },
+});`);
+      await expect(compileVisualArtifact({ entryPath, sourceRoot: directory }))
+        .resolves.toMatchObject({ name: "SymlinkPanel" });
+
+      await Bun.write(join(outside, "escape.ts"), `export const secret = "outside";`);
+      await symlink(join(outside, "escape.ts"), join(directory, "escape.ts"));
+      await Bun.write(entryPath, `import { defineReact } from "@fourier-video/sdk";
+import { secret } from "./escape";
+export default defineReact({
+  name: "EscapePanel",
+  schema: {},
+  component() { return <div>{secret}</div>; },
+  designPreview() { return { props: {}, composition: { width: 16, height: 16, durationSeconds: 0 } }; },
+});`);
+      await expect(compileVisualArtifact({ entryPath, sourceRoot: directory }))
+        .rejects.toMatchObject({ code: "ARTIFACT_SOURCE_OUTSIDE_ROOT" });
+    } finally {
+      await Promise.all([
+        rm(directory, { recursive: true, force: true }),
+        rm(outside, { recursive: true, force: true }),
+      ]);
+    }
+  }, 15_000);
 
   test("ABI v1 check 使用 DOM runtime 且不返回迁移警告", async () => {
     const result = await checkArtifact(join(import.meta.dir, "components/DomStaticPanel.tsx"));
@@ -151,13 +189,13 @@ export default defineReact({
     } finally {
       await rm(directory, { recursive: true, force: true });
     }
-  });
+  }, 15_000);
 
   test("snapshotId 覆盖 composition、seed、Motion 配置和字体内容", async () => {
     const directory = await mkdtemp(join(tmpdir(), "fourier-snapshot-identity-"));
     try {
       const font = join(directory, "font.ttf");
-      await Bun.write(font, "font-a");
+      await Bun.write(font, new Uint8Array([0, 1, 0, 0, 97]));
       const entryPath = join(import.meta.dir, "components/DomStaticPanel.tsx");
       const options = {
         entryPath,
@@ -170,6 +208,7 @@ export default defineReact({
         },
         seed: 7,
         fonts: [{ family: "Test", source: font }],
+        resourceRoots: [directory, dirname(entryPath)],
       } as const;
       const first = await compileVisualArtifact(options);
       const same = await compileVisualArtifact(options);
@@ -178,7 +217,7 @@ export default defineReact({
         composition: { ...options.composition, width: 33 },
       });
       const reseeded = await compileVisualArtifact({ ...options, seed: 8 });
-      await Bun.write(font, "font-b");
+      await Bun.write(font, new Uint8Array([0, 1, 0, 0, 98]));
       const changedFont = await compileVisualArtifact(options);
       expect(same.snapshotId).toBe(first.snapshotId);
       expect(resized.snapshotId).not.toBe(first.snapshotId);
@@ -217,5 +256,5 @@ export default defineReact({
     } finally {
       await rm(directory, { recursive: true, force: true });
     }
-  });
+  }, 15_000);
 });

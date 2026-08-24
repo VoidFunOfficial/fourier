@@ -1,15 +1,16 @@
 import { existsSync, realpathSync, statSync } from "node:fs";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import {
-  bindTemplateProps,
-  readProjectElement,
-  type AnyProjectDefinition,
-  type TemplateDefinition,
   type TemplatePropValue,
   type TimeExpression,
 } from "@fourier-video/sdk/project";
+import type {
+  AuthorElementWireV1,
+  ProjectDefinitionSnapshotV1,
+} from "@fourier-video/core/artifact";
+import { PROJECT_EXECUTION_REVISION } from "@fourier-video/core/artifact";
 import { fail, RenderEngineError } from "./errors.ts";
-import { loadProjectModule } from "./project-module-loader.ts";
+import { ProjectExecutionSession } from "./project-module-loader.ts";
 import {
   parseInteger,
   parsePositiveNumber,
@@ -172,28 +173,6 @@ function timeSource(value: TimeExpression): string {
   return typeof value === "string" ? value : value.source;
 }
 
-function childElements(value: unknown, owner: string): AuthorElement[] {
-  const result: AuthorElement[] = [];
-  const visit = (child: unknown): void => {
-    if (child === null || child === undefined || typeof child === "boolean") return;
-    if (Array.isArray(child)) {
-      for (const item of child) visit(item);
-      return;
-    }
-    if (typeof child === "string" && child.trim().length === 0) return;
-    const snapshot = readProjectElement(child);
-    if (snapshot === undefined) {
-      fail(
-        "INVALID_PROJECT_DECLARATION",
-        `${owner} 只能包含 Fourier 工程 JSX 节点`,
-      );
-    }
-    result.push(authorElement(snapshot.tag, snapshot.props));
-  };
-  visit(value);
-  return result;
-}
-
 function authorElement(name: string, props: Readonly<Record<string, unknown>>): AuthorElement {
   const attributes: Record<string, string> = {};
   let payload: Readonly<Record<string, unknown>> | undefined;
@@ -232,7 +211,7 @@ function authorElement(name: string, props: Readonly<Record<string, unknown>>): 
       fail("INVALID_PROJECT_DECLARATION", `${name}.${property} 类型无效`);
     }
   }
-  const children = childElements(props.children, name);
+  const children: AuthorElement[] = [];
   if (name === "text" || name === "subtitle") {
     if (typeof props.content !== "string") {
       fail("INVALID_PROJECT_DECLARATION", `${name}.content 必须是 string`);
@@ -265,35 +244,29 @@ function authorElement(name: string, props: Readonly<Record<string, unknown>>): 
   };
 }
 
-function projectElement(definition: AnyProjectDefinition, bindings: Readonly<Record<string, unknown>> = {}): {
+function wireElement(node: AuthorElementWireV1): AuthorElement {
+  const element = authorElement(node.tag, node.props);
+  return {
+    ...element,
+    children: [...element.children, ...node.children.map(wireElement)],
+  };
+}
+
+function projectElement(definition: ProjectDefinitionSnapshotV1): {
   project: AuthorElement;
   parameterContract: TemplateParameterDefinition[];
   typedBindings: Record<string, TemplatePropValue>;
   parameterSources: Record<string, TemplateParameterSource>;
 } {
-  if (definition.kind === "project") {
-    if (Object.keys(bindings).length > 0) {
-      fail("INVALID_TEMPLATE_DEFINITION", "普通 Project 不能接收 Template props");
-    }
-    const snapshot = readProjectElement(definition.declaration)!;
-    return {
-      project: authorElement(snapshot.tag, snapshot.props),
-      parameterContract: [],
-      typedBindings: {},
-      parameterSources: {},
-    };
-  }
-  const bound = bindTemplateProps(definition as TemplateDefinition, bindings);
-  const snapshot = readProjectElement(definition.render(bound.props))!;
   return {
-    project: authorElement(snapshot.tag, snapshot.props),
-    parameterContract: Object.entries(definition.schema).map(([name, field]) => ({
+    project: wireElement(definition.root),
+    parameterContract: Object.entries(definition.parameters).map(([name, field]) => ({
       name,
-      kind: field.kind as Exclude<typeof field.kind, "node">,
-      ...(field.hasDefault ? { defaultValue: field.defaultValue as TemplatePropValue } : {}),
+      kind: field.kind as TemplateParameterDefinition["kind"],
+      ...(field.hasDefault === true ? { defaultValue: field.defaultValue as TemplatePropValue } : {}),
     })),
-    typedBindings: { ...bound.props },
-    parameterSources: { ...bound.sources },
+    typedBindings: { ...definition.bindings } as Record<string, TemplatePropValue>,
+    parameterSources: { ...definition.bindingSources },
   };
 }
 
@@ -1055,11 +1028,8 @@ function parseMotion(
   const { props, propTypes } = parseProjectProps(element, context);
   const component = requiredAttribute(element, "component");
   const exportName = optionalAttribute(element, "export", "default");
-  if (
-    exportName !== "default" &&
-    !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(exportName)
-  ) {
-    fail("INVALID_ATTRIBUTE", `motion.export 非法: "${exportName}"`);
+  if (exportName !== "default") {
+    fail("ARTIFACT_EXPORT_INVALID", "Motion exportName 仅接受省略或 default；该字段已 deprecated");
   }
   return {
     ...parseModifierBase(element, context, host, previous),
@@ -1677,11 +1647,8 @@ function parseReact(
   const { props, propTypes } = parseProjectProps(element, context);
   const component = requiredAttribute(element, "component");
   const exportName = optionalAttribute(element, "export", "default");
-  if (
-    exportName !== "default" &&
-    !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(exportName)
-  ) {
-    fail("INVALID_ATTRIBUTE", `react.export 非法: "${exportName}"`);
+  if (exportName !== "default") {
+    fail("ARTIFACT_EXPORT_INVALID", "ReactLayer exportName 仅接受省略或 default；该字段已 deprecated");
   }
   const nodeBase = baseNode(
       element,
@@ -2303,6 +2270,7 @@ function resolveAuthorProject(
       metadata,
       canvas,
       projectDir: context.projectDir,
+      executionRevision: PROJECT_EXECUTION_REVISION,
       rootProjectDir: context.rootProjectDir,
       resourceRoots: [...new Set([
         context.projectDir,
@@ -2335,7 +2303,7 @@ function resolveAuthorProject(
 }
 
 export function compileProjectDeclaration(
-  definition: AnyProjectDefinition,
+  definition: ProjectDefinitionSnapshotV1,
   options: CompileProjectOptions,
 ): ResolvedProject {
   return resolveAuthorProject(projectElement(definition).project, options);
@@ -2581,7 +2549,7 @@ interface RecursiveLoadContext {
   rootProjectDir: string,
   options: LoadProjectOptions;
   projectsByKey: Map<string, Promise<LoadedRenderModule>>;
-  modulesByPath: Map<string, ReturnType<typeof loadProjectModule>>;
+  executionSession: ProjectExecutionSession;
 }
 
 function canonicalBindings(bindings: Readonly<Record<string, TemplatePropValue>>): string {
@@ -2617,12 +2585,10 @@ async function loadRenderModuleSource(
   let promise = context.projectsByKey.get(key);
   if (promise !== undefined) return promise;
   promise = (async () => {
-    let modulePromise = context.modulesByPath.get(declaration.sourcePath);
-    if (modulePromise === undefined) {
-      modulePromise = loadProjectModule(declaration.sourcePath);
-      context.modulesByPath.set(declaration.sourcePath, modulePromise);
-    }
-    const module = await modulePromise;
+    const module = await context.executionSession.load(
+      declaration.sourcePath,
+      declaration.bindings,
+    );
     if (
       declaration.kind === "scene" && module.definition.kind !== "project" ||
       declaration.kind === "template" && module.definition.kind !== "template"
@@ -2635,7 +2601,7 @@ async function loadRenderModuleSource(
         { sourcePath: declaration.sourcePath },
       );
     }
-    const materialized = projectElement(module.definition, declaration.bindings);
+    const materialized = projectElement(module.definition);
     if (declaration.kind === "scene") {
       if (hasRenderModuleElement(materialized.project)) {
         fail("NESTED_SCENE", "Scene main.tsx 不允许包含 Scene 或 Template");
@@ -2750,14 +2716,15 @@ export async function loadProject(
   options: LoadProjectOptions = {},
 ): Promise<ResolvedProject> {
   const sourcePath = resolve(projectPath);
-  const module = await loadProjectModule(sourcePath);
   const projectDir = dirname(sourcePath);
+  const executionSession = new ProjectExecutionSession(projectDir, options.signal);
+  const module = await executionSession.load(sourcePath);
   const materialized = projectElement(module.definition);
   const context: RecursiveLoadContext = {
     rootProjectDir: projectDir,
     options,
     projectsByKey: new Map(),
-    modulesByPath: new Map([[sourcePath, Promise.resolve(module)]]),
+    executionSession,
   };
   const project = await loadResolvedProject(
     materialized.project,

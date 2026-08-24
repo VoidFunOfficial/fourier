@@ -1,7 +1,6 @@
 import { existsSync, statSync } from "node:fs";
-import { mkdir, readdir, rm } from "node:fs/promises";
+import { mkdir, readdir, realpath, rm } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { createRequire } from "node:module";
 import { availableParallelism } from "node:os";
 import {
   basename,
@@ -17,25 +16,21 @@ import { Resvg } from "@resvg/resvg-js";
 import React from "react";
 import satori from "satori";
 import {
-  authorRuntimeAliasPlugin,
   isCompilerInjectedReactImport,
   isReactRuntimeImport,
   isSdkAuthorImport,
 } from "./author-runtime.ts";
 import {
-  assertArtifactComponent,
   bindSdkArtifactProps,
-  createMotionContext,
-  createRenderContext,
   isSupportedSdkAbiVersion,
   readSdkArtifact,
+  SDK_ARTIFACT,
   type SupportedSdkAbiVersion,
 } from "./artifact-protocol.ts";
 import { compileVisualArtifact } from "./artifact-compiler.ts";
 import { fail } from "./errors.ts";
 import { hashSeed } from "./deterministic.ts";
 import {
-  imageAssetUrlPlugin,
   imageAssetExtensions,
 } from "./image-assets.ts";
 import { sampleModifier } from "./modifiers.ts";
@@ -52,7 +47,7 @@ import {
   type TimelineVideoSurface,
   VisualTimelineRuntime,
 } from "./visual-timeline-runtime.ts";
-import type { CompiledVisualArtifact } from "./artifact-compiler.ts";
+import type { CompiledVisualArtifact, DynamicSubjectProvider } from "./artifact-compiler.ts";
 import {
   DOM_RENDER_PROFILE,
   LEGACY_RENDER_PROFILE,
@@ -153,12 +148,6 @@ type PreparedMotionSubject =
   | PreparedRasterMotionSubject
   | PreparedTextMotionSubject;
 
-type MotionComponent = React.ComponentType<{
-  subject: React.ReactNode;
-  props: Record<string, unknown>;
-  motionContext: MotionContext;
-}>;
-
 interface PrepareOptions {
   temporaryDirectory: string;
   ffmpegPath?: string;
@@ -189,7 +178,6 @@ const DETERMINISM_VIOLATIONS: Array<[RegExp, string]> = [
   ],
   [/\b(?:Bun|Deno|process)\b/, "运行时全局对象"],
 ];
-const requireComponent = createRequire(import.meta.url);
 
 function verticalJustify(
   value: TextNode["verticalAlign"],
@@ -518,12 +506,46 @@ function isWithinRoot(path: string, root: string): boolean {
   return pathFromRoot !== ".." && !pathFromRoot.startsWith(`..${sep}`);
 }
 
+async function resolveArtifactSourceRoot(
+  node: ComponentDescriptor,
+  projectRoots: readonly string[],
+): Promise<string> {
+  const [canonicalComponentPath, canonicalRoots] = await Promise.all([
+    realpath(node.componentPath).catch(() => undefined),
+    Promise.all(projectRoots.map(async (root) => await realpath(root))),
+  ]);
+  if (canonicalComponentPath === undefined) {
+    fail("COMPONENT_IMPORT_NOT_FOUND", `React 组件不存在: "${node.componentPath}"`, {
+      node: node.id,
+      path: node.componentPath,
+    });
+  }
+  const containingRoots = canonicalRoots.filter((root) =>
+    isWithinRoot(canonicalComponentPath, root)
+  );
+  if (containingRoots.length === 0) {
+    fail(
+      "INVALID_COMPONENT_IMPORT",
+      `React 组件不在允许的资源作用域内: "${node.componentPath}"`,
+      { node: node.id, path: node.componentPath },
+    );
+  }
+  return containingRoots.reduce((broadest, candidate) =>
+    isWithinRoot(broadest, candidate) ? candidate : broadest
+  );
+}
+
 export async function collectComponentDependencies(
   node: ComponentDescriptor,
   projectRoots: readonly string[],
 ): Promise<string[]> {
+  const canonicalRoots = await Promise.all(projectRoots.map(async (root) => await realpath(root)));
   const visited = new Set<string>();
-  if (!projectRoots.some((root) => isWithinRoot(node.componentPath, root))) {
+  const canonicalComponentPath = await realpath(node.componentPath).catch(() => undefined);
+  if (
+    canonicalComponentPath === undefined ||
+    !canonicalRoots.some((root) => isWithinRoot(canonicalComponentPath, root))
+  ) {
     fail(
       "INVALID_COMPONENT_IMPORT",
       `React 组件不在允许的资源作用域内: "${node.componentPath}"`,
@@ -531,22 +553,26 @@ export async function collectComponentDependencies(
     );
   }
   const visit = async (path: string): Promise<void> => {
-    if (visited.has(path)) return;
-    visited.add(path);
-    if (!projectRoots.some((root) => isWithinRoot(path, root))) {
+    const canonical = await realpath(path).catch(() => undefined);
+    if (canonical === undefined) {
+      fail("COMPONENT_IMPORT_NOT_FOUND", `React 组件依赖不存在: "${path}"`, { node: node.id, path });
+    }
+    if (visited.has(canonical)) return;
+    if (!canonicalRoots.some((root) => isWithinRoot(canonical, root))) {
       fail(
         "INVALID_COMPONENT_IMPORT",
-        `React 组件依赖必须位于允许的模块目录内: "${path}"`,
-        { node: node.id, path },
+        `React 组件依赖必须位于允许的模块目录内: "${canonical}"`,
+        { node: node.id, path: canonical },
       );
     }
-    const extension = extname(path).toLowerCase();
+    visited.add(canonical);
+    const extension = extname(canonical).toLowerCase();
     if (
       extension === ".css" ||
       extension === ".json" ||
       componentBinaryAssetExtensions.has(extension)
     ) return;
-    const source = await Bun.file(path).text();
+    const source = await Bun.file(canonical).text();
     validateDeterministicSource(node, source);
     const loader =
       extension === ".ts" || extension === ".mts" || extension === ".cts"
@@ -567,7 +593,7 @@ export async function collectComponentDependencies(
         fail(
           "INVALID_COMPONENT_IMPORT",
           `React 组件必须从 @fourier-video/sdk 导入 React 能力，禁止直接导入 "${dependency.path}"`,
-          { node: node.id, importer: path, specifier: dependency.path },
+          { node: node.id, importer: canonical, specifier: dependency.path },
         );
       }
       if (!dependency.path.startsWith(".")) {
@@ -576,93 +602,70 @@ export async function collectComponentDependencies(
           `React 组件只允许导入工程内相对模块和 @fourier-video/sdk，收到 "${dependency.path}"`,
           {
             node: node.id,
-            importer: path,
+            importer: canonical,
             specifier: dependency.path,
           },
         );
       }
-      await visit(resolveLocalImport(path, dependency.path));
+      await visit(resolveLocalImport(canonical, dependency.path));
     }
   };
-  await visit(node.componentPath);
+  await visit(canonicalComponentPath);
   return [...visited].sort();
 }
 
-export async function bundleReactModule(
+export async function inspectSdkArtifact(
   node: ComponentDescriptor,
-  bundleDirectory: string,
-  projectDirOrRoots: string | readonly string[],
-): Promise<Record<string, unknown>> {
-  const projectRoots = typeof projectDirOrRoots === "string"
-    ? [projectDirOrRoots]
-    : projectDirOrRoots;
-  await collectComponentDependencies(node, projectRoots);
-  const forbiddenModule = /^(?:node:|bun:|fs$|fs\/|child_process$|net$|tls$|http$|https$|dgram$)/;
-  const result = await Bun.build({
-    entrypoints: [node.componentPath],
-    outdir: bundleDirectory,
-    target: "bun",
-    format: "cjs",
-    splitting: false,
-    sourcemap: "none",
-    minify: false,
-    plugins: [
-      imageAssetUrlPlugin("render-engine-component-images"),
-      {
-        name: "render-engine-component-policy",
-        setup(builder) {
-          builder.onResolve({ filter: forbiddenModule }, (args) => {
-            throw new Error(`React 组件禁止导入模块 "${args.path}"`);
-          });
-        },
-      },
-      authorRuntimeAliasPlugin("fourier-component-author-runtime"),
-    ],
-  });
-  if (!result.success || result.outputs[0] === undefined) {
-    const messages = result.logs.map((log) => log.message).join("\n");
-    fail(
-      "COMPONENT_BUILD_FAILED",
-      `无法编译 React 组件 "${node.component}": ${messages}`,
-      { node: node.id, component: node.component },
-    );
-  }
-  const output = result.outputs[0];
-  const outputBytes = await output.arrayBuffer();
-  const modulePath = join(
-    bundleDirectory,
-    `${node.id.replaceAll(/[^A-Za-z0-9_-]/g, "_")}-${basename(output.path)}`,
-  );
-  await Bun.write(modulePath, outputBytes);
-  let imported: Record<string, unknown>;
-  try {
-    imported = requireComponent(modulePath) as Record<string, unknown>;
-  } catch (error) {
-    fail(
-      "COMPONENT_LOAD_FAILED",
-      `无法加载 React 组件 "${node.component}": ${error instanceof Error ? error.message : String(error)}`,
-      { node: node.id, component: node.component },
-    );
-  }
-  return imported;
-}
-
-async function bundleReactComponent(
-  node: ComponentDescriptor,
-  bundleDirectory: string,
+  _bundleDirectory: string,
   projectDirOrRoots: string | readonly string[],
 ): Promise<unknown> {
-  const imported = await bundleReactModule(
-    node,
-    bundleDirectory,
-    projectDirOrRoots,
-  );
-  const component = imported[node.exportName];
-  return assertArtifactComponent(
-    component,
-    node.kind === "motion" ? "motion" : "react",
-    `React 组件 "${node.component}" 的导出 "${node.exportName}"`,
-  );
+  if (node.exportName !== "default") {
+    fail("ARTIFACT_EXPORT_INVALID", "SDK ABI Artifact 只接受 default export；exportName 已 deprecated");
+  }
+  const projectRoots = typeof projectDirOrRoots === "string" ? [projectDirOrRoots] : projectDirOrRoots;
+  const sourceRoot = await resolveArtifactSourceRoot(node, projectRoots);
+  let compiled: CompiledVisualArtifact;
+  try {
+    compiled = await compileVisualArtifact({
+      entryPath: node.componentPath,
+      sourceRoot,
+      resourceRoots: projectRoots,
+      mode: "design-preview",
+    });
+  } catch (error) {
+    if (
+      typeof error === "object" && error !== null && "code" in error &&
+      ["ARTIFACT_EXPORT_INVALID", "ARTIFACT_ENTRY_NOT_FOUND"].includes(String(error.code))
+    ) {
+      fail(
+        "LEGACY_COMPONENT_UNSUPPORTED",
+        `组件 "${node.component}" 必须迁移为 default-export defineReact()/defineMotion() SDK Artifact`,
+        { node: node.id, component: node.component },
+      );
+    }
+    throw error;
+  }
+  const expectedKind = node.kind === "motion" ? "motion" : "react";
+  if (compiled.kind !== expectedKind) {
+    fail("ARTIFACT_KIND_MISMATCH", `期望 ${expectedKind} Artifact，收到 ${compiled.kind}`);
+  }
+  const proxy = (() => null) as unknown as Record<PropertyKey, unknown>;
+  const metadata = Object.freeze({
+    package: "@fourier-video/sdk" as const,
+    sdkAbiVersion: compiled.sdkAbiVersion,
+    renderer: compiled.renderer,
+    kind: compiled.kind,
+    name: compiled.name,
+    schema: compiled.schema,
+    static: compiled.static,
+    supportsTextMotion: compiled.supportsTextMotion,
+    videoComposition: compiled.videoComposition,
+    component: () => null,
+    designPreview: () => compiled.designPreview,
+    ...(compiled.supportsTextMotion === true ? { textComponent: () => null } : {}),
+  });
+  Object.defineProperty(proxy, SDK_ARTIFACT, { value: metadata });
+  return proxy;
 }
 
 async function runPool(
@@ -690,9 +693,13 @@ async function openTimelineInstances(
   runtime: VisualTimelineRuntime,
   artifact: CompiledVisualArtifact,
   count: number,
+  dynamicSubjectProvider?: DynamicSubjectProvider,
 ): Promise<readonly TimelineInstance[]> {
   const settled = await Promise.allSettled(
-    Array.from({ length: count }, () => runtime.open(artifact)),
+    Array.from({ length: count }, () => runtime.open(
+      artifact,
+      dynamicSubjectProvider === undefined ? {} : { dynamicSubjectProvider },
+    )),
   );
   const instances: TimelineInstance[] = [];
   let failure: unknown;
@@ -714,14 +721,19 @@ async function openTimelineInstancesForArtifact(
   runtime: VisualTimelineRuntime,
   artifact: CompiledVisualArtifact,
   maximumCount: number,
+  dynamicSubjectProvider?: DynamicSubjectProvider,
 ): Promise<readonly TimelineInstance[]> {
-  const first = await runtime.open(artifact);
+  const first = await runtime.open(
+    artifact,
+    dynamicSubjectProvider === undefined ? {} : { dynamicSubjectProvider },
+  );
   if (first.isStatic || maximumCount === 1) return [first];
   try {
     const remaining = await openTimelineInstances(
       runtime,
       artifact,
       maximumCount - 1,
+      dynamicSubjectProvider,
     );
     return [first, ...remaining];
   } catch (error) {
@@ -769,7 +781,7 @@ async function renderReactNode(
       message: `编译并加载 React 组件 ${node.component}`,
       details: { componentPath: node.componentPath, exportName: node.exportName },
     },
-    () => bundleReactComponent(
+    () => inspectSdkArtifact(
       node,
       bundleDirectory,
       project.resourceRoots,
@@ -781,7 +793,13 @@ async function renderReactNode(
   });
   const seed = hashSeed(`${project.metadata.id}:${node.id}`);
   const metadata = readSdkArtifact(component, "react");
-  if (metadata !== undefined && isSupportedSdkAbiVersion(metadata.sdkAbiVersion)) {
+  if (metadata === undefined || !isSupportedSdkAbiVersion(metadata.sdkAbiVersion)) {
+    fail(
+      "LEGACY_COMPONENT_UNSUPPORTED",
+      `ReactLayer "${node.component}" 必须迁移为 default-export defineReact() SDK Artifact`,
+    );
+  }
+  {
     if (node.exportName !== "default") {
       fail("ARTIFACT_EXPORT_INVALID", "SDK ABI React production entry 必须是 default export");
     }
@@ -795,6 +813,9 @@ async function renderReactNode(
       },
       async () => compileVisualArtifact({
         entryPath: node.componentPath,
+        sourceRoot: project.rootProjectDir,
+        resourceRoots: project.resourceRoots,
+        mode: "production",
         props,
         composition: {
           width: node.width,
@@ -859,28 +880,7 @@ async function renderReactNode(
       await Promise.allSettled(instances.map((instance) => instance.close()));
     }
   }
-  await runPool(node.durationFrames, concurrency, async (localFrame) => {
-    const frame = node.startFrame + localFrame;
-    const renderContext = createRenderContext({
-      frame,
-      localFrame,
-      fps: project.canvas.fps,
-      width: node.width,
-      height: node.height,
-      seed,
-    });
-    const element = React.createElement(
-      component as React.ElementType,
-      {
-        ...props,
-        renderContext,
-      },
-    );
-    const png = await rasterizeReact(element, node.width, node.height, fonts);
-    await Bun.write(join(outputDirectory, frameFileName(localFrame)), png);
-    onFrame();
-  }, signal);
-  return {};
+  fail("LEGACY_COMPONENT_UNSUPPORTED", `ReactLayer "${node.component}" 不是 SDK Artifact`);
 }
 
 function sourceFramePath(
@@ -1092,6 +1092,9 @@ async function renderSparseFfmpegVideoMotion(
   });
   const compiled = await compileVisualArtifact({
     entryPath: motion.componentPath,
+    sourceRoot: project.rootProjectDir,
+    resourceRoots: project.resourceRoots,
+    mode: "production",
     props,
     composition: {
       width: node.width,
@@ -1195,7 +1198,7 @@ async function renderReactFrame(
   fonts: SatoriFont[],
   domPages?: number,
 ): Promise<void> {
-  const component = await bundleReactComponent(
+  const component = await inspectSdkArtifact(
     node,
     bundleDirectory,
     project.resourceRoots,
@@ -1205,7 +1208,13 @@ async function renderReactFrame(
     ...(node.propTypes === undefined ? {} : { declarations: node.propTypes }),
   });
   const metadata = readSdkArtifact(component, "react");
-  if (metadata !== undefined && isSupportedSdkAbiVersion(metadata.sdkAbiVersion)) {
+  if (metadata === undefined || !isSupportedSdkAbiVersion(metadata.sdkAbiVersion)) {
+    fail(
+      "LEGACY_COMPONENT_UNSUPPORTED",
+      `ReactLayer "${node.component}" 必须迁移为 default-export defineReact() SDK Artifact`,
+    );
+  }
+  {
     if (node.exportName !== "default") {
       fail("ARTIFACT_EXPORT_INVALID", "SDK ABI React preview entry 必须是 default export");
     }
@@ -1215,6 +1224,9 @@ async function renderReactFrame(
     try {
       const compiled = await compileVisualArtifact({
         entryPath: node.componentPath,
+        sourceRoot: project.rootProjectDir,
+        resourceRoots: project.resourceRoots,
+        mode: "production",
         props,
         composition: {
           width: node.width,
@@ -1241,46 +1253,7 @@ async function renderReactFrame(
     }
     return;
   }
-  const frame = node.startFrame + localFrame;
-  const renderContext = createRenderContext({
-    frame,
-    localFrame,
-    fps: project.canvas.fps,
-    width: node.width,
-    height: node.height,
-    seed: hashSeed(`${project.metadata.id}:${node.id}`),
-  });
-  const element = React.createElement(component as React.ElementType, {
-    ...props,
-    renderContext,
-  });
-  await Bun.write(
-    outputPath,
-    await rasterizeReact(element, node.width, node.height, fonts),
-  );
-}
-
-async function renderUnmodifiedMotionSubject(
-  subject: PreparedMotionSubject,
-  hostFrame: number,
-  outputPath: string,
-): Promise<void> {
-  if (subject.kind === "raster") {
-    await Bun.write(
-      outputPath,
-      Bun.file(sourceFramePath(subject.visual, hostFrame)),
-    );
-    return;
-  }
-  await Bun.write(
-    outputPath,
-    await rasterizeReact(
-      subject.layout.element,
-      subject.layout.width,
-      subject.layout.height,
-      subject.layout.fonts,
-    ),
-  );
+  fail("LEGACY_COMPONENT_UNSUPPORTED", `ReactLayer "${node.component}" 不是 SDK Artifact`);
 }
 
 async function preparedSubjectPng(
@@ -1314,9 +1287,14 @@ async function renderDomMotionSamples(
   signal?: AbortSignal,
   sharedRuntime?: VisualTimelineRuntime,
   onDiagnostic?: RenderOptions["onDiagnostic"],
-): Promise<PreparedTimelineArtifact | undefined> {
+): Promise<PreparedTimelineArtifact> {
   const metadata = readSdkArtifact(component, "motion");
-  if (metadata === undefined || !isSupportedSdkAbiVersion(metadata.sdkAbiVersion)) return undefined;
+  if (metadata === undefined || !isSupportedSdkAbiVersion(metadata.sdkAbiVersion)) {
+    fail(
+      "LEGACY_COMPONENT_UNSUPPORTED",
+      `Motion "${motion.component}" 必须迁移为 default-export defineMotion() SDK Artifact`,
+    );
+  }
   if (subject.kind === "text" && !metadata.supportsTextMotion) {
     fail(
       "TEXT_MOTION_UNSUPPORTED",
@@ -1362,6 +1340,9 @@ async function renderDomMotionSamples(
     },
     async () => compileVisualArtifact({
       entryPath: motion.componentPath,
+      sourceRoot: project.rootProjectDir,
+      resourceRoots: project.resourceRoots,
+      mode: "production",
       props,
       composition: {
         width,
@@ -1378,7 +1359,6 @@ async function renderDomMotionSamples(
         fill: motion.fill,
       },
       ...(subject.kind === "text" ? { textSubject: subject.content } : {}),
-      dynamicSubjectProvider: provider,
     }),
   );
   const pageCount = Math.min(
@@ -1397,7 +1377,7 @@ async function renderDomMotionSamples(
         message: `启动 ${pageCount} 个 Motion DOM Timeline page`,
         details: { pageCount, host: node.id },
       },
-      () => openTimelineInstances(runtime, compiled, pageCount),
+      () => openTimelineInstances(runtime, compiled, pageCount, provider),
     );
     try {
       await runPool(frames.length, pageCount, async (index, workerIndex) => {
@@ -1421,67 +1401,6 @@ async function renderDomMotionSamples(
     if (ownsRuntime) await runtime.close();
   }
   return timelineArtifactRecord(motion.id, compiled);
-}
-
-async function renderMotionFrame(
-  project: ResolvedProject,
-  node: VisualNode,
-  motion: MotionNode,
-  subject: PreparedMotionSubject,
-  component: MotionComponent,
-  fonts: SatoriFont[],
-  seed: number,
-  hostFrame: number,
-  outputPath: string,
-): Promise<void> {
-  const sample = sampleModifier(motion, hostFrame);
-  if (sample === undefined) {
-    await renderUnmodifiedMotionSubject(subject, hostFrame, outputPath);
-    return;
-  }
-  const { width, height } = motionSubjectSize(subject);
-  const motionContext = createMotionContext({
-    absoluteFrame: node.startFrame + hostFrame,
-    hostFrame,
-    motionFrame: sample.modifierFrame,
-    durationFrames: motion.durationFrames,
-    progress: sample.progress,
-    phase: sample.phase,
-    fps: project.canvas.fps,
-    width,
-    height,
-    seed,
-  });
-  const motionSubject = subject.kind === "text"
-    ? subject.content
-    : React.createElement("img", {
-        src: await pngDataUri(sourceFramePath(subject.visual, hostFrame)),
-        width,
-        height,
-        style: { width, height },
-      });
-  const props = bindSdkArtifactProps(component, motion.props, {
-    fps: project.canvas.fps,
-    ...(motion.propTypes === undefined
-      ? {}
-      : { declarations: motion.propTypes }),
-  });
-  const element = React.createElement(component, {
-    subject: motionSubject,
-    props,
-    motionContext,
-  });
-  await Bun.write(
-    outputPath,
-    await rasterizeReact(
-      element,
-      width,
-      height,
-      subject.kind === "text"
-        ? [...subject.layout.fonts, ...fonts]
-        : fonts,
-    ),
-  );
 }
 
 export async function renderSparseVisualFrame(
@@ -1511,7 +1430,7 @@ export async function renderSparseVisualFrame(
       modifier.kind === "motion" && modifier.enabled,
   );
   if (motion !== undefined) {
-    const candidate = await bundleReactComponent(
+    const candidate = await inspectSdkArtifact(
       motion,
       options.bundleDirectory,
       project.resourceRoots,
@@ -1546,12 +1465,12 @@ export async function renderSparseVisualFrame(
     (node.kind === "text" || node.kind === "subtitle")
   ) {
     const layout = await prepareTextLayout(node, project.canvas.width);
-    const component = await bundleReactComponent(
+    const component = await inspectSdkArtifact(
       motion,
       options.bundleDirectory,
       project.resourceRoots,
     );
-    if ((await renderDomMotionSamples(
+    await renderDomMotionSamples(
       project,
       node,
       motion,
@@ -1562,17 +1481,6 @@ export async function renderSparseVisualFrame(
       () => {},
       1,
       options.domPages,
-    )) !== undefined) return;
-    await renderMotionFrame(
-      project,
-      node,
-      motion,
-      { kind: "text", content: node.content, layout },
-      component as MotionComponent,
-      options.fonts,
-      hashSeed(`${project.metadata.id}:${motion.id}`),
-      localFrame,
-      outputPath,
     );
     return;
   }
@@ -1603,12 +1511,12 @@ export async function renderSparseVisualFrame(
     fail("INTERNAL_ERROR", `无法识别预览视觉节点 "${node.id}"`);
   }
   if (motion === undefined) return;
-  const component = await bundleReactComponent(
+  const component = await inspectSdkArtifact(
     motion,
     options.bundleDirectory,
     project.resourceRoots,
   );
-  if ((await renderDomMotionSamples(
+  await renderDomMotionSamples(
     project,
     node,
     motion,
@@ -1628,26 +1536,6 @@ export async function renderSparseVisualFrame(
     () => {},
     1,
     options.domPages,
-  )) !== undefined) return;
-  await renderMotionFrame(
-    project,
-    node,
-    motion,
-    {
-      kind: "raster",
-      visual: {
-        nodeId: node.id,
-        type: "static",
-        path: subjectPath,
-        width: node.width,
-        height: node.height,
-      },
-    },
-    component as MotionComponent,
-    options.fonts,
-    hashSeed(`${project.metadata.id}:${motion.id}`),
-    localFrame,
-    outputPath,
   );
 }
 
@@ -1665,9 +1553,8 @@ async function renderMotionNode(
   onFrame: () => void,
   signal?: AbortSignal,
   onDiagnostic?: RenderOptions["onDiagnostic"],
-): Promise<PreparedTimelineArtifact | undefined> {
-  const seed = hashSeed(`${project.metadata.id}:${motion.id}`);
-  const domArtifact = await renderDomMotionSamples(
+): Promise<PreparedTimelineArtifact> {
+  return renderDomMotionSamples(
     project,
     node,
     motion,
@@ -1682,28 +1569,6 @@ async function renderMotionNode(
     runtime,
     onDiagnostic,
   );
-  if (domArtifact !== undefined) return domArtifact;
-  await runPool(
-    node.durationFrames,
-    concurrency,
-    async (hostFrame) => {
-      const outputPath = join(outputDirectory, frameFileName(hostFrame));
-      await renderMotionFrame(
-        project,
-        node,
-        motion,
-        subject,
-        component as MotionComponent,
-        fonts,
-        seed,
-        hostFrame,
-        outputPath,
-      );
-      onFrame();
-    },
-    signal,
-  );
-  return undefined;
 }
 
 interface RenderedFfmpegVideoMotion {
@@ -1777,6 +1642,9 @@ async function renderFfmpegVideoMotion(
   });
   const compiled = await compileVisualArtifact({
     entryPath: motion.componentPath,
+    sourceRoot: project.rootProjectDir,
+    resourceRoots: project.resourceRoots,
+    mode: "production",
     props,
     composition: {
       width: node.width,
@@ -2428,7 +2296,7 @@ export async function prepareGeneratedVisuals(
         message: `编译并加载 Motion 组件 ${motion.component}`,
         details: { componentPath: motion.componentPath, host: node.id },
       },
-      () => bundleReactComponent(
+      () => inspectSdkArtifact(
         motion,
         bundleDirectory,
         project.resourceRoots,

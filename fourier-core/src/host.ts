@@ -10,12 +10,18 @@ import {
 } from "./artifact-video-renderer.ts";
 import type { ArtifactHostOptions } from "./integration-types.ts";
 import {
+  materializeProjectModule,
+  type MaterializeProjectModuleOptions,
+  type MaterializedProjectModule,
+} from "./project-materializer.ts";
+import {
   VisualTimelineRuntime,
   type VisualTimelineRuntimeOptions,
 } from "./visual-timeline-runtime.ts";
 
 export interface ArtifactHost {
   compileVisualArtifact(options: CompileVisualArtifactOptions): Promise<CompiledVisualArtifact>;
+  materializeProjectModule(options: MaterializeProjectModuleOptions): Promise<MaterializedProjectModule>;
   createTimelineRuntime(options?: Omit<VisualTimelineRuntimeOptions, "resolveAuthorImport">): VisualTimelineRuntime;
   renderVisualArtifactVideo(
     input: CompiledVisualArtifact | CompileVisualArtifactOptions,
@@ -28,6 +34,7 @@ export function createArtifactHost(options: ArtifactHostOptions): ArtifactHost {
   const integration = Object.freeze({ resolveAuthorImport: options.resolveAuthorImport });
   const host: ArtifactHost = {
     compileVisualArtifact: (input) => compileArtifact(input, integration),
+    materializeProjectModule: (input) => materializeProjectModule(input, integration),
     createTimelineRuntime: (runtimeOptions = {}) => new VisualTimelineRuntime({
       ...runtimeOptions,
       resolveAuthorImport: integration.resolveAuthorImport,

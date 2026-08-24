@@ -9,6 +9,7 @@ import {
   ReactLayer,
   readProjectDefinition,
   readProjectElement,
+  serializeProjectDefinition,
   Text,
   Timeline,
   Transform,
@@ -25,6 +26,33 @@ describe("Project JSX SDK", () => {
     );
     expect(readProjectDefinition(definition)).toBe(definition);
     expect(readProjectElement(definition.declaration)).toMatchObject({ tag: "project" });
+  });
+
+  test("serializeProjectDefinition 展开数组、Fragment 与空 children", () => {
+    const labels = ["first", "second"] as const;
+    const definition = defineProject(
+      <Project id="nested-children" version="1.0" audioSampleRate={48_000}>
+        <Canvas width={1920} height={1080} fps={30} background="#000" colorSpace="sRGB" />
+        <Timeline>
+          {false}
+          {labels.map((label) => (
+            <Text key={label} id={label} duration="1f" role="body" content={label}
+              x={0} y={0} width={100} height={20} layer={1} font="Inter" fontSize={12}
+              lineHeight={1.2} color="#fff" align="left" />
+          ))}
+          <>
+            {null}
+            {[undefined, <Transform key="move" id="move" duration="1f" fill="both"
+              easing="linear" keyframes={[]} />]}
+          </>
+          {true}
+        </Timeline>
+      </Project>,
+    );
+
+    const snapshot = serializeProjectDefinition(definition);
+    expect(snapshot.root.children[1]?.children.map((child) => `${child.tag}:${child.props.id}`))
+      .toEqual(["text:first", "text:second", "transform:move"]);
   });
 
   test("defineTemplate 绑定 typed props、默认值并拒绝未知字段", () => {
@@ -48,6 +76,13 @@ describe("Project JSX SDK", () => {
     expect(() => bindTemplateProps(template, { title: "Card", extra: true })).toThrow(
       "schema 未声明",
     );
+    expect(serializeProjectDefinition(template, { title: "Card" })).toMatchObject({
+      revision: 1,
+      kind: "template",
+      root: { revision: 1, tag: "project", children: [{ tag: "canvas" }, { tag: "timeline" }] },
+      bindings: { title: "Card", count: 2, duration: "3f" },
+      bindingSources: { title: "explicit", count: "default", duration: "default" },
+    });
   });
 
   test("节点类型强制原生 boolean、对象 props 与 keyframes", () => {

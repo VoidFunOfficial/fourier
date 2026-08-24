@@ -1,6 +1,6 @@
 {
   "name": "@fourier-video/render-engine",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "license": "MIT",
   "type": "module",
   "description": "Bun + FFmpeg renderer and CLI for Fourier TSX projects",
@@ -48,7 +48,7 @@
     "test:dom": "bun run scripts/test-dom.ts"
   },
   "dependencies": {
-    "@fourier-video/core": "^1.0.0",
+    "@fourier-video/core": "^1.1.0",
     "@resvg/resvg-js": "^2.6.2",
     "playwright": "1.62.0",
     "react": "19.2.8",
@@ -56,7 +56,7 @@
     "satori": "^0.18.3"
   },
   "peerDependencies": {
-    "@fourier-video/sdk": "^1.1.5"
+    "@fourier-video/sdk": "^1.2.0"
   },
   "devDependencies": {
     "@fourier-video/sdk": "workspace:*",

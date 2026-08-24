@@ -1,4 +1,5 @@
 import type { CompiledVisualArtifact } from "@fourier-video/core/artifact";
+import { dirname } from "node:path";
 import {
   SampleClock,
   type RationalTimeInput,
@@ -8,12 +9,7 @@ import {
 } from "@fourier-video/core/timeline";
 import { sdkArtifactHost } from "./artifact-host.ts";
 import { SdkError } from "./errors.ts";
-import {
-  SDK_ARTIFACT,
-  type AnyArtifact,
-  type MotionPreviewContext,
-  type MotionPreviewDescriptor,
-} from "./types.ts";
+import type { MotionPreviewContext, MotionPreviewDescriptor } from "./types.ts";
 
 const { compileVisualArtifact, createTimelineRuntime } = sdkArtifactHost;
 
@@ -154,14 +150,10 @@ function timelineFixture(
       if (artifact.kind !== "motion") {
         throw new SdkError("ARTIFACT_KIND_MISMATCH", "只有 Motion artifact 支持 preview descriptor");
       }
-      const metadata = typeof artifact.sourceArtifact === "function"
-        ? (artifact.sourceArtifact as AnyArtifact)[SDK_ARTIFACT]
-        : undefined;
-      if (metadata?.kind !== "motion" || metadata.preview === undefined) return undefined;
-      return metadata.preview({
-        props: artifact.props,
-        context: motionPreviewContext(artifact, request),
-      });
+      // Preview functions remain inside browser bundles; functions are never
+      // reflected into the SDK/Bun host across the secure execution seam.
+      void motionPreviewContext(artifact, request);
+      return undefined;
     },
     async close() {
       if (closed) return;
@@ -175,10 +167,17 @@ function timelineFixture(
 /** Opens an ABI v1.1 artifact from its source entry path. */
 export async function openArtifact(
   entryPath: string,
-  options: { exportName?: "default" } = {},
+  options: {
+    exportName?: "default";
+    sourceRoot?: string;
+    resourceRoots?: readonly string[];
+  } = {},
 ): Promise<ArtifactFixture> {
   const artifact = await compileVisualArtifact({
     entryPath,
+    sourceRoot: options.sourceRoot ?? dirname(entryPath),
+    resourceRoots: options.resourceRoots ?? [options.sourceRoot ?? dirname(entryPath)],
+    mode: "design-preview",
     ...(options.exportName === undefined ? {} : { exportName: options.exportName }),
   });
   const runtime = createTimelineRuntime();

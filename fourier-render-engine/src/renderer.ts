@@ -198,6 +198,11 @@ export async function renderProject(
       projectId: project.metadata.id,
       totalFrames: project.totalFrames,
       fps: project.canvas.fps,
+      executionRevision: project.executionRevision,
+      sourceFingerprint: project.sourceFingerprint ?? fail(
+        "SECURE_EXECUTION_PROTOCOL_INVALID",
+        "渲染工程缺少安全执行 source fingerprint",
+      ),
       artifacts,
     });
     const result: RenderResult = {

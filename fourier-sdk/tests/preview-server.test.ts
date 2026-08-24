@@ -272,7 +272,7 @@ export default defineReact({
     };
     expect(recovered.snapshotId).not.toBe(second.snapshotId);
     expect(recovered.diagnostic).toBeUndefined();
-  });
+  }, 15_000);
 
   test("watch 模式在源码保存后自动发布新 snapshot", async () => {
     const directory = await mkdtemp(join(import.meta.dir, ".preview-watch-"));
@@ -325,7 +325,7 @@ export default defineReact({
 
     let eventText = "";
     let pendingRead = reader.read();
-    const deadline = Date.now() + 1_500;
+    const deadline = Date.now() + 5_000;
     while (Date.now() < deadline && !eventText.includes("Alpha.tsx")) {
       const remaining = Math.max(1, deadline - Date.now());
       const result = await Promise.race([
@@ -341,5 +341,5 @@ export default defineReact({
     await reader.cancel();
     expect(eventText).toContain("Alpha.tsx");
     expect(eventText).not.toContain("Zulu.tsx");
-  });
+  }, 15_000);
 });

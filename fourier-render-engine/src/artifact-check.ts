@@ -1,4 +1,4 @@
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { compileVisualArtifact } from "./artifact-compiler.ts";
 import type { SupportedSdkAbiVersion } from "./artifact-protocol.ts";
 import { checkBrowserRuntime, type BrowserCheckResult } from "./browser-check.ts";
@@ -15,7 +15,12 @@ export interface ArtifactCheckResult {
 
 export async function checkArtifact(entryPath: string): Promise<ArtifactCheckResult> {
   const resolvedEntryPath = resolve(entryPath);
-  const artifact = await compileVisualArtifact({ entryPath: resolvedEntryPath });
+  const artifact = await compileVisualArtifact({
+    entryPath: resolvedEntryPath,
+    sourceRoot: dirname(resolvedEntryPath),
+    resourceRoots: [dirname(resolvedEntryPath)],
+    mode: "design-preview",
+  });
   const browser = await checkBrowserRuntime();
   return Object.freeze({
     valid: true,

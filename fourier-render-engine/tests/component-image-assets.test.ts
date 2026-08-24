@@ -1,9 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, realpath, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  bundleReactModule,
   collectComponentDependencies,
   type ComponentDescriptor,
 } from "../src/visual-renderer.ts";
@@ -49,21 +48,17 @@ export default defineReact({
       };
 
       const dependencies = await collectComponentDependencies(node, [directory]);
-      expect(dependencies).toContain(componentPath);
-      expect(dependencies).toContain(imagePath);
-
-      const imported = await bundleReactModule(node, bundleDirectory, [directory]);
-      expect(imported.default).toBeDefined();
-      expect(imported.posterUrl).toStartWith(
-        "https://fourier.invalid/__fourier_image_assets__/",
-      );
+      expect(dependencies).toContain(await realpath(componentPath));
+      expect(dependencies).toContain(await realpath(imagePath));
 
       const artifact = await compileVisualArtifact({ entryPath: componentPath });
-      expect(artifact.props.poster).toBe(imported.posterUrl);
-      expect(artifact.bundleSnapshot.javascript).toContain(imported.posterUrl as string);
+      expect(artifact.props.poster).toStartWith(
+        "https://fourier.invalid/__fourier_image_assets__/",
+      );
+      expect(artifact.bundleSnapshot.javascript).toContain(artifact.props.poster as string);
       expect(artifact.bundleSnapshot.imageAssets).toEqual([
         expect.objectContaining({
-          url: imported.posterUrl,
+          url: artifact.props.poster,
           mimeType: "image/png",
         }),
       ]);

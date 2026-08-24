@@ -11,6 +11,7 @@ import {
   compileVisualArtifact,
   type CompiledVisualArtifact,
   type CompileVisualArtifactOptions,
+  type DynamicSubjectProvider,
 } from "./artifact-compiler.ts";
 import { isSupportedSdkAbiVersion } from "./artifact-protocol.ts";
 import {
@@ -79,7 +80,10 @@ export interface TimelineInstance {
 }
 
 interface TimelineAdapter {
-  open(artifact: CompiledVisualArtifact): Promise<TimelineInstance>;
+  open(
+    artifact: CompiledVisualArtifact,
+    options?: TimelineOpenOptions,
+  ): Promise<TimelineInstance>;
   close(): Promise<void>;
 }
 
@@ -808,7 +812,10 @@ export class DomTimelineAdapter implements TimelineAdapter {
     this.#pool = new BrowserPagePool(maximumPages);
   }
 
-  async open(artifact: CompiledVisualArtifact): Promise<TimelineInstance> {
+  async open(
+    artifact: CompiledVisualArtifact,
+    options: TimelineOpenOptions = {},
+  ): Promise<TimelineInstance> {
     if (
       !isSupportedSdkAbiVersion(artifact.sdkAbiVersion) ||
       !["dom-timeline", "dom-timeline-ffmpeg-video"].includes(artifact.renderer) ||
@@ -896,10 +903,11 @@ export class DomTimelineAdapter implements TimelineAdapter {
         seed: artifact.seed,
         durationMilliseconds,
         props: artifact.props,
+        useDesignPreview: artifact.useDesignPreview,
         ...(artifact.textSubject === undefined
           ? {}
           : { textSubject: artifact.textSubject }),
-        ...(artifact.dynamicSubjectProvider === undefined
+        ...(options.dynamicSubjectProvider === undefined
           ? {}
           : { subjectDataUrl: transparentSubject }),
         ...(artifact.renderer === "dom-timeline-ffmpeg-video"
@@ -974,9 +982,9 @@ export class DomTimelineAdapter implements TimelineAdapter {
         cancelled(request.signal);
         const time = rationalTime(request.time);
         if (time.numerator < 0n) fail("INVALID_SAMPLE_TIME", "sample time 不能为负数");
-        const subject = artifact.dynamicSubjectProvider === undefined
+        const subject = options.dynamicSubjectProvider === undefined
           ? undefined
-          : await artifact.dynamicSubjectProvider(time, request.signal);
+          : await options.dynamicSubjectProvider(time, request.signal);
         cancelled(request.signal);
         const clock = new SampleClock(artifact.composition.fpsSource);
         const phase = artifact.motion === undefined
@@ -1096,7 +1104,11 @@ export class DomTimelineAdapter implements TimelineAdapter {
         state = "closed";
         cache.clear();
         await serial;
-        await this.#pool.release(resource);
+        // A sampled media element leaves Chromium decoder and virtual-time
+        // state attached to its context. Reusing that page for a non-media
+        // artifact can hang the next synchronous initialize call, so retire
+        // media contexts at this boundary.
+        await this.#pool.release(resource, hasMedia);
       },
     });
   }
@@ -1117,13 +1129,23 @@ export class VisualTimelineRuntime {
 
   async open(
     input: CompiledVisualArtifact | CompileVisualArtifactOptions,
+    options: TimelineOpenOptions = {},
   ): Promise<TimelineInstance> {
-    const artifact = "sdkAbiVersion" in input
-      ? input
-      : await compileVisualArtifact(input, {
-          resolveAuthorImport: this.#resolveAuthorImport,
-        });
-    return this.#dom.open(artifact);
+    const dynamicSubjectProvider = options.dynamicSubjectProvider ?? (
+      "sdkAbiVersion" in input ? undefined : input.dynamicSubjectProvider
+    );
+    let artifact: CompiledVisualArtifact;
+    if ("sdkAbiVersion" in input) {
+      artifact = input;
+    } else {
+      const { dynamicSubjectProvider: _runtimeProvider, ...compileInput } = input;
+      artifact = await compileVisualArtifact(compileInput, {
+        resolveAuthorImport: this.#resolveAuthorImport,
+      });
+    }
+    return this.#dom.open(artifact, dynamicSubjectProvider === undefined
+      ? {}
+      : { dynamicSubjectProvider });
   }
 
   async close(): Promise<void> {
@@ -1134,4 +1156,8 @@ export class VisualTimelineRuntime {
 export interface VisualTimelineRuntimeOptions {
   readonly maximumDomPages?: number;
   readonly resolveAuthorImport: ResolveAuthorImport;
+}
+
+export interface TimelineOpenOptions {
+  readonly dynamicSubjectProvider?: DynamicSubjectProvider;
 }

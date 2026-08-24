@@ -4,6 +4,7 @@ import {
   defineProject,
   Image,
   Project,
+  serializeProjectDefinition,
   Timeline,
   Transform,
   Video,
@@ -14,7 +15,7 @@ import type { PreparedVisual } from "../src/visual-renderer.ts";
 
 describe("FFmpeg consumes Project JSX IR", () => {
   test("Transform 仍生成逐帧 overlay 表达式", () => {
-    const project = compileProjectDeclaration(defineProject(
+    const project = compileProjectDeclaration(serializeProjectDefinition(defineProject(
       <Project id="transform-frame-index" version="1.0" audioSampleRate={48_000}>
         <Canvas width={64} height={64} fps={10} background="#000" colorSpace="sRGB" />
         <Timeline>
@@ -28,7 +29,7 @@ describe("FFmpeg consumes Project JSX IR", () => {
           </Image>
         </Timeline>
       </Project>,
-    ), { projectDir: "/tmp/fourier-ffmpeg-test", validateAssets: false });
+    )), { projectDir: "/tmp/fourier-ffmpeg-test", validateAssets: false });
 
     const plan = buildFfmpegPlan(project, new Map(), "/tmp/fourier-transform.mp4", {
       output: "/tmp/fourier-transform.mp4",
@@ -42,7 +43,7 @@ describe("FFmpeg consumes Project JSX IR", () => {
   });
 
   test("FFmpeg Video Motion 仍直接读取原视频并合成投影", () => {
-    const project = compileProjectDeclaration(defineProject(
+    const project = compileProjectDeclaration(serializeProjectDefinition(defineProject(
       <Project id="ffmpeg-video-panel" version="1.0" audioSampleRate={48_000}>
         <Canvas width={64} height={64} fps={10} background="#000" colorSpace="sRGB" />
         <Timeline>
@@ -50,7 +51,7 @@ describe("FFmpeg consumes Project JSX IR", () => {
             rate={1.5} loop fit="stretch" audio x={32} y={32} width={8} height={8} layer={1} />
         </Timeline>
       </Project>,
-    ), { projectDir: "/tmp/fourier-ffmpeg-video-test", validateAssets: false });
+    )), { projectDir: "/tmp/fourier-ffmpeg-video-test", validateAssets: false });
     const projections = [
       [[0, 0], [8, 0], [0, 8], [8, 8]],
       [[1, 0], [7, 1], [1, 8], [7, 7]],

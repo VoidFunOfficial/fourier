@@ -1,48 +1,44 @@
-import React from "react";
+import {
+  defineMotion,
+  field,
+  createElement,
+  useFourierContext,
+  useFourierLifecycle,
+  useFourierTimeline,
+  useLayoutEffect,
+  useRef,
+} from "@fourier-video/sdk";
 
-interface BenchmarkRevealProps {
-  subject: React.ReactNode;
-  props: Record<string, unknown>;
-  motionContext: {
-    progress: number;
-    width: number;
-    height: number;
-  };
-}
-
-export default function BenchmarkReveal({
-  subject,
-  props,
-  motionContext,
-}: BenchmarkRevealProps) {
-  const direction = props.direction === "right" ? -1 : 1;
-  const distance =
-    typeof props.distance === "number" ? props.distance : 24;
-  const translateX =
-    (1 - motionContext.progress) * distance * direction;
-
-  return React.createElement(
-    "div",
-    {
-      style: {
-        width: motionContext.width,
-        height: motionContext.height,
-        display: "flex",
-        overflow: "hidden",
-        opacity: 0.35 + motionContext.progress * 0.65,
-      },
-    },
-    React.createElement(
-      "div",
-      {
-        style: {
-          width: motionContext.width,
-          height: motionContext.height,
-          display: "flex",
-          transform: `translateX(${translateX}px)`,
-        },
-      },
-      subject,
-    ),
-  );
-}
+export default defineMotion({
+  name: "BenchmarkReveal",
+  schema: {
+    direction: field.enum(["left", "right"] as const, { default: "left" }),
+    distance: field.number({ default: 24, min: 0 }),
+  },
+  supportsTextMotion: false,
+  component({ subject, props }) {
+    const context = useFourierContext();
+    const timeline = useFourierTimeline();
+    const target = useRef<HTMLDivElement>(null);
+    useFourierLifecycle({ fourierStart() {}, fourierEnd() {} });
+    useLayoutEffect(() => {
+      if (target.current === null) throw new Error("benchmark motion target missing");
+      const direction = props.direction === "right" ? -1 : 1;
+      timeline.animate(target.current, [
+        { opacity: 0.35, transform: `translateX(${props.distance * direction}px)` },
+        { opacity: 1, transform: "translateX(0px)" },
+      ], { fill: "both" });
+    }, [timeline, props.direction, props.distance]);
+    return createElement("div", {
+      ref: target,
+      style: { width: context.width, height: context.height, display: "flex", overflow: "hidden" },
+    }, subject);
+  },
+  designPreview() {
+    return {
+      props: {},
+      subject: createElement("div", { style: { width: 240, height: 160, background: "#334155" } }),
+      composition: { width: 240, height: 160, durationSeconds: 1 },
+    };
+  },
+});

@@ -273,6 +273,7 @@ export interface ResolvedProject {
   projectDir: string;
   sourcePath?: string;
   sourceFingerprint?: string;
+  executionRevision: "project-wire-v1";
   declaredDurationFrames?: number;
   totalFrames: number;
   nodes: RenderNode[];

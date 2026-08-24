@@ -13,6 +13,7 @@ import searchCursorUrl from "../assets/cursor-search.svg";
 import videoCursorUrl from "../assets/cursor-video.svg";
 
 const DURATION_SECONDS = 5.5;
+const PREVIEW_DURATION_SECONDS = 6;
 const WORLD_WIDTH = 5200;
 const WORLD_HEIGHT = 1800;
 const FONT = "Inter, Arial, sans-serif";
@@ -377,7 +378,7 @@ export default defineReact({
   designPreview() {
     return {
       props: {},
-      composition: { width: 1920, height: 1080, durationSeconds: DURATION_SECONDS },
+      composition: { width: 1920, height: 1080, durationSeconds: PREVIEW_DURATION_SECONDS },
       player: { background: BACKGROUND, loop: true },
     };
   },

@@ -22,7 +22,11 @@ describeDom("SDK testing ABI v1 path Adapter", () => {
   }, 20_000);
 
   test("Example3D 加载 GLB 并由 Fourier 绝对时间驱动旋转", async () => {
-    const fixture = await openArtifact(join(import.meta.dir, "../example/Example3D.tsx"));
+    const sdkRoot = join(import.meta.dir, "..");
+    const fixture = await openArtifact(join(sdkRoot, "example/Example3D.tsx"), {
+      sourceRoot: sdkRoot,
+      resourceRoots: [sdkRoot],
+    });
     try {
       expect(fixture.isStatic).toBe(false);
       const first = await fixture.renderFrame({ frame: 0 });
@@ -35,7 +39,11 @@ describeDom("SDK testing ABI v1 path Adapter", () => {
   }, 40_000);
 
   test("VideoPanel 输出单一投影 surface 并按 Y/X 弹簧时间复位", async () => {
-    const fixture = await openArtifact(join(import.meta.dir, "../example/VideoPanel.tsx"));
+    const sdkRoot = join(import.meta.dir, "..");
+    const fixture = await openArtifact(join(sdkRoot, "example/VideoPanel.tsx"), {
+      sourceRoot: sdkRoot,
+      resourceRoots: [sdkRoot],
+    });
     try {
       const front = await fixture.renderFrame({ frame: 0 });
       const yPeak = await fixture.renderFrame({ frame: 45 });
@@ -107,7 +115,11 @@ describeDom("SDK testing ABI v1 path Adapter", () => {
   }, 40_000);
 
   test("Universe3D 固定 xyz 并在每次大幅转镜后依次显隐四张卡片", async () => {
-    const fixture = await openArtifact(join(import.meta.dir, "../example/Universe3DCameraExample.tsx"));
+    const sdkRoot = join(import.meta.dir, "..");
+    const fixture = await openArtifact(join(sdkRoot, "example/Universe3DCameraExample.tsx"), {
+      sourceRoot: sdkRoot,
+      resourceRoots: [sdkRoot],
+    });
     try {
       const black = await fixture.renderFrame({ frame: 0 });
       const thisIs = await fixture.renderFrame({ frame: 76 });

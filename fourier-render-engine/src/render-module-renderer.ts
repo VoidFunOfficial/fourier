@@ -34,7 +34,7 @@ export interface PrepareRenderModuleOptions {
 export type PrepareSceneOptions = PrepareRenderModuleOptions;
 
 const CACHE_SCHEMA_VERSION = "v3";
-const RENDERER_VERSION = "1.0.0";
+const RENDERER_VERSION = "2.0.0";
 const EXCLUDED_DIRECTORIES = new Set([".render-cache", "output", "node_modules"]);
 
 function decimal(value: number): string {

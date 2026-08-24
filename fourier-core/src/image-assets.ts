@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import { basename } from "node:path";
+import type { Plugin } from "esbuild";
 
 export const FOURIER_ASSET_ORIGIN = "https://fourier.invalid";
 export const FOURIER_IMAGE_ASSET_ROUTE =
@@ -40,10 +42,10 @@ export interface BundledImageAsset {
 export function imageAssetUrlPlugin(
   name: string,
   onAsset?: (asset: BundledImageAsset) => void,
-) {
+): Plugin {
   return {
     name,
-    setup(build: Bun.PluginBuilder) {
+    setup(build) {
       build.onLoad(
         { filter: /\.(?:avif|bmp|gif|jpe?g|png|svg|webp)$/i },
         async (args) => {
@@ -51,7 +53,7 @@ export function imageAssetUrlPlugin(
             .slice(args.path.lastIndexOf("."))
             .toLowerCase() as keyof typeof imageMimeTypes;
           const mimeType = imageMimeTypes[extension];
-          const bytes = new Uint8Array(await Bun.file(args.path).arrayBuffer());
+          const bytes = new Uint8Array(await readFile(args.path));
           const hash = createHash("sha256").update(bytes).digest("hex").slice(0, 24);
           const filename = encodeURIComponent(basename(args.path));
           const url = `${FOURIER_ASSET_ORIGIN}/__fourier_image_assets__/${hash}/${filename}`;

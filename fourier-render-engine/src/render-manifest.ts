@@ -6,16 +6,17 @@ import {
   CHROMIUM_REVISION,
   CHROMIUM_VERSION,
   PLAYWRIGHT_VERSION,
+  PROJECT_EXECUTION_REVISION,
   type RenderProfile,
-} from "./render-profile.ts";
+} from "@fourier-video/core/artifact";
 import type { PreparedTimelineArtifact } from "./visual-renderer.ts";
 
 export interface RenderManifest {
-  readonly schemaVersion: 1;
-  readonly engine: { readonly name: "@fourier-video/render-engine"; readonly version: "1.0.0" };
+  readonly schemaVersion: 2;
+  readonly engine: { readonly name: "@fourier-video/render-engine"; readonly version: "2.0.0" };
   readonly sdk: {
     readonly name: "@fourier-video/sdk";
-    readonly version: "1.1.0";
+    readonly version: "1.2.0";
     readonly abiVersion: typeof SDK_ABI_VERSION;
   };
   readonly playwright: { readonly version: typeof PLAYWRIGHT_VERSION };
@@ -23,7 +24,13 @@ export interface RenderManifest {
     readonly version: typeof CHROMIUM_VERSION;
     readonly revision: typeof CHROMIUM_REVISION;
   };
-  readonly project: { readonly id: string; readonly totalFrames: number; readonly fps: number };
+  readonly project: {
+    readonly id: string;
+    readonly totalFrames: number;
+    readonly fps: number;
+    readonly executionRevision: typeof PROJECT_EXECUTION_REVISION;
+    readonly sourceFingerprint: string;
+  };
   readonly output: { readonly path: string; readonly sha256: string };
   readonly profiles: readonly RenderProfile[];
   readonly snapshots: readonly PreparedTimelineArtifact[];
@@ -44,6 +51,8 @@ export async function writeRenderManifest(input: {
   projectId: string;
   totalFrames: number;
   fps: number;
+  executionRevision: typeof PROJECT_EXECUTION_REVISION;
+  sourceFingerprint: string;
   artifacts: readonly PreparedTimelineArtifact[];
 }): Promise<{ manifest: RenderManifest; manifestPath: string }> {
   const output = resolve(input.output);
@@ -57,16 +66,22 @@ export async function writeRenderManifest(input: {
   const byProfile = new Map<string, RenderProfile>();
   for (const artifact of snapshots) byProfile.set(artifact.profile.hash, artifact.profile);
   const manifest = Object.freeze({
-    schemaVersion: 1 as const,
-    engine: Object.freeze({ name: "@fourier-video/render-engine" as const, version: "1.0.0" as const }),
+    schemaVersion: 2 as const,
+    engine: Object.freeze({ name: "@fourier-video/render-engine" as const, version: "2.0.0" as const }),
     sdk: Object.freeze({
       name: "@fourier-video/sdk" as const,
-      version: "1.1.0" as const,
+      version: "1.2.0" as const,
       abiVersion: SDK_ABI_VERSION,
     }),
     playwright: Object.freeze({ version: PLAYWRIGHT_VERSION }),
     chromium: Object.freeze({ version: CHROMIUM_VERSION, revision: CHROMIUM_REVISION }),
-    project: Object.freeze({ id: input.projectId, totalFrames: input.totalFrames, fps: input.fps }),
+    project: Object.freeze({
+      id: input.projectId,
+      totalFrames: input.totalFrames,
+      fps: input.fps,
+      executionRevision: input.executionRevision,
+      sourceFingerprint: input.sourceFingerprint,
+    }),
     output: Object.freeze({ path: output, sha256: await fileSha256(output) }),
     profiles: Object.freeze([...byProfile.values()].sort((left, right) => left.hash.localeCompare(right.hash))),
     snapshots,

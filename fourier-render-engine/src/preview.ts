@@ -5,7 +5,6 @@ import { tmpdir } from "node:os";
 import { basename, dirname, extname, join, resolve } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
 import React from "react";
-import { resolveMotionPreviewExports } from "./artifact-protocol.ts";
 import { hashSeed } from "./deterministic.ts";
 import { fail } from "./errors.ts";
 import { assertFfmpegTools, validateProjectMedia } from "./media-probe.ts";
@@ -31,7 +30,6 @@ import type {
   VisualNode,
 } from "./types.ts";
 import {
-  bundleReactModule,
   loadProjectFonts,
   pngDataUri,
   rasterizeReact,
@@ -936,55 +934,13 @@ export async function renderProjectPreview(
         continue;
       }
 
-      const previewContext = motionContext(
-        project,
-        node,
-        modifier,
-        anchorFrame,
-        rangeStartFrame,
-        rangeEndFrame,
-      );
-      const module = await bundleReactModule(
-        modifier,
-        bundleDirectory,
-        project.resourceRoots,
-      );
-      const motionPreviewExports = resolveMotionPreviewExports(
-        module,
-        modifier.exportName,
-        {
-          ...(modifier.propTypes === undefined
-            ? {}
-            : { declarations: modifier.propTypes }),
-        },
-      );
-      const previewExport = motionPreviewExports.preview;
-      const customPreview = motionPreviewExports.Preview;
-      let descriptor: MotionPreviewDescriptor;
-      let fallback = false;
-      if (previewExport === undefined) {
-        descriptor = {
-          representativeProgress: 1,
-          priority: "secondary",
-          annotations: [],
-          overlayBounds: [],
-        };
-        fallback = true;
-      } else {
-        if (typeof previewExport !== "function") {
-          fail("INVALID_PREVIEW_DEFINITION", `Motion "${modifier.id}" 的 preview 导出必须是函数`);
-        }
-        const value = previewExport({ props: modifier.props, previewContext });
-        if (
-          typeof value === "object" &&
-          value !== null &&
-          "then" in value &&
-          typeof (value as { then?: unknown }).then === "function"
-        ) {
-          fail("INVALID_PREVIEW_DEFINITION", `Motion "${modifier.id}" 的 preview() 必须同步返回`);
-        }
-        descriptor = validateDescriptor(value);
-      }
+      const descriptor: MotionPreviewDescriptor = {
+        representativeProgress: 1,
+        priority: "secondary",
+        annotations: [],
+        overlayBounds: [],
+      };
+      const fallback = true;
       const priority = descriptor.priority ?? "secondary";
       const representativeProgress = descriptor.representativeProgress ?? 1;
       const representativeFrame = modifierLocalFrame(modifier, representativeProgress);
@@ -1066,56 +1022,6 @@ export async function renderProjectPreview(
           MOTION_COLOR,
           priority,
         );
-      }
-      if (customPreview !== undefined) {
-        if (
-          typeof customPreview !== "function" &&
-          (typeof customPreview !== "object" || customPreview === null)
-        ) {
-          fail("INVALID_PREVIEW_DEFINITION", `Motion "${modifier.id}" 的 Preview 导出必须是 React 组件`);
-        }
-        if ((descriptor.overlayBounds ?? []).length === 0) {
-          fail("INVALID_PREVIEW_DEFINITION", `Motion "${modifier.id}" 使用 Preview 组件时必须声明 overlayBounds`);
-        }
-        occupied.push(...(descriptor.overlayBounds ?? []));
-        const subject = node.kind === "text" || node.kind === "subtitle"
-          ? node.content
-          : React.createElement("img", {
-              src: await pngDataUri(
-                await frameFor(node, representativeFrame),
-              ),
-              width: node.width,
-              height: node.height,
-              style: { width: node.width, height: node.height },
-            });
-        const element = React.createElement(
-          "div",
-          {
-            style: {
-              width: project.canvas.width,
-              height: project.canvas.height,
-              display: "flex",
-              position: "relative",
-            },
-          },
-          React.createElement(customPreview as React.ElementType, {
-            subject,
-            props: modifier.props,
-            previewContext,
-            descriptor,
-          }),
-        );
-        const overlayPath = join(overlayDirectory, `motion-${modifier.id}.png`);
-        await Bun.write(
-          overlayPath,
-          await rasterizeReact(
-            element,
-            project.canvas.width,
-            project.canvas.height,
-            fonts,
-          ),
-        );
-        customOverlays.push(overlayPath);
       }
     }
 

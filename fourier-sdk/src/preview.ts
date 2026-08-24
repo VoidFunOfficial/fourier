@@ -4,12 +4,9 @@ import { randomUUID } from "node:crypto";
 import { basename, dirname, relative, resolve, sep } from "node:path";
 import type { CompiledVisualArtifact } from "@fourier-video/core/artifact";
 import { sdkArtifactHost } from "./artifact-host.ts";
-import { resolveDesignPreview } from "./preview-config.ts";
 import { PLAYER_CSS, PLAYER_HTML } from "./player.ts";
 import {
   DESIGN_PREVIEW_FPS,
-  type AnyArtifact,
-  type PreviewConfig,
 } from "./types.ts";
 
 export { definePreview } from "./preview-config.ts";
@@ -48,7 +45,17 @@ export interface PreviewServerHandle {
 interface CompiledSession {
   mode: "browser-dom";
   artifact: CompiledVisualArtifact;
-  config: PreviewConfig<AnyArtifact>;
+  config: {
+    readonly composition: {
+      readonly width: number;
+      readonly height: number;
+      readonly durationSeconds: number;
+      readonly fps: number;
+      readonly durationInFrames: number;
+      readonly static: boolean;
+    };
+    readonly player?: { readonly background?: "checkerboard" | string; readonly loop?: boolean };
+  };
   dependencies: readonly string[];
 }
 
@@ -151,14 +158,22 @@ function domRuntimeJavascript(artifact: CompiledVisualArtifact): string {
 }
 
 async function compileSessionNow(configPath: string): Promise<CompiledSession> {
-  const artifact = await compileVisualArtifact({ entryPath: configPath });
-  if (typeof artifact.sourceArtifact !== "function") {
-    throw Object.assign(
-      new Error("preview entry 的 default export 必须由 defineReact/defineMotion 创建"),
-      { code: "ARTIFACT_EXPORT_INVALID" },
-    );
-  }
-  const config = resolveDesignPreview(artifact.sourceArtifact as AnyArtifact);
+  const artifact = await compileVisualArtifact({
+    entryPath: configPath,
+    sourceRoot: dirname(configPath),
+    resourceRoots: [dirname(configPath)],
+    mode: "design-preview",
+  });
+  const preview = artifact.designPreview;
+  const config = Object.freeze({
+    composition: Object.freeze({
+      ...preview.composition,
+      fps: artifact.composition.fps,
+      durationInFrames: artifact.composition.durationInFrames,
+      static: preview.composition.durationSeconds === 0,
+    }),
+    ...(preview.player === undefined ? {} : { player: preview.player }),
+  });
   const dependencies = artifact.dependencies;
   return { mode: "browser-dom", artifact, config, dependencies };
 }
