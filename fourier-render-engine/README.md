@@ -4,7 +4,7 @@ English | [简体中文](./README.zh-CN.md)
 
 **Compile structured video projects into reliable deliverables.**
 
-Fourier Render Engine is Fourier's deterministic execution layer. It loads an SDK-authored `main.tsx`, compiles branded JSX nodes into a `ResolvedProject`, prepares React, Motion, text, media, and TTS content, and uses FFmpeg to produce the final video. TSX is the declaration layer, not a separate browser rendering backend.
+Fourier Render Engine is Fourier's deterministic execution layer. It loads an SDK-authored `main.tsx`, compiles branded JSX nodes into a `ResolvedProject`, prepares React, Motion, Shader, text, media, and TTS content, and uses FFmpeg to produce the final video. TSX is the declaration layer, not a separate browser rendering backend.
 
 ## Why Fourier Render Engine
 
@@ -24,11 +24,11 @@ This package owns project execution, caching, TTS, Preview, CLI/HTTP, and projec
 
 Fourier optimizes around the structure of the video project rather than treating every render as a new opaque job:
 
-1. **Fingerprint dependencies:** project declarations, Scene/Template bundles, component source, local assets, fonts, Motion timing, TTS inputs, FPS, and the render profile participate in cache identity.
+1. **Fingerprint dependencies:** project declarations, Scene/Template bundles, component source, local assets, fonts, Motion/Shader timing, TTS inputs, FPS, and the render profile participate in cache identity.
 2. **Reuse unchanged layers:** raw module content, derived module ranges, prepared visuals, static artifact images, dynamic visual output, and synthesized speech can be reused when their inputs remain unchanged.
 3. **Invalidate precisely:** editing one dependency invalidates the cache entries that depend on it instead of discarding unrelated Scene and component work.
 4. **Prepare independent work concurrently:** visual nodes and artifact sampling can use bounded concurrency and a shared browser runtime; one Chromium process is not launched for every node or frame.
-5. **Keep the fast path simple:** Image and Video nodes without Motion go directly to FFmpeg, while only Text, React, and Motion content enters visual preparation.
+5. **Keep the fast path simple:** Image and Video nodes without Motion or Shader go directly to FFmpeg, while only Text, React, Motion, and Shader content enters visual preparation.
 
 The performance model depends on determinism. Cache entries include content hashes and render-profile information, are validated before use, and are rebuilt when their identity or integrity no longer matches. The result is faster iteration without silently accepting stale pixels.
 
@@ -72,7 +72,9 @@ export default defineProject(
 );
 ```
 
-Available nodes include `Project`, `Canvas`, `Timeline`, `Group`, `Video`, `Audio`, `Image`, `Text`, `Subtitle`, `ReactLayer`, `Scene`, `Template`, `Motion`, and `Transform`.
+Available nodes include `Project`, `Canvas`, `Timeline`, `Group`, `Video`, `Audio`, `Image`, `Text`, `Subtitle`, `ReactLayer`, `Scene`, `Template`, `Motion`, `Shader`, and `Transform`.
+
+All visual hosts accept any number of Shader modifiers from the project's `shaders/` directory. The engine renders Motion first, folds enabled Shader passes by ascending `layer` and declaration-order ties, then applies Transform during final composition. Each Shader pass preserves host dimensions; inactive `fill="none"` ranges pass the previous raster through unchanged.
 
 Declarations use native values:
 
@@ -238,7 +240,7 @@ main.tsx + local static imports
   -> SDK-branded JSX declaration
   -> Project Compiler
   -> ResolvedProject IR
-  -> React/Motion visual preparation + TTS
+  -> React/Motion/Shader visual preparation + TTS
   -> FFmpeg plan
   -> media output
 ```

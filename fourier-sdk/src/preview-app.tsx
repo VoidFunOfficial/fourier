@@ -32,7 +32,7 @@ interface ArtifactSummary {
   path: string;
   status: "ready" | "error";
   name?: string;
-  kind?: "react" | "motion";
+  kind?: "react" | "motion" | "shader";
   renderMode?: "browser-dom";
   snapshotId?: string;
   composition?: Composition;
@@ -58,7 +58,7 @@ interface PreviewSession {
   id: string;
   path: string;
   name: string;
-  kind: "react" | "motion";
+  kind: "react" | "motion" | "shader";
   renderMode: "browser-dom";
   snapshotId: string;
   composition: Composition;
@@ -726,7 +726,7 @@ function PreviewCard({
 
 function Gallery(): ReactNode {
   const { artifacts, loading, error } = useArtifacts();
-  const [filter, setFilter] = useState<"all" | "react" | "motion">("all");
+  const [filter, setFilter] = useState<"all" | "react" | "motion" | "shader">("all");
   const [search, setSearch] = useState("");
   const deferredSearch = useDeferredValue(search.trim().toLocaleLowerCase());
   const visible = useMemo(() => artifacts.filter((artifact) => {
@@ -736,6 +736,7 @@ function Gallery(): ReactNode {
   }), [artifacts, deferredSearch, filter]);
   const motionCount = artifacts.filter((artifact) => artifact.kind === "motion").length;
   const reactCount = artifacts.filter((artifact) => artifact.kind === "react").length;
+  const shaderCount = artifacts.filter((artifact) => artifact.kind === "shader").length;
 
   return (
     <main className="shell">
@@ -758,6 +759,7 @@ function Gallery(): ReactNode {
             {([
               ["all", `全部 ${artifacts.length}`],
               ["motion", `Motion ${motionCount}`],
+              ["shader", `Shader ${shaderCount}`],
               ["react", `React ${reactCount}`],
             ] as const).map(([value, label]) => (
               <button
@@ -847,7 +849,7 @@ function Detail({ artifactId }: { artifactId: string }): ReactNode {
           />
         </div>
         <aside className="detail-aside" aria-label="组件信息">
-          <Fact label="类型" value={artifact.kind === "motion" ? "Motion" : "React"} />
+          <Fact label="类型" value={artifact.kind === "motion" ? "Motion" : artifact.kind === "shader" ? "Shader" : "React"} />
           <Fact
             label="画布"
             value={artifact.composition === undefined ? "—" : `${artifact.composition.width} × ${artifact.composition.height}`}

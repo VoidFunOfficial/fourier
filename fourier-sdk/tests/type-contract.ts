@@ -3,6 +3,7 @@ import {
   defineFourierShader,
   definePreview,
   defineReact,
+  defineShader,
   field,
   FourierShaderCanvas,
   glsl,
@@ -66,6 +67,22 @@ const noCustomUniforms = defineFourierShader({
   fragmentShader: "out vec4 fragColor; void main() { fragColor = vec4(1.0); }",
 });
 FourierShaderCanvas({ shader: noCustomUniforms });
+
+defineShader({
+  name: "TypedShader",
+  schema: { amount: field.number() },
+  shader,
+  uniforms: ({ props, frame }) => {
+    props.amount satisfies number;
+    frame.progress satisfies number;
+    return { uGain: props.amount, uTint: [1, 0.5, 0.2] };
+  },
+  designPreview: () => ({
+    props: { amount: 1 },
+    subject: "data:image/png;base64,AA==",
+    composition: { width: 100, height: 100, durationSeconds: 1 },
+  }),
+});
 
 loadFont("./font.ttf") satisfies string;
 loadFont("./font.otf", { weight: 700, style: "italic" }) satisfies string;

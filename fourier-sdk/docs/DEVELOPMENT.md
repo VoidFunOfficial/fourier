@@ -1,8 +1,8 @@
-# SDK ABI v1.1 Artifact 开发规范
+# SDK ABI v1.2 Artifact 开发规范
 
 ## 新代码使用 component
 
-React/Motion artifact 必须由 `defineReact`/`defineMotion` 创建，并在同一模块实现 `name`、`schema`、`component()`、`designPreview()`。Motion 还必须声明 `supportsTextMotion`；支持文本时单独实现 `textComponent()`。
+React/Motion/Shader artifact 必须分别由 `defineReact`/`defineMotion`/`defineShader` 创建，并在同一模块实现 `name`、`schema` 和 `designPreview()`。Motion 还必须声明 `supportsTextMotion`；支持文本时单独实现 `textComponent()`。Shader 组合 `defineFourierShader()` 与同步 `uniforms({ props, frame })`。
 
 文件默认导出 definition 即可。不要创建 preview renderer、逐帧截图服务或第二份 preview 配置；`fourier-sdk preview` 会把 definition 编译成浏览器 DOM runtime，直接在播放器内挂载并控制时间。`designPreview()` 只提供样例 props、composition、字体和 Motion subject。
 
@@ -85,8 +85,9 @@ CSS transition/keyframes 受支持；SDK WAAPI 必须通过 `useFourierTimeline(
 - Artifact 组合节点用 `field.node()`；Project Template schema 不支持该字段。
 - `designPreview().props` 覆盖所有必填字段。
 - composition 声明 width/height/durationSeconds；静态为 0，动态为 1—30 整数秒，不声明 fps。
-- 生产画面不随时间变化的 ABI v1.1 React 声明 `static: true`；它不能注册 lifecycle、animation、media、SMIL 或 render driver。
+- 生产画面不随时间变化的 ABI v1.2 React 声明 `static: true`；它不能注册 lifecycle、animation、media、SMIL 或 render driver。
 - Motion designPreview 必须提供本地或 data URI subject。
+- Shader designPreview 必须提供图片 URL/data URI subject。
 
 ## 字体、CSS 与素材
 
@@ -109,9 +110,13 @@ image/video/react subject 会变成引擎持有的当前时刻 PNG，再传给�
 
 不要在 Motion 中重复实现 fill。TSX Transform、layer、blend、opacity 仍在 Motion PNG 之后执行。
 
+## Shader 修饰链
+
+Shader artifact 放在 `shaders/`；fragment shader 用 `uFourierSource` 读取上一个 pass。一个视觉宿主可声明任意多个 `<Shader>`，引擎在 Motion 后按 `layer` 升序、同层声明顺序执行，再应用 Transform。不要在 shader 内实现 pass 排序、fill 或宿主缩放；宿主保证尺寸，Core 在 `fill="none"` 的非活动区透传输入 PNG。
+
 ## 测试
 
-ABI v1.1 必须从路径打开：
+ABI v1.2 必须从路径打开：
 
 ```ts
 const fixture = await openArtifact(new URL("./MetricPanel.tsx", import.meta.url).pathname);
@@ -140,7 +145,7 @@ try {
 
 ```bash
 fourier check ./MetricPanel.tsx
-fourier-sdk publish ./MetricPanel --dry-run
+fourier-sdk publish https://www.npmjs.com/package/@scope/components/v/1.0.0 --dry-run
 bun run typecheck
 bun test
 bun run test:dom
@@ -149,4 +154,4 @@ bun run build
 
 `fourier check` 会验证 ABI v1.1、DOM bundle 和浏览器环境；非法 marker、浏览器缺失或版本不匹配会稳定失败。prepack 必须运行真实 DOM Adapter 测试，浏览器未安装时不允许 skip。
 
-发布到 Fourier World 的目录还必须包含 `package.json`，具体字段与账号流程见 [Fourier World 发布规范](./PUBLISHING.md)。
+发布到 Fourier World 前必须先把多组件 package 发布到公开 npm，具体根 manifest 与账号流程见 [Fourier World 发布规范](./PUBLISHING.md)。

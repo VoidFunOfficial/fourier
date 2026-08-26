@@ -14,11 +14,21 @@ import {
   type DomReactArtifact,
   type DomReactArtifactMetadata,
   type DomReactDefinition,
+  type DomShaderArtifact,
+  type DomShaderArtifactMetadata,
+  type DomShaderDefinition,
   type MotionArtifact,
   type MotionDefinition,
   type ReactArtifact,
   type ReactDefinition,
+  type ShaderArtifact,
+  type ShaderDefinition,
 } from "./types.ts";
+import {
+  FourierShaderCanvas,
+  type FourierShaderCanvasProps,
+  type FourierShaderUniformLayout,
+} from "./webgl.ts";
 
 function validateName(name: unknown, kind: string): asserts name is string {
   if (typeof name !== "string" || name.trim().length === 0) {
@@ -223,4 +233,83 @@ export function defineMotion<const Schema extends FieldsSchema>(
       props: Object.freeze({ ...input.props }),
     })) as DomMotionArtifact<Schema>;
   return attachMetadata(artifact, metadata as DomMotionArtifactMetadata<any>);
+}
+
+export function defineShader<
+  const Schema extends FieldsSchema,
+  const Layout extends FourierShaderUniformLayout,
+>(
+  definition: DomShaderDefinition<Schema, Layout>,
+): DomShaderArtifact<Schema, Layout>;
+export function defineShader<
+  const Schema extends FieldsSchema,
+  const Layout extends FourierShaderUniformLayout,
+>(
+  definition: ShaderDefinition<Schema, Layout>,
+): ShaderArtifact<Schema, Layout> {
+  validateName(definition?.name, "Shader");
+  if (typeof definition?.designPreview !== "function") {
+    sdkFail(
+      "DESIGN_PREVIEW_REQUIRED",
+      "Shader definition.designPreview 必须实现；SDK artifact 不允许缺少设计预览入口",
+    );
+  }
+  if (
+    typeof definition.shader !== "object" ||
+    definition.shader === null ||
+    typeof definition.shader.fragmentShader !== "string"
+  ) {
+    sdkFail("INVALID_ARTIFACT_DEFINITION", "Shader definition.shader 必须由 defineFourierShader() 创建");
+  }
+  const schema = defineSchema(definition.schema);
+  const designPreview = () => {
+    const preview = synchronous(
+      definition.designPreview(),
+      `${definition.name}.designPreview()`,
+    );
+    if (typeof preview.subject !== "string" || preview.subject.length === 0) {
+      sdkFail("INVALID_DESIGN_PREVIEW", "Shader designPreview.subject 必须是图片 URL 或 data URI");
+    }
+    return preview;
+  };
+  const component = (input: Parameters<DomShaderArtifact<Schema, Layout>>[0]) => {
+    const source = definition.uniforms;
+    const canvasProps = {
+      shader: definition.shader,
+      source: input.source,
+      ...(source === undefined
+        ? {}
+        : {
+            uniforms: typeof source === "function"
+              ? (frame: Parameters<typeof source>[0]["frame"]) => source({
+                  props: input.props,
+                  frame,
+                })
+              : source,
+          }),
+    } as FourierShaderCanvasProps<Layout>;
+    return React.createElement(
+      FourierShaderCanvas as React.ComponentType<FourierShaderCanvasProps<Layout>>,
+      canvasProps as React.Attributes & FourierShaderCanvasProps<Layout>,
+    );
+  };
+  const metadata: DomShaderArtifactMetadata<Schema, Layout> = {
+    package: "@fourier-video/sdk",
+    sdkAbiVersion: SDK_ABI_VERSION,
+    renderer: "dom-timeline",
+    kind: "shader",
+    name: definition.name,
+    schema,
+    component,
+    designPreview,
+  };
+  const artifact = ((input: Parameters<DomShaderArtifact<Schema, Layout>>[0]) =>
+    React.createElement(component, {
+      source: input.source,
+      props: Object.freeze({ ...input.props }),
+    })) as DomShaderArtifact<Schema, Layout>;
+  return attachMetadata(
+    artifact,
+    metadata as DomShaderArtifactMetadata<any, any>,
+  );
 }

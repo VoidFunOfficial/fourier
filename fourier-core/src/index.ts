@@ -24,6 +24,7 @@ export type {
   ArtifactKind,
   ArtifactPropDeclaration,
   SdkArtifactMetadata,
+  SdkDomShaderArtifactMetadata,
   SdkArtifactSchema,
   SdkSchemaField,
   SupportedSdkAbiVersion,

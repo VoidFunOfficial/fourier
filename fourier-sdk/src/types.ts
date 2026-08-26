@@ -9,6 +9,12 @@ import type {
   InferFieldInputs,
   InferFields,
 } from "./schema.ts";
+import type {
+  FourierShaderDefinition,
+  FourierShaderFrame,
+  FourierShaderUniformLayout,
+  FourierShaderUniformValues,
+} from "./webgl.ts";
 
 export { SDK_ABI_VERSION, SDK_ARTIFACT, SDK_ARTIFACT_SYMBOL_KEY };
 export const DESIGN_PREVIEW_FPS = 60 as const;
@@ -29,7 +35,7 @@ export interface RenderContext {
   seed: number;
 }
 
-/** Values that never change while one ABI v1.1 timeline instance is open. */
+/** Values that never change while one DOM timeline instance is open. */
 export interface FourierStableContext {
   readonly width: number;
   readonly height: number;
@@ -162,6 +168,13 @@ export type VideoMotionDesignPreview<Schema extends FieldsSchema> =
     motion?: Partial<MotionTiming>;
   };
 
+export type ShaderDesignPreview<Schema extends FieldsSchema> =
+  DesignPreviewBase<Schema> & {
+    /** Bundled local image URL or data URI used as the standalone input texture. */
+    subject: string;
+    motion?: never;
+  };
+
 /** Opaque identity for the video owned by a Project JSX video host. */
 export interface FourierVideoHandle {
   readonly id: string;
@@ -212,6 +225,43 @@ export interface TextMotionComponentInput<Schema extends FieldsSchema> {
   props: Readonly<InferFields<Schema>>;
 }
 
+export interface ShaderComponentInput<Schema extends FieldsSchema> {
+  source: string;
+  props: Readonly<InferFields<Schema>>;
+}
+
+export interface ShaderUniformInput<Schema extends FieldsSchema> {
+  props: Readonly<InferFields<Schema>>;
+  frame: Readonly<FourierShaderFrame>;
+}
+
+type ShaderUniformDefinition<
+  Schema extends FieldsSchema,
+  Layout extends FourierShaderUniformLayout,
+> = keyof Layout extends never
+  ? {
+      uniforms?: FourierShaderUniformValues<Layout> | ((
+        input: ShaderUniformInput<Schema>,
+      ) => FourierShaderUniformValues<Layout>);
+    }
+  : {
+      uniforms: FourierShaderUniformValues<Layout> | ((
+        input: ShaderUniformInput<Schema>,
+      ) => FourierShaderUniformValues<Layout>);
+    };
+
+export type DomShaderDefinition<
+  Schema extends FieldsSchema,
+  Layout extends FourierShaderUniformLayout,
+> = {
+  name: string;
+  schema: Schema;
+  shader: FourierShaderDefinition<Layout>;
+  render?: never;
+  component?: never;
+  designPreview(): ShaderDesignPreview<Schema>;
+} & ShaderUniformDefinition<Schema, Layout>;
+
 interface DomMotionDefinitionBase<Schema extends FieldsSchema> {
   name: string;
   schema: Schema;
@@ -252,6 +302,10 @@ export type ReactDefinition<Schema extends FieldsSchema> = DomReactDefinition<Sc
 export type MotionDefinition<Schema extends FieldsSchema> =
   | DomMotionDefinition<Schema>
   | DomFfmpegVideoMotionDefinition<Schema>;
+export type ShaderDefinition<
+  Schema extends FieldsSchema,
+  Layout extends FourierShaderUniformLayout,
+> = DomShaderDefinition<Schema, Layout>;
 
 interface ArtifactMetadataBase<Schema extends FieldsSchema> {
   readonly package: "@fourier-video/sdk";
@@ -301,6 +355,16 @@ export interface DomFfmpegVideoMotionArtifactMetadata<Schema extends FieldsSchem
   readonly preview?: DomFfmpegVideoMotionDefinition<Schema>["preview"];
 }
 
+export interface DomShaderArtifactMetadata<
+  Schema extends FieldsSchema,
+  Layout extends FourierShaderUniformLayout,
+> extends ArtifactMetadataBase<Schema> {
+  readonly kind: "shader";
+  readonly renderer: "dom-timeline";
+  readonly component: (input: ShaderComponentInput<Schema>) => React.ReactNode;
+  readonly designPreview: () => ShaderDesignPreview<Schema>;
+}
+
 export type ReactArtifactMetadata<Schema extends FieldsSchema> =
   DomReactArtifactMetadata<Schema>;
 export type MotionArtifactMetadata<Schema extends FieldsSchema> =
@@ -308,7 +372,8 @@ export type MotionArtifactMetadata<Schema extends FieldsSchema> =
   | DomFfmpegVideoMotionArtifactMetadata<Schema>;
 export type ArtifactMetadata<Schema extends FieldsSchema> =
   | ReactArtifactMetadata<Schema>
-  | MotionArtifactMetadata<Schema>;
+  | MotionArtifactMetadata<Schema>
+  | DomShaderArtifactMetadata<Schema, FourierShaderUniformLayout>;
 
 export type DomReactArtifact<Schema extends FieldsSchema> = ((
   props: InferFields<Schema>,
@@ -326,10 +391,21 @@ export type DomFfmpegVideoMotionArtifact<Schema extends FieldsSchema> = ((input:
   readonly [SDK_ARTIFACT]: DomFfmpegVideoMotionArtifactMetadata<Schema>;
 };
 
+export type DomShaderArtifact<
+  Schema extends FieldsSchema,
+  Layout extends FourierShaderUniformLayout,
+> = ((input: ShaderComponentInput<Schema>) => React.ReactNode) & {
+  readonly [SDK_ARTIFACT]: DomShaderArtifactMetadata<Schema, Layout>;
+};
+
 export type ReactArtifact<Schema extends FieldsSchema> = DomReactArtifact<Schema>;
 export type MotionArtifact<Schema extends FieldsSchema> =
   | DomMotionArtifact<Schema>
   | DomFfmpegVideoMotionArtifact<Schema>;
+export type ShaderArtifact<
+  Schema extends FieldsSchema,
+  Layout extends FourierShaderUniformLayout,
+> = DomShaderArtifact<Schema, Layout>;
 
 export type AnyArtifact =
   | (((...args: any[]) => React.ReactNode) & {
@@ -337,6 +413,9 @@ export type AnyArtifact =
     })
   | (((...args: any[]) => React.ReactNode) & {
       readonly [SDK_ARTIFACT]: MotionArtifactMetadata<any>;
+    })
+  | (((...args: any[]) => React.ReactNode) & {
+      readonly [SDK_ARTIFACT]: DomShaderArtifactMetadata<any, any>;
     });
 export type SchemaOf<Artifact> = Artifact extends {
   readonly [SDK_ARTIFACT]: ArtifactMetadata<infer Schema>;
@@ -361,6 +440,8 @@ export type MotionPreviewDefinition<Artifact extends AnyArtifact> =
   PreviewDefinitionBase<Artifact> & { subject: MotionSubject; motion?: Partial<MotionTiming> };
 export type VideoMotionPreviewDefinition<Artifact extends AnyArtifact> =
   PreviewDefinitionBase<Artifact> & { subject?: never; motion?: Partial<MotionTiming> };
+export type ShaderPreviewDefinition<Artifact extends AnyArtifact> =
+  PreviewDefinitionBase<Artifact> & { subject: string; motion?: never };
 export type PreviewDefinition<Artifact extends AnyArtifact = AnyArtifact> =
   Artifact extends unknown
     ? Artifact[typeof SDK_ARTIFACT] extends ReactArtifactMetadata<any>
@@ -369,6 +450,8 @@ export type PreviewDefinition<Artifact extends AnyArtifact = AnyArtifact> =
         ? VideoMotionPreviewDefinition<Artifact>
       : Artifact[typeof SDK_ARTIFACT] extends MotionArtifactMetadata<any>
         ? MotionPreviewDefinition<Artifact>
+      : Artifact[typeof SDK_ARTIFACT] extends DomShaderArtifactMetadata<any, any>
+        ? ShaderPreviewDefinition<Artifact>
         : never
     : never;
 
@@ -387,6 +470,8 @@ export type MotionPreviewConfig<Artifact extends AnyArtifact> =
   PreviewConfigBase<Artifact> & { subject: MotionSubject; motion?: Readonly<Required<MotionTiming>> };
 export type VideoMotionPreviewConfig<Artifact extends AnyArtifact> =
   PreviewConfigBase<Artifact> & { subject?: never; motion?: Readonly<Required<MotionTiming>> };
+export type ShaderPreviewConfig<Artifact extends AnyArtifact> =
+  PreviewConfigBase<Artifact> & { subject: string; motion?: never };
 export type PreviewConfig<Artifact extends AnyArtifact = AnyArtifact> =
   Artifact extends unknown
     ? Artifact[typeof SDK_ARTIFACT] extends ReactArtifactMetadata<any>
@@ -395,5 +480,7 @@ export type PreviewConfig<Artifact extends AnyArtifact = AnyArtifact> =
         ? VideoMotionPreviewConfig<Artifact>
       : Artifact[typeof SDK_ARTIFACT] extends MotionArtifactMetadata<any>
         ? MotionPreviewConfig<Artifact>
+      : Artifact[typeof SDK_ARTIFACT] extends DomShaderArtifactMetadata<any, any>
+        ? ShaderPreviewConfig<Artifact>
         : never
     : never;

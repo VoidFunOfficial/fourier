@@ -94,7 +94,7 @@ function isTimelineArtifact(value: unknown): value is PreparedTimelineArtifact {
   const artifact = value as Partial<PreparedTimelineArtifact>;
   const profile = artifact.profile as Partial<PreparedTimelineArtifact["profile"]> | undefined;
   return typeof artifact.nodeId === "string" &&
-    (artifact.kind === "react" || artifact.kind === "motion") &&
+    (artifact.kind === "react" || artifact.kind === "motion" || artifact.kind === "shader") &&
     typeof artifact.name === "string" &&
     isSupportedSdkAbiVersion(artifact.sdkAbiVersion) &&
     (artifact.renderer === "dom-timeline" ||

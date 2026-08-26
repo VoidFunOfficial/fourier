@@ -10,6 +10,7 @@ import {
   readProjectDefinition,
   readProjectElement,
   serializeProjectDefinition,
+  Shader,
   Text,
   Timeline,
   Transform,
@@ -96,11 +97,13 @@ describe("Project JSX SDK", () => {
         { offset: 0, translateX: 0, translateY: 0, scaleX: 1, scaleY: 1, rotation: 0, opacity: 0 },
         { offset: 1, translateX: 0, translateY: 0, scaleX: 1, scaleY: 1, rotation: 0, opacity: 1 },
       ]} />;
+    const shader = <Shader id="s" duration="1s" fill="both"
+      component="Channel.tsx" layer={2} props={{ amount: 1 }} />;
     const text = <Text id="text" duration="1s" role="body" content="typed"
       x={1} y={1} width={1} height={1} layer={1} font="Inter" fontSize={12}
       lineHeight={1.2} color="#fff" align="left" />;
-    expect([video, layer, transform, text].map(readProjectElement).map((item) => item?.tag))
-      .toEqual(["video", "react", "transform", "text"]);
+    expect([video, layer, transform, shader, text].map(readProjectElement).map((item) => item?.tag))
+      .toEqual(["video", "react", "transform", "shader", "text"]);
 
     // @ts-expect-error audio 使用 boolean，不接受旧式字符串值。
     const invalidAudio = <Video id="bad" duration="1s" src="v.mp4" sourceIn="0f" fit="cover" audio="off" x={1} y={1} width={1} height={1} layer={1} />;

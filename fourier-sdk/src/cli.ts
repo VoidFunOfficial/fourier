@@ -20,6 +20,7 @@ import {
 } from "./world-credentials.ts";
 import { prepareWorldPackage } from "./world-publish.ts";
 import { addWorldComponent, deleteWorldComponent } from "./world-project.ts";
+import { parseNpmPackageReference } from "./npm-package.ts";
 import { defaultPreviewSourcePath, startPreviewServer } from "./preview.ts";
 
 const HELP = `Fourier React/Motion SDK
@@ -30,12 +31,12 @@ const HELP = `Fourier React/Motion SDK
   fourier-sdk whoami [--world <url>]
   fourier-sdk logout
   fourier-sdk search <自然语言描述> [--type <type>] [--style <style>] [--limit <n>] [--json] [--world <url>]
-  fourier-sdk publish [directory|package.json] [--world <url>] [--dry-run]
-  fourier-sdk add <@namespace/ComponentName> [--project <dir>] [--dir <dir>] [--world <url>] [--force]
-  fourier-sdk del <@namespace/ComponentName> [--project <dir>] [--purge]
+  fourier-sdk publish <npm-package-url> [--world <url>] [--dry-run]
+  fourier-sdk add <npm-package-url[#ComponentName]> [--project <dir>] [--dir <dir>] [--world <url>] [--force]
+  fourier-sdk del <npm-package-url[#ComponentName]> [--project <dir>] [--purge]
 
-publish 目录必须包含 package.json；组件元数据从 package.json 的 fourier 字段读取。
-发布会先编译并校验 artifact，再提交到 Fourier World 的 review 状态。
+publish 只接受 https://www.npmjs.com/package/@scope/name/v/1.2.3 精确版本 URL。
+发布会解析包内全部 Fourier 组件，逐一编译并生成预览，再提交到 review 状态。
 preview 不传入口时会加载 SDK example 目录中的全部组件。
 search 使用 Fourier World 的关键词 + 语义混合检索；无需登录，--json 适合 Agent 调用。
 默认 World: ${DEFAULT_FOURIER_WORLD_URL}`;
@@ -84,14 +85,14 @@ export interface SearchInvocation {
 
 export interface PublishInvocation {
   readonly command: "publish";
-  readonly inputPath: string;
+  readonly npmUrl: string;
   readonly worldUrl?: string;
   readonly dryRun: boolean;
 }
 
 export interface AddInvocation {
   readonly command: "add";
-  readonly packageName: string;
+  readonly npmUrl: string;
   readonly projectDirectory: string;
   readonly componentsDirectory: string;
   readonly worldUrl?: string;
@@ -100,7 +101,7 @@ export interface AddInvocation {
 
 export interface DeleteInvocation {
   readonly command: "del";
-  readonly packageName: string;
+  readonly npmUrl: string;
   readonly projectDirectory: string;
   readonly purge: boolean;
 }
@@ -297,8 +298,7 @@ function parseSearch(argv: readonly string[]): SearchInvocation {
 }
 
 function parsePublish(argv: readonly string[]): PublishInvocation {
-  let inputPath = process.cwd();
-  let hasInput = false;
+  let npmUrl: string | undefined;
   let worldUrl: string | undefined;
   let dryRun = false;
   for (let index = 0; index < argv.length; index += 1) {
@@ -310,23 +310,26 @@ function parsePublish(argv: readonly string[]): PublishInvocation {
       dryRun = true;
     } else if (arg.startsWith("-")) {
       throw new TypeError(`未知参数: ${arg}`);
-    } else if (!hasInput) {
-      inputPath = resolve(arg);
-      hasInput = true;
+    } else if (npmUrl === undefined) {
+      npmUrl = arg;
     } else {
       throw new TypeError(`多余位置参数: ${arg}`);
     }
   }
+  if (npmUrl === undefined) throw new TypeError("publish 缺少精确版本 npm package URL");
+  if (parseNpmPackageReference(npmUrl).componentName !== undefined) {
+    throw new TypeError("publish 不接受 #ComponentName");
+  }
   return {
     command: "publish",
-    inputPath,
+    npmUrl,
     ...(worldUrl === undefined ? {} : { worldUrl }),
     dryRun,
   };
 }
 
 function parseAdd(argv: readonly string[]): AddInvocation {
-  let packageName: string | undefined;
+  let npmUrl: string | undefined;
   let projectDirectory = process.cwd();
   let componentsDirectory = "components";
   let worldUrl: string | undefined;
@@ -346,16 +349,17 @@ function parseAdd(argv: readonly string[]): AddInvocation {
       force = true;
     } else if (arg.startsWith("-")) {
       throw new TypeError(`未知参数: ${arg}`);
-    } else if (packageName === undefined) {
-      packageName = arg;
+    } else if (npmUrl === undefined) {
+      npmUrl = arg;
     } else {
       throw new TypeError(`多余位置参数: ${arg}`);
     }
   }
-  if (packageName === undefined) throw new TypeError("add 缺少 @namespace/ComponentName");
+  if (npmUrl === undefined) throw new TypeError("add 缺少精确版本 npm URL");
+  parseNpmPackageReference(npmUrl);
   return {
     command: "add",
-    packageName,
+    npmUrl,
     projectDirectory,
     componentsDirectory,
     ...(worldUrl === undefined ? {} : { worldUrl }),
@@ -364,7 +368,7 @@ function parseAdd(argv: readonly string[]): AddInvocation {
 }
 
 function parseDelete(argv: readonly string[]): DeleteInvocation {
-  let packageName: string | undefined;
+  let npmUrl: string | undefined;
   let projectDirectory = process.cwd();
   let purge = false;
   for (let index = 0; index < argv.length; index += 1) {
@@ -376,14 +380,15 @@ function parseDelete(argv: readonly string[]): DeleteInvocation {
       purge = true;
     } else if (arg.startsWith("-")) {
       throw new TypeError(`未知参数: ${arg}`);
-    } else if (packageName === undefined) {
-      packageName = arg;
+    } else if (npmUrl === undefined) {
+      npmUrl = arg;
     } else {
       throw new TypeError(`多余位置参数: ${arg}`);
     }
   }
-  if (packageName === undefined) throw new TypeError("del 缺少 @namespace/ComponentName");
-  return { command: "del", packageName, projectDirectory, purge };
+  if (npmUrl === undefined) throw new TypeError("del 缺少精确版本 npm URL");
+  parseNpmPackageReference(npmUrl);
+  return { command: "del", npmUrl, projectDirectory, purge };
 }
 
 export function parseCliInvocation(argv: readonly string[]): CliInvocation {
@@ -556,29 +561,28 @@ async function runSearch(invocation: SearchInvocation): Promise<void> {
     console.log(`${index + 1}. ${item.packageName}@${item.version} · ${(item.match.score * 100).toFixed(1)}%`);
     console.log(`   ${item.summary}`);
     console.log(`   ${item.match.reasons.join("；")}`);
-    console.log(item.downloadable ? `   fourier-sdk add ${item.packageName}` : "   当前版本暂不可下载");
+    console.log(item.downloadable ? `   fourier-sdk add ${item.npmComponentUrl}` : "   当前版本暂不可安装");
   }
 }
 
 async function runPublish(invocation: PublishInvocation): Promise<void> {
-  const prepared = await prepareWorldPackage(invocation.inputPath);
-  const packageName = prepared.componentPackage.manifest.name;
-  console.log(`✓ package.json: ${packageName}@${prepared.componentPackage.manifest.version}`);
-  console.log(`✓ artifact: ${prepared.artifact.kind} · ABI v${prepared.artifact.sdkAbiVersion} · ${prepared.artifact.renderer}`);
-  console.log(`✓ preview: ${prepared.preview.width}×${prepared.preview.height} · ${prepared.preview.durationSeconds.toFixed(2)}s · ${(prepared.preview.bytes.byteLength / 1024 / 1024).toFixed(2)} MiB`);
-  if (invocation.dryRun) {
-    console.log("✓ dry-run 完成；未向 Fourier World 写入数据");
-    return;
+  const prepared = await prepareWorldPackage(invocation.npmUrl);
+  try {
+    console.log(`✓ npm package: ${prepared.npmPackage.reference.packageName}@${prepared.npmPackage.reference.version}`);
+    for (const component of prepared.components) {
+      console.log(`✓ ${component.artifact.name}: ${component.artifact.kind} · ABI v${component.artifact.sdkAbiVersion} · ${component.preview.width}×${component.preview.height}`);
+    }
+    if (invocation.dryRun) {
+      console.log(`✓ dry-run 完成；${prepared.components.length} 个组件已验证，未向 Fourier World 写入数据`);
+      return;
+    }
+    const active = await session(invocation.worldUrl);
+    const result = await new FourierWorldClient(active).publish(prepared);
+    console.log(`✓ ${result.created ? "已创建" : "已存在"} ${prepared.npmPackage.reference.packageUrl}`);
+    console.log(`  ${result.components.length} 个组件进入 review`);
+  } finally {
+    await prepared.cleanup();
   }
-  const active = await session(invocation.worldUrl);
-  const result = await new FourierWorldClient(active).publish(
-    prepared.componentPackage,
-    prepared.archive,
-    prepared.preview,
-  );
-  console.log(`✓ ${result.created ? "已创建" : "已更新"} ${packageName}@${result.component.version}`);
-  console.log(`  状态: ${result.component.status}（等待 Fourier World 审核）`);
-  console.log(`  ${active.worldUrl}/components/${result.component.id}`);
 }
 
 async function runAdd(invocation: AddInvocation): Promise<void> {
@@ -586,27 +590,31 @@ async function runAdd(invocation: AddInvocation): Promise<void> {
     invocation.worldUrl ?? process.env.FOURIER_WORLD_URL ?? DEFAULT_FOURIER_WORLD_URL,
   );
   const result = await addWorldComponent({
-    packageName: invocation.packageName,
+    npmUrl: invocation.npmUrl,
     projectDirectory: invocation.projectDirectory,
     componentsDirectory: invocation.componentsDirectory,
     worldUrl,
     force: invocation.force,
   });
-  console.log(result.unchanged
-    ? `· 已是最新版本 ${result.packageName}@${result.version}`
-    : `✓ 已添加 ${result.packageName}@${result.version}`);
-  console.log(`  ${result.path}`);
+  for (const component of result.components) {
+    console.log(component.unchanged
+      ? `· 已安装 ${component.packageName}@${component.version}`
+      : `✓ 已添加 ${component.packageName}@${component.version}`);
+    console.log(`  ${component.path}`);
+  }
 }
 
 async function runDelete(invocation: DeleteInvocation): Promise<void> {
   const result = await deleteWorldComponent({
-    packageName: invocation.packageName,
+    npmUrl: invocation.npmUrl,
     projectDirectory: invocation.projectDirectory,
     purge: invocation.purge,
   });
-  if (result.missing) console.log(`· 组件目录已不存在，已清理安装清单: ${result.packageName}`);
-  else console.log(`✓ 已移除 ${result.packageName}`);
-  if (result.trashPath !== undefined) console.log(`  可恢复副本: ${result.trashPath}`);
+  for (const component of result.components) {
+    if (component.missing) console.log(`· 组件目录已不存在，已清理安装清单: ${component.packageName}`);
+    else console.log(`✓ 已移除 ${component.packageName}`);
+    if (component.trashPath !== undefined) console.log(`  可恢复副本: ${component.trashPath}`);
+  }
 }
 
 export async function runCli(argv: readonly string[]): Promise<number> {

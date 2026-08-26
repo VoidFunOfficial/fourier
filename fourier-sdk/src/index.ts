@@ -1,4 +1,4 @@
-export { defineMotion, defineReact } from "./definitions.ts";
+export { defineMotion, defineReact, defineShader } from "./definitions.ts";
 export { loadFont } from "./font.ts";
 export type { LoadFontOptions } from "./font.ts";
 export * from "./project.ts";
@@ -119,6 +119,9 @@ export type {
   DomReactArtifact,
   DomReactArtifactMetadata,
   DomReactDefinition,
+  DomShaderArtifact,
+  DomShaderArtifactMetadata,
+  DomShaderDefinition,
   DesignPreviewComposition,
   FontSource,
   FourierAnimationOptions,
@@ -142,6 +145,13 @@ export type {
   MotionPreviewInput,
   MotionSubject,
   MotionTiming,
+  ShaderArtifact,
+  ShaderComponentInput,
+  ShaderDefinition,
+  ShaderDesignPreview,
+  ShaderPreviewConfig,
+  ShaderPreviewDefinition,
+  ShaderUniformInput,
   VideoMotionComponentInput,
   VideoMotionDesignPreview,
   VideoMotionPreviewConfig,

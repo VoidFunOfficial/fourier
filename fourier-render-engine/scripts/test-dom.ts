@@ -1,5 +1,6 @@
 const files = [
   "tests/visual-consumers.dom.test.tsx",
+  "tests/shader-modifier.dom.test.tsx",
 ] as const;
 
 for (const file of files) {

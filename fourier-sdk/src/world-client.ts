@@ -1,17 +1,15 @@
-import { createHash } from "node:crypto";
-import type { WorldPackageArchive } from "./world-archive.ts";
 import {
   WORLD_COMPONENT_TYPES,
   WORLD_LANGUAGES,
   WORLD_MOODS,
   WORLD_STYLES,
-  parseWorldPackageName,
-  type LoadedWorldPackage,
   type WorldComponentType,
   type WorldLanguage,
   type WorldMood,
   type WorldStyle,
 } from "./world-manifest.ts";
+import { parseNpmPackageReference } from "./npm-package.ts";
+import type { PreparedWorldPackage } from "./world-publish.ts";
 import { MAX_WORLD_PREVIEW_BYTES, type WorldPreviewVideo } from "./world-preview.ts";
 
 export const DEFAULT_FOURIER_WORLD_URL = "https://www.fourier.video";
@@ -41,15 +39,17 @@ export interface WorldComponentRecord {
 
 export interface WorldPublishResult {
   readonly created: boolean;
-  readonly component: WorldComponentRecord;
+  readonly packageId: string | number;
+  readonly components: readonly WorldComponentRecord[];
 }
 
-export interface DownloadedWorldPackage {
-  readonly packageName: string;
-  readonly version: string;
-  readonly sha256: string;
-  readonly componentId?: string;
-  readonly bytes: Uint8Array;
+export interface ApprovedNpmPackage {
+  readonly npmPackageUrl: string;
+  readonly integrity: string;
+  readonly components: readonly {
+    readonly name: string;
+    readonly npmComponentUrl: string;
+  }[];
 }
 
 export interface WorldSearchOptions {
@@ -104,6 +104,8 @@ export interface WorldSearchResult {
   readonly name: string;
   readonly namespace: string;
   readonly packageName: string;
+  readonly npmPackageUrl: string;
+  readonly npmComponentUrl: string;
   readonly downloadable: boolean;
   readonly version: string;
   readonly type: WorldComponentType;
@@ -180,6 +182,8 @@ export function normalizeWorldUrl(value: string): string {
 function errorMessage(status: number, body: unknown): string {
   const data = object(body);
   if (typeof data?.message === "string") return data.message;
+  const nestedError = object(data?.error);
+  if (typeof nestedError?.message === "string") return nestedError.message;
   if (Array.isArray(data?.errors)) {
     const messages = data.errors
       .map((entry) => object(entry)?.message)
@@ -407,22 +411,32 @@ function searchResult(value: unknown, worldUrl: string): WorldSearchResult {
   const name = requiredString(data, "name");
   const namespace = requiredString(data, "namespace");
   const packageName = requiredString(data, "packageName");
-  let parsedPackage: ReturnType<typeof parseWorldPackageName>;
-  try {
-    parsedPackage = parseWorldPackageName(packageName);
-  } catch {
-    throw new TypeError("字段 packageName 不是有效的 Fourier World 包名");
-  }
-  if (parsedPackage.namespace !== namespace || parsedPackage.componentName !== name) {
+  if (packageName !== `${namespace}/${name}`) {
     throw new TypeError("字段 packageName 与 namespace/name 不一致");
+  }
+  const npmPackageUrl = requiredString(data, "npmPackageUrl");
+  const npmComponentUrl = requiredString(data, "npmComponentUrl");
+  const version = requiredString(data, "version");
+  const parsedNpmPackage = parseNpmPackageReference(npmPackageUrl);
+  const parsedNpmComponent = parseNpmPackageReference(npmComponentUrl);
+  if (
+    parsedNpmPackage.componentName !== undefined ||
+    parsedNpmComponent.packageUrl !== parsedNpmPackage.packageUrl ||
+    parsedNpmComponent.componentName !== name ||
+    parsedNpmPackage.namespace !== namespace ||
+    parsedNpmPackage.version !== version
+  ) {
+    throw new TypeError("npmPackageUrl/npmComponentUrl 与组件身份不一致");
   }
   return Object.freeze({
     id: data.id,
     name,
     namespace,
     packageName,
+    npmPackageUrl,
+    npmComponentUrl,
     downloadable: data.downloadable,
-    version: requiredString(data, "version"),
+    version,
     type: data.type as WorldComponentType,
     ...(subtype === undefined ? {} : { subtype }),
     summary: requiredString(data, "summary"),
@@ -607,193 +621,99 @@ export class FourierWorldClient {
     }
   }
 
-  async publish(
-    componentPackage: LoadedWorldPackage,
-    archive: WorldPackageArchive,
-    preview: WorldPreviewVideo,
-  ): Promise<WorldPublishResult> {
+  async publish(prepared: PreparedWorldPackage): Promise<WorldPublishResult> {
     if (this.token === undefined) throw new TypeError("Fourier World token 缺失");
-    if (preview.bytes.byteLength === 0 || preview.bytes.byteLength > MAX_WORLD_PREVIEW_BYTES) {
-      throw new TypeError(`Fourier World 预览 MP4 必须为 1—${MAX_WORLD_PREVIEW_BYTES} bytes`);
-    }
-    const previewSha256 = createHash("sha256").update(preview.bytes).digest("hex");
-    if (previewSha256 !== preview.sha256) {
-      throw new TypeError("Fourier World 预览 MP4 的 SHA-256 与内容不一致");
-    }
-    const authorQuery = new URLSearchParams({ limit: "1", depth: "0" });
-    authorQuery.set("where[namespace][equals]", componentPackage.namespace);
-    const authorBody = object(await this.request(`api/authors?${authorQuery}`));
-    const author = Array.isArray(authorBody?.docs) ? object(authorBody.docs[0]) : undefined;
-    if (typeof author?.id !== "string" && typeof author?.id !== "number") {
-      throw new FourierWorldApiError(
-        404,
-        `Fourier World 中不存在发布者 ${componentPackage.namespace}；请先让管理员创建该 namespace`,
-        authorBody,
-      );
-    }
-
-    const packageQuery = new URLSearchParams({ limit: "1", depth: "0" });
-    packageQuery.set("where[and][0][packageName][equals]", componentPackage.manifest.name);
-    packageQuery.set("where[and][1][version][equals]", componentPackage.manifest.version);
-    const packageBody = object(await this.request(`api/component-packages?${packageQuery}`));
-    const existingPackage = Array.isArray(packageBody?.docs) ? object(packageBody.docs[0]) : undefined;
-    let packageArchiveId: string | number;
-    let uploadedPackageId: string | number | undefined;
-    let uploadedPreviewId: string | number | undefined;
-    const cleanupUploads = async (): Promise<void> => {
-      await Promise.all([
-        ...(uploadedPreviewId === undefined
-          ? []
-          : [this.request(`api/media/${encodeURIComponent(uploadedPreviewId)}`, { method: "DELETE" })
-              .catch(() => undefined)]),
-        ...(uploadedPackageId === undefined
-          ? []
-          : [this.request(`api/component-packages/${encodeURIComponent(uploadedPackageId)}`, { method: "DELETE" })
-              .catch(() => undefined)]),
-      ]);
+    const uploadedMedia: Array<string | number> = [];
+    const cleanup = async (): Promise<void> => {
+      await Promise.all(uploadedMedia.map((id) =>
+        this.request(`api/media/${encodeURIComponent(id)}`, { method: "DELETE" }).catch(() => undefined)));
     };
-    if (existingPackage !== undefined) {
-      if (existingPackage.sha256 !== archive.sha256) {
-        throw new FourierWorldApiError(
-          409,
-          `${componentPackage.manifest.name}@${componentPackage.manifest.version} 已存在且内容不同；请提升 version`,
-          existingPackage,
-        );
+    try {
+      const previews: Array<{ name: string; mediaId: string | number }> = [];
+      for (const component of prepared.components) {
+        const preview: WorldPreviewVideo = component.preview;
+        if (preview.bytes.byteLength < 1 || preview.bytes.byteLength > MAX_WORLD_PREVIEW_BYTES) {
+          throw new TypeError(`Fourier World 预览 MP4 必须为 1—${MAX_WORLD_PREVIEW_BYTES} bytes`);
+        }
+        const form = new FormData();
+        form.append("_payload", JSON.stringify({ alt: `${component.artifact.name} · Fourier preview` }));
+        form.append("file", new File(
+          [Uint8Array.from(preview.bytes).buffer],
+          `${component.artifact.name}-${prepared.npmPackage.reference.version}-preview.mp4`,
+          { type: preview.mimeType },
+        ));
+        const uploaded = object(await this.request("api/media", { method: "POST", body: form }));
+        const doc = object(uploaded?.doc) ?? uploaded;
+        if (typeof doc?.id !== "string" && typeof doc?.id !== "number") {
+          throw new FourierWorldApiError(502, "Fourier World 预览上传响应格式无效", uploaded);
+        }
+        uploadedMedia.push(doc.id);
+        previews.push({ name: component.artifact.name, mediaId: doc.id });
       }
-      if (typeof existingPackage.id !== "string" && typeof existingPackage.id !== "number") {
-        throw new FourierWorldApiError(502, "Fourier World 组件包响应格式无效", existingPackage);
-      }
-      packageArchiveId = existingPackage.id;
-    } else {
-      const form = new FormData();
-      form.append("_payload", JSON.stringify({
-        packageName: componentPackage.manifest.name,
-        version: componentPackage.manifest.version,
-        sha256: archive.sha256,
-        fileCount: archive.fileCount,
-        unpackedSize: archive.unpackedSize,
+      const body = object(await this.request("api/npm-packages/publish", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          npmPackageUrl: prepared.npmPackage.reference.packageUrl,
+          integrity: prepared.npmPackage.integrity,
+          fileCount: prepared.npmPackage.fileCount,
+          unpackedSize: prepared.npmPackage.unpackedSize,
+          previews,
+        }),
       }));
-      const filename = `${componentPackage.namespace.slice(1)}-${componentPackage.componentName}-${componentPackage.manifest.version}.tar.gz`;
-      const archiveBuffer = Uint8Array.from(archive.bytes).buffer;
-      form.append("file", new File([archiveBuffer], filename, { type: "application/gzip" }));
-      const uploaded = object(await this.request("api/component-packages", { method: "POST", body: form }));
-      const uploadedDoc = object(uploaded?.doc) ?? uploaded;
-      if (typeof uploadedDoc?.id !== "string" && typeof uploadedDoc?.id !== "number") {
-        throw new FourierWorldApiError(502, "Fourier World 组件包上传响应格式无效", uploaded);
+      if (
+        body === undefined ||
+        typeof body.created !== "boolean" ||
+        (typeof body.packageId !== "string" && typeof body.packageId !== "number") ||
+        !Array.isArray(body.components)
+      ) {
+        throw new FourierWorldApiError(502, "Fourier World npm 发布响应格式无效", body);
       }
-      packageArchiveId = uploadedDoc.id;
-      uploadedPackageId = uploadedDoc.id;
-    }
-
-    let previewMediaId: string | number;
-    try {
-      const form = new FormData();
-      form.append("_payload", JSON.stringify({
-        alt: `${componentPackage.componentName} · Fourier Render Engine preview`,
-      }));
-      const filename = `${componentPackage.namespace.slice(1)}-${componentPackage.componentName}-${componentPackage.manifest.version}-preview.mp4`;
-      const previewBuffer = Uint8Array.from(preview.bytes).buffer;
-      form.append("file", new File([previewBuffer], filename, { type: preview.mimeType }));
-      const uploaded = object(await this.request("api/media", { method: "POST", body: form }));
-      const uploadedDoc = object(uploaded?.doc) ?? uploaded;
-      if (typeof uploadedDoc?.id !== "string" && typeof uploadedDoc?.id !== "number") {
-        throw new FourierWorldApiError(502, "Fourier World 预览视频上传响应格式无效", uploaded);
-      }
-      previewMediaId = uploadedDoc.id;
-      uploadedPreviewId = uploadedDoc.id;
+      return Object.freeze({
+        created: body.created,
+        packageId: body.packageId,
+        components: Object.freeze(body.components.map(componentRecord)),
+      });
     } catch (error) {
-      await cleanupUploads();
+      await cleanup();
       throw error;
     }
-
-    const componentQuery = new URLSearchParams({ limit: "1", depth: "0" });
-    componentQuery.set("where[and][0][namespace][equals]", componentPackage.namespace);
-    componentQuery.set("where[and][1][name][equals]", componentPackage.componentName);
-    let existingBody: Record<string, unknown> | undefined;
-    try {
-      existingBody = object(await this.request(`api/components?${componentQuery}`));
-    } catch (error) {
-      await cleanupUploads();
-      throw error;
-    }
-    const existing = Array.isArray(existingBody?.docs) ? object(existingBody.docs[0]) : undefined;
-    const metadata = componentPackage.manifest.fourier;
-    const data = {
-      namespace: componentPackage.namespace,
-      name: componentPackage.componentName,
-      version: componentPackage.manifest.version,
-      type: metadata.type,
-      ...(metadata.subtype === undefined ? {} : { subtype: metadata.subtype }),
-      license: componentPackage.manifest.license,
-      author: author.id,
-      status: "review",
-      summary: metadata.summary,
-      description: componentPackage.manifest.description,
-      instruction: metadata.instruction,
-      useCases: metadata.useCases,
-      ...(metadata.negativeUseCases === undefined ? {} : { negativeUseCases: metadata.negativeUseCases }),
-      ...(metadata.aliases === undefined ? {} : { aliases: metadata.aliases }),
-      tags: metadata.tags,
-      style: metadata.style,
-      ...(metadata.contentDomains === undefined ? {} : { contentDomains: metadata.contentDomains }),
-      ...(metadata.mood === undefined ? {} : { mood: metadata.mood }),
-      ...(metadata.languages === undefined ? {} : { languages: metadata.languages }),
-      packageArchive: packageArchiveId,
-      preview: previewMediaId,
-    };
-    const existingId = existing?.id;
-    const created = typeof existingId !== "string" && typeof existingId !== "number";
-    let body: unknown;
-    try {
-      body = await this.request(
-        created ? "api/components" : `api/components/${encodeURIComponent(existingId)}`,
-        {
-          method: created ? "POST" : "PATCH",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(data),
-        },
-      );
-    } catch (error) {
-      await cleanupUploads();
-      throw error;
-    }
-    return Object.freeze({ created, component: componentRecord(body) });
   }
 
-  async download(packageName: string): Promise<DownloadedWorldPackage> {
-    const { namespace, componentName } = parseWorldPackageName(packageName);
-    const response = await this.fetchResponse(
-      `api/packages/${encodeURIComponent(namespace)}/${encodeURIComponent(componentName)}`,
-    );
-    if (!response.ok) {
-      const body = await responseBody(response);
-      throw new FourierWorldApiError(response.status, errorMessage(response.status, body), body);
+  async approvedNpmPackage(npmUrl: string): Promise<ApprovedNpmPackage> {
+    const reference = parseNpmPackageReference(npmUrl);
+    const query = new URLSearchParams({ url: reference.componentUrl ?? reference.packageUrl });
+    const body = object(await this.request(`api/npm-packages/resolve?${query}`));
+    if (
+      body === undefined ||
+      body.npmPackageUrl !== reference.packageUrl ||
+      typeof body.integrity !== "string" ||
+      !body.integrity.startsWith("sha512-") ||
+      !Array.isArray(body.components)
+    ) {
+      throw new FourierWorldApiError(502, "Fourier World npm release 响应格式无效", body);
     }
-    const length = Number(response.headers.get("content-length"));
-    if (Number.isFinite(length) && length > 10 * 1024 * 1024) {
-      throw new FourierWorldApiError(413, "Fourier World 组件包超过 10 MiB 下载限制");
+    const components = body.components.map((value) => {
+      const item = object(value);
+      if (typeof item?.name !== "string" || typeof item.npmComponentUrl !== "string") {
+        throw new FourierWorldApiError(502, "Fourier World npm component 响应格式无效", value);
+      }
+      const parsed = parseNpmPackageReference(item.npmComponentUrl);
+      if (parsed.packageUrl !== reference.packageUrl || parsed.componentName !== item.name) {
+        throw new FourierWorldApiError(502, "Fourier World npm component 身份不一致", value);
+      }
+      return Object.freeze({ name: item.name, npmComponentUrl: item.npmComponentUrl });
+    });
+    if (components.length < 1 || components.length > 50 || new Set(components.map((item) => item.name)).size !== components.length) {
+      throw new FourierWorldApiError(502, "Fourier World npm release 组件列表无效", body);
     }
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    if (bytes.byteLength > 10 * 1024 * 1024) {
-      throw new FourierWorldApiError(413, "Fourier World 组件包超过 10 MiB 下载限制");
+    if (reference.componentName !== undefined && (components.length !== 1 || components[0]?.name !== reference.componentName)) {
+      throw new FourierWorldApiError(404, `Fourier World 未发布组件 ${reference.componentName}`, body);
     }
-    const version = response.headers.get("x-fourier-package-version");
-    const expectedSha256 = response.headers.get("x-fourier-package-sha256");
-    const responsePackageName = response.headers.get("x-fourier-package-name");
-    if (!version || !expectedSha256 || responsePackageName !== packageName || !/^[0-9a-f]{64}$/.test(expectedSha256)) {
-      throw new FourierWorldApiError(502, "Fourier World 下载响应缺少有效的包元数据");
-    }
-    const actualSha256 = createHash("sha256").update(bytes).digest("hex");
-    if (actualSha256 !== expectedSha256) {
-      throw new FourierWorldApiError(502, "Fourier World 组件包 SHA-256 校验失败");
-    }
-    const componentId = response.headers.get("x-fourier-component-id");
     return Object.freeze({
-      packageName,
-      version,
-      sha256: actualSha256,
-      ...(componentId === null ? {} : { componentId }),
-      bytes,
+      npmPackageUrl: reference.packageUrl,
+      integrity: body.integrity,
+      components: Object.freeze(components),
     });
   }
 }

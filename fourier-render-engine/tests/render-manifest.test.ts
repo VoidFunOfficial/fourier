@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { writeRenderManifest } from "../src/render-manifest.ts";
 import { DOM_RENDER_PROFILE } from "../src/render-profile.ts";
 import { PROJECT_EXECUTION_REVISION } from "@fourier-video/core/artifact";
+import { SDK_ABI_VERSION } from "@fourier-video/sdk";
 
 const directories: string[] = [];
 
@@ -45,7 +46,7 @@ describe("render manifest", () => {
     expect(result.manifest).toMatchObject({
       schemaVersion: 2,
       engine: { version: "2.0.0" },
-      sdk: { version: "1.2.0", abiVersion: 1.1 },
+      sdk: { version: "1.2.0", abiVersion: SDK_ABI_VERSION },
       playwright: { version: "1.62.0" },
       chromium: { version: "151.0.7922.34", revision: "1234" },
       profiles: [{ runtimeRevision: "5" }],

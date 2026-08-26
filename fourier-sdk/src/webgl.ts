@@ -125,6 +125,8 @@ interface FourierShaderCanvasBaseProps<
   Layout extends FourierShaderUniformLayout,
 > {
   readonly shader: FourierShaderDefinition<Layout>;
+  /** Optional raster input exposed to GLSL as uFourierSource. */
+  readonly source?: string;
   readonly className?: string;
   readonly style?: CSSProperties;
   readonly ariaLabel?: string;
@@ -276,12 +278,15 @@ uniform float uFourierDuration;
 uniform float uFourierSeed;
 `;
 
-function shaderSource(source: string): string {
+const FOURIER_SOURCE_GLSL_HEADER = "uniform sampler2D uFourierSource;\n";
+
+function shaderSource(source: string, hasSource: boolean): string {
+  const header = FOURIER_GLSL_HEADER + (hasSource ? FOURIER_SOURCE_GLSL_HEADER : "");
   const version = source.match(/^\s*#version[^\r\n]*(?:\r?\n|$)/);
   if (version === null) {
-    return `#version 300 es\n${FOURIER_GLSL_HEADER}\n${source}`;
+    return `#version 300 es\n${header}\n${source}`;
   }
-  return `${version[0]}${FOURIER_GLSL_HEADER}\n${source.slice(version[0].length)}`;
+  return `${version[0]}${header}\n${source.slice(version[0].length)}`;
 }
 
 type ShaderStage = "vertex" | "fragment";
@@ -291,6 +296,7 @@ function compileShader(
   definition: FourierShaderDefinition,
   stage: ShaderStage,
   source: string,
+  hasSource = false,
 ): WebGLShader {
   const shader = gl.createShader(
     stage === "vertex" ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER,
@@ -302,7 +308,7 @@ function compileShader(
       { stage },
     );
   }
-  gl.shaderSource(shader, shaderSource(source));
+  gl.shaderSource(shader, shaderSource(source, hasSource));
   gl.compileShader(shader);
   if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) === true) return shader;
   const log = gl.getShaderInfoLog(shader)?.trim() || "未知 GLSL 编译错误";
@@ -317,11 +323,12 @@ function compileShader(
 function linkProgram(
   gl: WebGL2RenderingContext,
   definition: FourierShaderDefinition,
+  hasSource = false,
 ): WebGLProgram {
-  const vertex = compileShader(gl, definition, "vertex", definition.vertexShader);
+  const vertex = compileShader(gl, definition, "vertex", definition.vertexShader, hasSource);
   let fragment: WebGLShader | undefined;
   try {
-    fragment = compileShader(gl, definition, "fragment", definition.fragmentShader);
+    fragment = compileShader(gl, definition, "fragment", definition.fragmentShader, hasSource);
     const program = gl.createProgram();
     if (program === null) {
       throw new SdkError(
@@ -438,6 +445,7 @@ const builtinUniformNames = [
   "uFourierProgress",
   "uFourierDuration",
   "uFourierSeed",
+  "uFourierSource",
 ] as const;
 
 type BuiltinUniformName = typeof builtinUniformNames[number];
@@ -448,7 +456,19 @@ interface FourierWebGLState {
   readonly vertexArray: WebGLVertexArrayObject;
   readonly builtins: Readonly<Record<BuiltinUniformName, WebGLUniformLocation | null>>;
   readonly uniforms: Readonly<Record<string, WebGLUniformLocation | null>>;
+  readonly sourceTexture?: WebGLTexture;
+  readonly sourceProgram?: WebGLProgram;
+  readonly sourceSampler?: WebGLUniformLocation | null;
 }
+
+const SOURCE_COPY_SHADER = defineFourierShader({
+  name: "Fourier source copy",
+  fragmentShader: `
+    in vec2 vUv;
+    out vec4 fragColor;
+    void main() { fragColor = texture(uFourierSource, vUv); }
+  `,
+});
 
 function loseContext(gl: WebGL2RenderingContext): void {
   gl.getExtension("WEBGL_lose_context")?.loseContext();
@@ -571,6 +591,7 @@ export function FourierShaderCanvas<
 >(props: FourierShaderCanvasProps<Layout>): ReactElement {
   const { width, height, seed } = useFourierContext();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const sourceRef = useRef<HTMLImageElement>(null);
   const uniformsRef = useRef(props.uniforms);
   uniformsRef.current = props.uniforms;
   const configRef = useRef({
@@ -581,7 +602,7 @@ export function FourierShaderCanvas<
     let state: FourierWebGLState | undefined;
 
     return {
-      ready() {
+      async ready() {
         const canvas = canvasRef.current;
         if (canvas === null) {
           throw new SdkError(
@@ -606,7 +627,13 @@ export function FourierShaderCanvas<
         }
         try {
           const shader = configRef.current.shader;
-          const program = linkProgram(gl, shader);
+          const hasSource = props.source !== undefined;
+          const source = sourceRef.current;
+          if (hasSource && source === null) {
+            throw new SdkError("FOURIER_SHADER_SOURCE_MISSING", "FourierShaderCanvas 找不到输入纹理");
+          }
+          if (source !== null) await source.decode();
+          const program = linkProgram(gl, shader, hasSource);
           const vertexArray = gl.createVertexArray();
           if (vertexArray === null) {
             gl.deleteProgram(program);
@@ -624,7 +651,26 @@ export function FourierShaderCanvas<
               gl.getUniformLocation(program, name),
             ]),
           ));
-          state = Object.freeze({ gl, program, vertexArray, builtins, uniforms });
+          const sourceTexture = hasSource ? gl.createTexture() : undefined;
+          if (hasSource && sourceTexture === null) {
+            gl.deleteVertexArray(vertexArray);
+            gl.deleteProgram(program);
+            throw new SdkError("FOURIER_SHADER_RESOURCE_FAILED", "无法创建 Shader 输入纹理");
+          }
+          const sourceProgram = hasSource && shader.blend !== "replace"
+            ? linkProgram(gl, SOURCE_COPY_SHADER, true)
+            : undefined;
+          state = Object.freeze({
+            gl,
+            program,
+            vertexArray,
+            builtins,
+            uniforms,
+            ...(sourceTexture === undefined ? {} : { sourceTexture }),
+            ...(sourceProgram === undefined
+              ? {}
+              : { sourceProgram, sourceSampler: gl.getUniformLocation(sourceProgram, "uFourierSource") }),
+          });
         } catch (error) {
           loseContext(gl);
           throw error;
@@ -643,11 +689,38 @@ export function FourierShaderCanvas<
         gl.disable(gl.DEPTH_TEST);
         gl.disable(gl.CULL_FACE);
         gl.disable(gl.SCISSOR_TEST);
-        configureBlend(gl, shader.blend);
-        if (shader.clearColor !== undefined) {
+        if (state.sourceTexture !== undefined) {
+          const source = sourceRef.current;
+          if (source === null) {
+            throw new SdkError("FOURIER_SHADER_SOURCE_MISSING", "FourierShaderCanvas 找不到输入纹理");
+          }
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, state.sourceTexture);
+          gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          gl.texImage2D(
+            gl.TEXTURE_2D,
+            0,
+            gl.RGBA,
+            gl.RGBA,
+            gl.UNSIGNED_BYTE,
+            source,
+          );
+        }
+        if (state.sourceProgram !== undefined) {
+          gl.disable(gl.BLEND);
+          gl.useProgram(state.sourceProgram);
+          gl.uniform1i(state.sourceSampler ?? null, 0);
+          gl.bindVertexArray(vertexArray);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+        } else if (shader.clearColor !== undefined) {
           gl.clearColor(...shader.clearColor);
           gl.clear(gl.COLOR_BUFFER_BIT);
         }
+        configureBlend(gl, shader.blend);
         gl.useProgram(program);
         gl.bindVertexArray(vertexArray);
         const durationSeconds = frame.durationMilliseconds / 1_000;
@@ -665,6 +738,9 @@ export function FourierShaderCanvas<
         }
         if (builtins.uFourierSeed !== null) {
           gl.uniform1f(builtins.uFourierSeed, seed);
+        }
+        if (builtins.uFourierSource !== null) {
+          gl.uniform1i(builtins.uFourierSource, 0);
         }
 
         const source = uniformsRef.current;
@@ -708,15 +784,17 @@ export function FourierShaderCanvas<
         if (state === undefined) return;
         state.gl.deleteVertexArray(state.vertexArray);
         state.gl.deleteProgram(state.program);
+        if (state.sourceProgram !== undefined) state.gl.deleteProgram(state.sourceProgram);
+        if (state.sourceTexture !== undefined) state.gl.deleteTexture(state.sourceTexture);
         loseContext(state.gl);
         state = undefined;
       },
     };
-  }, [height, seed, width]);
+  }, [height, props.source, seed, width]);
 
   useFourierRenderDriver(driver);
 
-  return React.createElement("canvas", {
+  const canvas = React.createElement("canvas", {
     ref: canvasRef,
     className: props.className,
     "aria-label": props.ariaLabel,
@@ -729,4 +807,15 @@ export function FourierShaderCanvas<
       ...props.style,
     },
   });
+  if (props.source === undefined) return canvas;
+  return React.createElement(React.Fragment, null,
+    React.createElement("img", {
+      ref: sourceRef,
+      src: props.source,
+      alt: "",
+      "data-fourier-subject": "",
+      style: { display: "none" },
+    }),
+    canvas,
+  );
 }

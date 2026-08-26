@@ -63,7 +63,7 @@ describe("DOM SampleClock", () => {
     })).toBe(10_000_000);
   });
 
-  test("Motion fill 使用半开 active 区间", () => {
+  test("Modifier fill 使用半开 active 区间", () => {
     const clock = new SampleClock(30);
     const start = { numerator: 1, denominator: 1 };
     const duration = { numerator: 2, denominator: 1 };

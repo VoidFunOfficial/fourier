@@ -94,7 +94,7 @@ async function collectProjectDependencies(
     }
     if (node.kind === "react") components.push(node);
     for (const modifier of node.kind === "audio" ? [] : node.modifiers) {
-      if (modifier.kind === "motion" && modifier.enabled) {
+      if ((modifier.kind === "motion" || modifier.kind === "shader") && modifier.enabled) {
         components.push(modifier);
       }
     }

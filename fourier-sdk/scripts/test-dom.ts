@@ -30,4 +30,16 @@ for (const pattern of patterns) {
   if (exitCode !== 0) process.exit(exitCode);
 }
 
+const shader = Bun.spawn(
+  ["bun", "test", "--max-concurrency=1", "example/ChannelShader.test.ts"],
+  {
+    cwd: new URL("..", import.meta.url).pathname,
+    env: { ...process.env, RUN_DOM_TESTS: "1" },
+    stdin: "inherit",
+    stdout: "inherit",
+    stderr: "inherit",
+  },
+);
+if (await shader.exited !== 0) process.exit(1);
+
 process.exit(0);

@@ -24,10 +24,12 @@ import {
 import type {
   AnchorKind,
   AudioNode,
+  BaseVisualModifier,
   Canvas,
   FitMode,
   GroupNode,
   ImageNode,
+  MotionNode,
   ProjectMetadata,
   ReactNode,
   ReactPropValue,
@@ -39,6 +41,7 @@ import type {
   SceneBlend,
   SceneNode,
   SceneOverflow,
+  ShaderNode,
   SubtitleTtsArtifact,
   TextNode,
   TimePropValue,
@@ -815,9 +818,10 @@ interface ModifierHost {
   enabled: boolean;
 }
 
-function resolveMotionComponentPath(
+function resolveModifierComponentPath(
   context: BuildContext,
   component: string,
+  kind: "motion" | "shader",
 ): string {
   if (
     component.length === 0 ||
@@ -827,25 +831,26 @@ function resolveMotionComponentPath(
   ) {
     fail(
       "INVALID_PATH",
-      `motion.component 必须是 motions/ 内的相对路径，收到 "${component}"`,
+      `${kind}.component 必须是 ${kind}s/ 内的相对路径，收到 "${component}"`,
     );
   }
-  const motionsDirectory = resolve(context.projectDir, "motions");
-  const privatePath = resolve(motionsDirectory, component);
-  const pathFromMotions = relative(motionsDirectory, privatePath);
+  const directoryName = `${kind}s`;
+  const privateDirectory = resolve(context.projectDir, directoryName);
+  const privatePath = resolve(privateDirectory, component);
+  const pathFromDirectory = relative(privateDirectory, privatePath);
   if (
-    pathFromMotions === ".." ||
-    pathFromMotions.startsWith(
+    pathFromDirectory === ".." ||
+    pathFromDirectory.startsWith(
       `..${process.platform === "win32" ? "\\" : "/"}`,
     )
   ) {
     fail(
       "INVALID_PATH",
-      `motion.component 不能指向 motions/ 外: "${component}"`,
+      `${kind}.component 不能指向 ${directoryName}/ 外: "${component}"`,
     );
   }
-  const sharedMotionsDirectory = resolve(context.rootProjectDir, "motions");
-  const sharedPath = resolve(sharedMotionsDirectory, component);
+  const sharedDirectory = resolve(context.rootProjectDir, directoryName);
+  const sharedPath = resolve(sharedDirectory, component);
   const path =
     existsSync(privatePath) || context.projectDir === context.rootProjectDir
       ? privatePath
@@ -854,7 +859,7 @@ function resolveMotionComponentPath(
     context.validateAssets &&
     (!existsSync(path) || !statSync(path).isFile())
   ) {
-    fail("ASSET_NOT_FOUND", `motion.component 文件不存在: "${component}"`, {
+    fail("ASSET_NOT_FOUND", `${kind}.component 文件不存在: "${component}"`, {
       value: component,
       resolvedPath: path,
     });
@@ -926,11 +931,7 @@ function parseModifierBase(
   context: BuildContext,
   host: ModifierHost,
   previous: Map<string, VisualModifier>,
-): Omit<
-  VisualModifier,
-  "kind" | "component" | "componentPath" | "exportName" | "props" |
-    "easing" | "keyframes"
-> {
+): Omit<BaseVisualModifier, "kind"> {
   const id = validateId(requiredAttribute(element, "id"));
   registerId(context, id);
   const durationFrames = parseDuration(element, context);
@@ -1016,7 +1017,7 @@ function parseMotion(
   context: BuildContext,
   host: ModifierHost,
   previous: Map<string, VisualModifier>,
-): VisualModifier {
+): MotionNode {
   assertAllowedAttributes(element, [
     ...MODIFIER_COMMON_ATTRIBUTES,
     "fill",
@@ -1035,10 +1036,43 @@ function parseMotion(
     ...parseModifierBase(element, context, host, previous),
     kind: "motion",
     component,
-    componentPath: resolveMotionComponentPath(context, component),
+    componentPath: resolveModifierComponentPath(context, component, "motion"),
     exportName,
     props,
     propTypes,
+  };
+}
+
+function parseShader(
+  element: AuthorElement,
+  context: BuildContext,
+  host: ModifierHost,
+  previous: Map<string, VisualModifier>,
+): ShaderNode {
+  assertAllowedAttributes(element, [
+    ...MODIFIER_COMMON_ATTRIBUTES,
+    "fill",
+    "component",
+    "export",
+    "layer",
+  ]);
+  assertWhitespaceOnly(element);
+  if (element.children.length > 0) fail("INVALID_STRUCTURE", "Shader 不能包含子节点");
+  const { props, propTypes } = parseProjectProps(element, context);
+  const component = requiredAttribute(element, "component");
+  const exportName = optionalAttribute(element, "export", "default");
+  if (exportName !== "default") {
+    fail("ARTIFACT_EXPORT_INVALID", "Shader exportName 仅接受省略或 default；该字段已 deprecated");
+  }
+  return {
+    ...parseModifierBase(element, context, host, previous),
+    kind: "shader",
+    component,
+    componentPath: resolveModifierComponentPath(context, component, "shader"),
+    exportName,
+    props,
+    propTypes,
+    layer: parseInteger(requiredAttribute(element, "layer"), "shader.layer"),
   };
 }
 
@@ -1150,6 +1184,8 @@ function parseVisualModifiers(
         );
       }
       modifier = parseMotion(element, context, host, previous);
+    } else if (element.name === "shader") {
+      modifier = parseShader(element, context, host, previous);
     } else if (element.name === "transform") {
       modifier = parseTransform(element, context, host, previous);
     } else {
@@ -1191,10 +1227,10 @@ function parseVideo(
   assertWhitespaceOnly(element);
   if (
     element.children.some(
-      (child) => child.name !== "motion" && child.name !== "transform",
+      (child) => child.name !== "motion" && child.name !== "shader" && child.name !== "transform",
     )
   ) {
-    fail("INVALID_STRUCTURE", "video 节点只能包含 motion 或 transform");
+    fail("INVALID_STRUCTURE", "video 节点只能包含 motion、shader 或 transform");
   }
   const src = requiredAttribute(element, "src");
   const inFrame = parseTimeToFrames(
@@ -1326,10 +1362,10 @@ function parseImage(
   assertWhitespaceOnly(element);
   if (
     element.children.some(
-      (child) => child.name !== "motion" && child.name !== "transform",
+      (child) => child.name !== "motion" && child.name !== "shader" && child.name !== "transform",
     )
   ) {
-    fail("INVALID_STRUCTURE", "image 节点只能包含 motion 或 transform");
+    fail("INVALID_STRUCTURE", "image 节点只能包含 motion、shader 或 transform");
   }
   const nodeBase = baseNode(
       element,
@@ -1442,20 +1478,21 @@ function parseText(
     (child) => child.name === "tts",
   );
   const modifierElements = element.children.filter(
-    (child) => child.name === "motion" || child.name === "transform",
+    (child) => child.name === "motion" || child.name === "shader" || child.name === "transform",
   );
   const invalidChildren = element.children.filter(
     (child) =>
       child.name !== "content" &&
       child.name !== "tts" &&
       child.name !== "motion" &&
+      child.name !== "shader" &&
       child.name !== "transform",
   );
   const ttsIndex = element.children.findIndex(
     (child) => child.name === "tts",
   );
   const firstModifierIndex = element.children.findIndex(
-    (child) => child.name === "motion" || child.name === "transform",
+    (child) => child.name === "motion" || child.name === "shader" || child.name === "transform",
   );
   if (
     invalidChildren.length > 0 ||
@@ -1639,9 +1676,9 @@ function parseReact(
   ]);
   assertWhitespaceOnly(element);
   if (element.children.some(
-    (child) => child.name !== "motion" && child.name !== "transform"
+    (child) => child.name !== "motion" && child.name !== "shader" && child.name !== "transform"
   )) {
-    fail("INVALID_STRUCTURE", "ReactLayer 只能包含 Motion 或 Transform");
+    fail("INVALID_STRUCTURE", "ReactLayer 只能包含 Motion、Shader 或 Transform");
   }
   const modifierElements = element.children;
   const { props, propTypes } = parseProjectProps(element, context);

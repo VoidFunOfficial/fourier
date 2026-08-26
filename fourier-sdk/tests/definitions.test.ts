@@ -4,6 +4,8 @@ import {
   defineMotion,
   definePreview,
   defineReact,
+  defineShader,
+  defineFourierShader,
   DESIGN_PREVIEW_FPS,
   field,
   MAX_DESIGN_PREVIEW_SECONDS,
@@ -13,6 +15,39 @@ import {
 } from "../src/index.ts";
 
 describe("SDK artifact definition", () => {
+  test("defineShader 复用 typed shader 并强制图片 design subject", () => {
+    const shader = defineShader({
+      name: "Invert",
+      schema: { amount: field.number({ default: 1 }) },
+      shader: defineFourierShader({
+        uniforms: { amount: "float" },
+        fragmentShader: "in vec2 vUv; uniform float amount; out vec4 fragColor; void main(){ fragColor=texture(uFourierSource,vUv)*amount; }",
+      }),
+      uniforms: ({ props, frame }) => ({ amount: props.amount * (frame.progress + 1) }),
+      designPreview: () => ({
+        props: {},
+        subject: "data:image/png;base64,AA==",
+        composition: { width: 16, height: 16, durationSeconds: 1 },
+      }),
+    });
+    expect(shader[SDK_ARTIFACT]).toMatchObject({
+      sdkAbiVersion: SDK_ABI_VERSION,
+      kind: "shader",
+      renderer: "dom-timeline",
+      name: "Invert",
+    });
+    expect(() => defineShader({
+      name: "MissingSubject",
+      schema: {},
+      shader: defineFourierShader({ fragmentShader: "out vec4 fragColor; void main(){fragColor=vec4(1);}" }),
+      designPreview: () => ({
+        props: {},
+        subject: "",
+        composition: { width: 1, height: 1, durationSeconds: 0 },
+      }),
+    })[SDK_ARTIFACT].designPreview()).toThrow("subject");
+  });
+
   test("defineReact 强制携带 schema/designPreview 并保持可调用 ABI", () => {
     const panel = defineReact({
       name: "MetricPanel",

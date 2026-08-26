@@ -88,7 +88,7 @@ export function validatePreviewConfig<Artifact extends AnyArtifact>(
   if (metadata === undefined) {
     sdkFail(
       "ARTIFACT_EXPORT_INVALID",
-      "preview config.artifact 必须由 defineReact 或 defineMotion 创建",
+      "preview config.artifact 必须由 defineReact、defineMotion 或 defineShader 创建",
     );
   }
   if (
@@ -154,6 +154,13 @@ export function validatePreviewConfig<Artifact extends AnyArtifact>(
       sdkFail("INVALID_PREVIEW_CONFIG", `motion.fill 不受支持: ${fill}`);
     }
   }
+  if (
+    metadata.kind === "shader" &&
+    (typeof (config as { subject?: unknown }).subject !== "string" ||
+      (config as { subject: string }).subject.length === 0)
+  ) {
+    sdkFail("INVALID_PREVIEW_CONFIG", "Shader preview 必须声明图片 subject");
+  }
   const normalized = {
     ...config,
     composition: Object.freeze({
@@ -202,7 +209,7 @@ export function resolveDesignPreview<Artifact extends AnyArtifact>(
   if (metadata === undefined) {
     sdkFail(
       "ARTIFACT_EXPORT_INVALID",
-      "design preview 入口必须由 defineReact 或 defineMotion 创建",
+      "design preview 入口必须由 defineReact、defineMotion 或 defineShader 创建",
     );
   }
   const preview = metadata.designPreview();

@@ -239,6 +239,11 @@ async function initialize(config) {
   const component = textMotion ? metadata.textComponent : metadata.component;
   const componentProps = metadata.kind === "react"
     ? { props: Object.freeze({ ...resolvedProps }) }
+    : metadata.kind === "shader"
+      ? {
+          source: config.subjectDataUrl ?? preview.subject,
+          props: Object.freeze({ ...resolvedProps }),
+        }
     : metadata.renderer === "dom-timeline-ffmpeg-video"
       ? {
           video: Object.freeze({ id: config.videoId ?? "subject" }),
@@ -405,7 +410,7 @@ function timelineSnapshot() {
 async function setSubject(dataUrl) {
   const images = Array.from(rootNode.querySelectorAll("img[data-fourier-subject]"));
   if (images.length === 0 || images.some((image) => !(image instanceof HTMLImageElement))) {
-    fail("MOTION_SUBJECT_MISSING", "动态 Motion subject image 不存在");
+    fail("MOTION_SUBJECT_MISSING", "动态 modifier subject image 不存在");
   }
   observer?.disconnect();
   mutationCount = 0;

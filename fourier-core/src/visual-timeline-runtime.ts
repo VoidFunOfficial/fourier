@@ -883,9 +883,10 @@ export class DomTimelineAdapter implements TimelineAdapter {
         "DOM bootstrap script initialization",
         resource.page.addScriptTag({ content: bundleSnapshot.javascript }),
       );
+      const modifier = artifact.modifier ?? artifact.motion;
       const durationMilliseconds =
-        (artifact.kind === "motion" && artifact.motion !== undefined
-          ? artifact.motion.durationInFrames
+        (modifier !== undefined
+          ? modifier.durationInFrames
           : artifact.composition.durationInFrames) /
         artifact.composition.fps * 1000;
       const descriptor = await browserCall<{
@@ -897,8 +898,8 @@ export class DomTimelineAdapter implements TimelineAdapter {
         height: artifact.composition.height,
         fps: artifact.composition.fps,
         durationInFrames:
-          artifact.kind === "motion" && artifact.motion !== undefined
-            ? artifact.motion.durationInFrames
+          modifier !== undefined
+            ? modifier.durationInFrames
             : artifact.composition.durationInFrames,
         seed: artifact.seed,
         durationMilliseconds,
@@ -987,15 +988,16 @@ export class DomTimelineAdapter implements TimelineAdapter {
           : await options.dynamicSubjectProvider(time, request.signal);
         cancelled(request.signal);
         const clock = new SampleClock(artifact.composition.fpsSource);
-        const phase = artifact.motion === undefined
+        const modifier = artifact.modifier ?? artifact.motion;
+        const phase = modifier === undefined
           ? undefined
           : clock.phase(
               time,
-              clock.frameStart(artifact.motion.startFrame),
-              clock.frameStart(artifact.motion.durationInFrames),
-              artifact.motion.fill,
+              clock.frameStart(modifier.startFrame),
+              clock.frameStart(modifier.durationInFrames),
+              modifier.fill,
             );
-        const inactiveSubject = artifact.motion !== undefined && phase === undefined;
+        const inactiveSubject = modifier !== undefined && phase === undefined;
         const timePart = staticArtifact ? "static" : rationalTimeKey(time);
         const cacheKey = [
           artifact.snapshotId,

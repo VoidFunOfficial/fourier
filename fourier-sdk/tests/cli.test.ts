@@ -44,12 +44,14 @@ describe("fourier-sdk CLI arguments", () => {
     });
   });
 
-  test("publish 默认要求当前目录 package.json 并支持 dry-run", () => {
-    expect(parseCliInvocation(["publish", "./component", "--dry-run"])).toEqual({
+  test("publish 只接受精确 npm URL 并支持 dry-run", () => {
+    const npmUrl = "https://www.npmjs.com/package/@studio/components/v/1.2.3";
+    expect(parseCliInvocation(["publish", npmUrl, "--dry-run"])).toEqual({
       command: "publish",
-      inputPath: resolve("./component"),
+      npmUrl,
       dryRun: true,
     });
+    expect(() => parseCliInvocation(["publish", `${npmUrl}#MetricPanel`])).toThrow("不接受 #ComponentName");
   });
 
   test("拒绝未知参数和明文 password 参数", () => {
@@ -58,18 +60,19 @@ describe("fourier-sdk CLI arguments", () => {
   });
 
   test("解析 add 和 del 项目指令", () => {
+    const npmUrl = "https://www.npmjs.com/package/@studio/components/v/1.2.3";
     expect(parseCliInvocation([
-      "add", "@studio/MetricPanel", "--project", "./video", "--dir", "src/components", "--force",
+      "add", `${npmUrl}#MetricPanel`, "--project", "./video", "--dir", "src/components", "--force",
     ])).toEqual({
       command: "add",
-      packageName: "@studio/MetricPanel",
+      npmUrl: `${npmUrl}#MetricPanel`,
       projectDirectory: resolve("./video"),
       componentsDirectory: "src/components",
       force: true,
     });
-    expect(parseCliInvocation(["remove", "@studio/MetricPanel", "--purge"])).toEqual({
+    expect(parseCliInvocation(["remove", npmUrl, "--purge"])).toEqual({
       command: "del",
-      packageName: "@studio/MetricPanel",
+      npmUrl,
       projectDirectory: process.cwd(),
       purge: true,
     });

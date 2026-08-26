@@ -36,7 +36,7 @@ export interface MotionPreviewInspectionRequest {
 }
 
 export interface ArtifactFixture {
-  readonly kind: "react" | "motion";
+  readonly kind: "react" | "motion" | "shader";
   readonly name: string;
   readonly snapshotId: string;
   /** Runtime-verified pixel invariance across sample time. */
@@ -164,7 +164,7 @@ function timelineFixture(
   });
 }
 
-/** Opens an ABI v1.1 artifact from its source entry path. */
+/** Opens a supported SDK artifact from its source entry path. */
 export async function openArtifact(
   entryPath: string,
   options: {

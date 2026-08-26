@@ -14,6 +14,7 @@ import { renderModuleContentKey } from "./render-module-renderer.ts";
 import { parseTimeToFrames } from "./time.ts";
 import type {
   AudioNode,
+  BaseVisualModifier,
   MotionNode,
   MotionPreviewContext,
   MotionPreviewDescriptor,
@@ -526,8 +527,8 @@ function motionContext(
   };
 }
 
-function modifierLocalFrame(motion: MotionNode, progress: number): number {
-  return motion.localStartFrame + Math.round(progress * Math.max(0, motion.durationFrames - 1));
+function modifierLocalFrame(modifier: BaseVisualModifier, progress: number): number {
+  return modifier.localStartFrame + Math.round(progress * Math.max(0, modifier.durationFrames - 1));
 }
 
 function transformPriority(transform: TransformNode): PreviewPriority {

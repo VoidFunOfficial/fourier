@@ -195,7 +195,7 @@ function sessionName(session: CompiledSession): string {
   return session.artifact.name;
 }
 
-function sessionKind(session: CompiledSession): "react" | "motion" {
+function sessionKind(session: CompiledSession): "react" | "motion" | "shader" {
   return session.artifact.kind;
 }
 
@@ -323,12 +323,12 @@ function sessionPayload(record: PreviewRecord, current: CompiledSession): Readon
             styleUrl: `/api/runtime.css?${query}&snapshot=${encodeURIComponent(current.artifact.snapshotId)}`,
             seed: current.artifact.seed,
             durationMilliseconds:
-              current.artifact.kind === "motion" && current.artifact.motion !== undefined
-                ? current.artifact.motion.durationInFrames / DESIGN_PREVIEW_FPS * 1_000
+              (current.artifact.modifier ?? current.artifact.motion) !== undefined
+                ? (current.artifact.modifier ?? current.artifact.motion)!.durationInFrames / DESIGN_PREVIEW_FPS * 1_000
                 : current.config.composition.durationSeconds * 1_000,
             durationInFrames:
-              current.artifact.kind === "motion" && current.artifact.motion !== undefined
-                ? current.artifact.motion.durationInFrames
+              (current.artifact.modifier ?? current.artifact.motion) !== undefined
+                ? (current.artifact.modifier ?? current.artifact.motion)!.durationInFrames
                 : current.config.composition.durationInFrames,
             ...(current.artifact.motion === undefined ? {} : { motion: current.artifact.motion }),
             ...(current.artifact.textSubject === undefined
@@ -601,7 +601,7 @@ export async function startPreviewServer(
           {
             error: {
               code: "DOM_PREVIEW_DIRECT",
-              message: "ABI v1.1 preview 由浏览器直接渲染，不提供 PNG 帧接口",
+              message: "SDK ABI preview 由浏览器直接渲染，不提供 PNG 帧接口",
             },
           },
           404,

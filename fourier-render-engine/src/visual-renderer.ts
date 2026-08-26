@@ -58,6 +58,7 @@ import type {
   ImageNode,
   MotionContext,
   MotionNode,
+  ShaderNode,
   ReactNode,
   RenderContext,
   RenderNode,
@@ -94,7 +95,7 @@ export interface PreparedVisual {
 
 export interface PreparedTimelineArtifact {
   readonly nodeId: string;
-  readonly kind: "react" | "motion";
+  readonly kind: "react" | "motion" | "shader";
   readonly name: string;
   readonly sdkAbiVersion: SupportedSdkAbiVersion;
   readonly renderer: "dom-timeline" | "dom-timeline-ffmpeg-video";
@@ -161,7 +162,7 @@ interface PrepareOptions {
 
 export interface ComponentDescriptor {
   id: string;
-  kind?: "react" | "motion";
+  kind?: "react" | "motion" | "shader";
   component: string;
   componentPath: string;
   exportName: string;
@@ -639,13 +640,13 @@ export async function inspectSdkArtifact(
     ) {
       fail(
         "LEGACY_COMPONENT_UNSUPPORTED",
-        `组件 "${node.component}" 必须迁移为 default-export defineReact()/defineMotion() SDK Artifact`,
+        `组件 "${node.component}" 必须迁移为 default-export defineReact()/defineMotion()/defineShader() SDK Artifact`,
         { node: node.id, component: node.component },
       );
     }
     throw error;
   }
-  const expectedKind = node.kind === "motion" ? "motion" : "react";
+  const expectedKind = node.kind ?? "react";
   if (compiled.kind !== expectedKind) {
     fail("ARTIFACT_KIND_MISMATCH", `期望 ${expectedKind} Artifact，收到 ${compiled.kind}`);
   }
@@ -1058,6 +1059,59 @@ function sparseRoundedAlpha(
     `lte(pow(X-(${nearestX}),2)+pow(Y-(${nearestY}),2),pow(${value},2)))))`;
 }
 
+async function compositeFfmpegVideoMotionFrame(
+  project: ResolvedProject,
+  node: VideoNode,
+  surface: TimelineVideoSurface,
+  localFrame: number,
+  panelPath: string,
+  maskPath: string,
+  outputPath: string,
+  ffmpegPath: string,
+): Promise<void> {
+  const sourceSeconds =
+    (node.inFrame + localFrame * node.rate) / project.canvas.fps;
+  const [topLeft, topRight, bottomLeft, bottomRight] = surface.corners;
+  const perspective = [
+    `x0=${topLeft.x}`, `y0=${topLeft.y}`,
+    `x1=${topRight.x}`, `y1=${topRight.y}`,
+    `x2=${bottomLeft.x}`, `y2=${bottomLeft.y}`,
+    `x3=${bottomRight.x}`, `y3=${bottomRight.y}`,
+    "interpolation=cubic", "sense=destination", "eval=init",
+  ].join(":");
+  const filters = [
+    `[0:v]trim=start=${sourceSeconds}:duration=${1 / project.canvas.fps},` +
+      `setpts=PTS-STARTPTS,format=rgba,${videoFitFilters(node).join(",")},` +
+      `geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':` +
+      `a='${sparseRoundedAlpha(surface.cornerRadiusRatio, node.width, node.height)}',` +
+      `perspective=${perspective},split=2[video_color_source][video_alpha_source]`,
+    "[video_color_source]format=rgb24[video_color]",
+    "[video_alpha_source]alphaextract[video_alpha]",
+    `[2:v]format=gray,scale=${node.width}:${node.height}[video_quad_mask]`,
+    "[video_alpha][video_quad_mask]blend=all_mode=multiply[video_clipped_alpha]",
+    "[video_color][video_clipped_alpha]alphamerge[video]",
+    `[1:v]format=rgba,scale=${node.width}:${node.height}[panel]`,
+    "[panel][video]overlay=x=0:y=0:shortest=1[out]",
+  ].join(";");
+  const process = Bun.spawn([
+    ffmpegPath,
+    "-hide_banner", "-loglevel", "error", "-y",
+    ...(node.loop ? ["-stream_loop", "-1"] : []),
+    "-i", node.sourcePath,
+    "-i", panelPath,
+    "-i", maskPath,
+    "-filter_complex", filters,
+    "-map", "[out]", "-frames:v", "1", outputPath,
+  ], { stdout: "ignore", stderr: "pipe" });
+  const [exitCode, stderr] = await Promise.all([
+    process.exited,
+    new Response(process.stderr).text(),
+  ]);
+  if (exitCode !== 0) {
+    fail("FFMPEG_FAILED", `FFmpeg Video Motion 合成失败: ${stderr}`);
+  }
+}
+
 async function renderSparseFfmpegVideoMotion(
   project: ResolvedProject,
   node: VideoNode,
@@ -1136,47 +1190,16 @@ async function renderSparseFfmpegVideoMotion(
         Bun.write(panelPath, result.png),
         Bun.write(maskPath, videoSurfaceMaskPng(surface, node.width, node.height)),
       ]);
-      const sourceSeconds =
-        (node.inFrame + localFrame * node.rate) / project.canvas.fps;
-      const [topLeft, topRight, bottomLeft, bottomRight] = surface.corners;
-      const perspective = [
-        `x0=${topLeft.x}`, `y0=${topLeft.y}`,
-        `x1=${topRight.x}`, `y1=${topRight.y}`,
-        `x2=${bottomLeft.x}`, `y2=${bottomLeft.y}`,
-        `x3=${bottomRight.x}`, `y3=${bottomRight.y}`,
-        "interpolation=cubic", "sense=destination", "eval=init",
-      ].join(":");
-      const filters = [
-        `[0:v]trim=start=${sourceSeconds}:duration=${1 / project.canvas.fps},` +
-          `setpts=PTS-STARTPTS,format=rgba,${videoFitFilters(node).join(",")},` +
-          `geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':` +
-          `a='${sparseRoundedAlpha(surface.cornerRadiusRatio, node.width, node.height)}',` +
-          `perspective=${perspective},split=2[video_color_source][video_alpha_source]`,
-        "[video_color_source]format=rgb24[video_color]",
-        "[video_alpha_source]alphaextract[video_alpha]",
-        `[2:v]format=gray,scale=${node.width}:${node.height}[video_quad_mask]`,
-        "[video_alpha][video_quad_mask]blend=all_mode=multiply[video_clipped_alpha]",
-        "[video_color][video_clipped_alpha]alphamerge[video]",
-        `[1:v]format=rgba,scale=${node.width}:${node.height}[panel]`,
-        "[panel][video]overlay=x=0:y=0:shortest=1[out]",
-      ].join(";");
-      const process = Bun.spawn([
+      await compositeFfmpegVideoMotionFrame(
+        project,
+        node,
+        surface,
+        localFrame,
+        panelPath,
+        maskPath,
+        outputPath,
         ffmpegPath,
-        "-hide_banner", "-loglevel", "error", "-y",
-        ...(node.loop ? ["-stream_loop", "-1"] : []),
-        "-i", node.sourcePath,
-        "-i", panelPath,
-        "-i", maskPath,
-        "-filter_complex", filters,
-        "-map", "[out]", "-frames:v", "1", outputPath,
-      ], { stdout: "ignore", stderr: "pipe" });
-      const [exitCode, stderr] = await Promise.all([
-        process.exited,
-        new Response(process.stderr).text(),
-      ]);
-      if (exitCode !== 0) {
-        fail("FFMPEG_FAILED", `FFmpeg Video Motion 稀疏预览失败: ${stderr}`);
-      }
+      );
     } finally {
       await instance.close();
     }
@@ -1403,7 +1426,7 @@ async function renderDomMotionSamples(
   return timelineArtifactRecord(motion.id, compiled);
 }
 
-export async function renderSparseVisualFrame(
+async function renderSparseVisualBeforeShaders(
   project: ResolvedProject,
   node: Exclude<RenderNode, AudioNode>,
   localFrame: number,
@@ -1539,6 +1562,125 @@ export async function renderSparseVisualFrame(
   );
 }
 
+async function renderSparseShaderFrame(
+  project: ResolvedProject,
+  node: VisualNode,
+  shader: ShaderNode,
+  localFrame: number,
+  inputPath: string,
+  outputPath: string,
+  bundleDirectory: string,
+  domPages?: number,
+): Promise<void> {
+  const component = await inspectSdkArtifact(
+    shader,
+    bundleDirectory,
+    project.resourceRoots,
+  );
+  const metadata = readSdkArtifact(component, "shader");
+  if (metadata === undefined) {
+    fail("ARTIFACT_KIND_MISMATCH", `Shader "${shader.component}" 必须由 defineShader() 创建`);
+  }
+  const props = bindSdkArtifactProps(component, shader.props, {
+    fps: project.canvas.fps,
+    ...(shader.propTypes === undefined ? {} : { declarations: shader.propTypes }),
+  });
+  const png = new Uint8Array(await Bun.file(inputPath).arrayBuffer());
+  const provider: DynamicSubjectProvider = async () => ({
+    png,
+    digest: createHash("sha256").update(png).digest("hex"),
+    dataUrl: `data:image/png;base64,${Buffer.from(png).toString("base64")}`,
+  });
+  const compiled = await compileVisualArtifact({
+    entryPath: shader.componentPath,
+    sourceRoot: project.rootProjectDir,
+    resourceRoots: project.resourceRoots,
+    mode: "production",
+    props,
+    composition: {
+      width: node.width,
+      height: node.height,
+      fps: project.canvas.fps,
+      fpsSource: project.canvas.fpsSource,
+      durationInFrames: node.durationFrames,
+    },
+    seed: hashSeed(`${project.metadata.id}:${shader.id}`),
+    modifier: {
+      startFrame: shader.localStartFrame,
+      durationInFrames: shader.durationFrames,
+      fill: shader.fill,
+    },
+  });
+  const runtime = new VisualTimelineRuntime({ maximumDomPages: domPages ?? 1 });
+  try {
+    const instance = await runtime.open(compiled, { dynamicSubjectProvider: provider });
+    try {
+      const result = await instance.sample({
+        time: new SampleClock(project.canvas.fpsSource).frameStart(localFrame),
+      });
+      await Bun.write(outputPath, result.png);
+    } finally {
+      await instance.close();
+    }
+  } finally {
+    await runtime.close();
+  }
+}
+
+export async function renderSparseVisualFrame(
+  project: ResolvedProject,
+  node: Exclude<RenderNode, AudioNode>,
+  localFrame: number,
+  outputPath: string,
+  options: {
+    bundleDirectory: string;
+    fonts: SatoriFont[];
+    ffmpegPath?: string;
+    domPages?: number;
+  },
+): Promise<void> {
+  const shaders = node.modifiers
+    .filter((modifier): modifier is ShaderNode =>
+      modifier.kind === "shader" && modifier.enabled
+    )
+    .sort((left, right) =>
+      left.layer - right.layer || left.declarationOrder - right.declarationOrder
+    );
+  if (shaders.length === 0) {
+    await renderSparseVisualBeforeShaders(project, node, localFrame, outputPath, options);
+    return;
+  }
+  const temporaryPaths = shaders.map((_, index) => `${outputPath}.shader-${index}.png`);
+  try {
+    await renderSparseVisualBeforeShaders(
+      project,
+      node,
+      localFrame,
+      temporaryPaths[0]!,
+      options,
+    );
+    for (let index = 0; index < shaders.length; index++) {
+      const shader = shaders[index]!;
+      const inputPath = temporaryPaths[index]!;
+      const targetPath = index === shaders.length - 1
+        ? outputPath
+        : temporaryPaths[index + 1]!;
+      await renderSparseShaderFrame(
+        project,
+        node,
+        shader,
+        localFrame,
+        inputPath,
+        targetPath,
+        options.bundleDirectory,
+        options.domPages,
+      );
+    }
+  } finally {
+    await Promise.all(temporaryPaths.map((path) => rm(path, { force: true })));
+  }
+}
+
 async function renderMotionNode(
   project: ResolvedProject,
   node: VisualNode,
@@ -1569,6 +1711,88 @@ async function renderMotionNode(
     runtime,
     onDiagnostic,
   );
+}
+
+async function renderShaderNode(
+  project: ResolvedProject,
+  node: VisualNode,
+  shader: ShaderNode,
+  subject: PreparedVisual,
+  component: unknown,
+  outputDirectory: string,
+  concurrency: number,
+  domPages: number | undefined,
+  runtime: VisualTimelineRuntime,
+  onFrame: RenderProgressReporter,
+  signal?: AbortSignal,
+  onDiagnostic?: RenderOptions["onDiagnostic"],
+): Promise<PreparedTimelineArtifact> {
+  const metadata = readSdkArtifact(component, "shader");
+  if (metadata === undefined || !isSupportedSdkAbiVersion(metadata.sdkAbiVersion)) {
+    fail(
+      "LEGACY_COMPONENT_UNSUPPORTED",
+      `Shader "${shader.component}" 必须由 defineShader() 创建`,
+    );
+  }
+  const props = bindSdkArtifactProps(component, shader.props, {
+    fps: project.canvas.fps,
+    ...(shader.propTypes === undefined ? {} : { declarations: shader.propTypes }),
+  });
+  const clock = new SampleClock(project.canvas.fpsSource);
+  const provider: DynamicSubjectProvider = async (time, providerSignal) => {
+    if (providerSignal?.aborted) fail("RENDER_CANCELLED", "Shader subject 已取消");
+    const hostFrame = clock.frameAt(time);
+    const png = new Uint8Array(
+      await Bun.file(sourceFramePath(subject, hostFrame)).arrayBuffer(),
+    );
+    return {
+      png,
+      digest: createHash("sha256").update(png).digest("hex"),
+      dataUrl: `data:image/png;base64,${Buffer.from(png).toString("base64")}`,
+    };
+  };
+  const compiled = await compileVisualArtifact({
+    entryPath: shader.componentPath,
+    sourceRoot: project.rootProjectDir,
+    resourceRoots: project.resourceRoots,
+    mode: "production",
+    props,
+    composition: {
+      width: subject.width,
+      height: subject.height,
+      fps: project.canvas.fps,
+      fpsSource: project.canvas.fpsSource,
+      durationInFrames: node.durationFrames,
+    },
+    seed: hashSeed(`${project.metadata.id}:${shader.id}`),
+    modifier: {
+      startFrame: shader.localStartFrame,
+      durationInFrames: shader.durationFrames,
+      fill: shader.fill,
+    },
+  });
+  const pageCount = Math.min(
+    node.durationFrames,
+    concurrency,
+    effectiveDomPageCount(domPages),
+  );
+  const instances = await openTimelineInstances(runtime, compiled, pageCount, provider);
+  try {
+    await runPool(node.durationFrames, instances.length, async (hostFrame, workerIndex) => {
+      if (signal?.aborted) fail("RENDER_CANCELLED", "Shader 渲染已取消");
+      const instance = instances[workerIndex];
+      if (instance === undefined) fail("INTERNAL_ERROR", "Shader DOM page worker 不存在");
+      const result = await instance.sample({
+        time: clock.frameStart(hostFrame),
+        ...(signal === undefined ? {} : { signal }),
+      });
+      await Bun.write(join(outputDirectory, frameFileName(hostFrame)), result.png);
+      onFrame();
+    }, signal);
+  } finally {
+    await Promise.allSettled(instances.map((instance) => instance.close()));
+  }
+  return timelineArtifactRecord(shader.id, compiled);
 }
 
 interface RenderedFfmpegVideoMotion {
@@ -1869,6 +2093,111 @@ async function packageVisualForCache(input: {
   };
 }
 
+async function decodeVisualMedia(
+  inputPath: string,
+  outputDirectory: string,
+  frameCount: number,
+  ffmpegPath: string,
+  signal?: AbortSignal,
+): Promise<string> {
+  await mkdir(outputDirectory, { recursive: true });
+  const pattern = join(outputDirectory, "%08d.png");
+  const process = Bun.spawn([
+    ffmpegPath,
+    "-hide_banner",
+    "-loglevel",
+    "error",
+    "-y",
+    "-i",
+    inputPath,
+    "-frames:v",
+    String(frameCount),
+    "-start_number",
+    "0",
+    pattern,
+  ], {
+    stdout: "ignore",
+    stderr: "pipe",
+    ...(signal === undefined ? {} : { signal }),
+  });
+  const [exitCode, stderr] = await Promise.all([
+    process.exited,
+    new Response(process.stderr).text(),
+  ]);
+  if (exitCode !== 0) {
+    if (signal?.aborted) fail("RENDER_CANCELLED", "Shader 输入解码已取消");
+    fail("VISUAL_RENDER_FAILED", `无法解码 Shader 输入缓存: ${stderr}`);
+  }
+  return pattern;
+}
+
+async function materializeShaderSubject(
+  project: ResolvedProject,
+  node: Exclude<RenderNode, AudioNode>,
+  visual: PreparedVisual,
+  outputDirectory: string,
+  ffmpegPath: string,
+  concurrency: number,
+  signal?: AbortSignal,
+): Promise<PreparedVisual> {
+  if (visual.type !== "media" && visual.ffmpegVideo === undefined) return visual;
+  const panelPattern = visual.type === "media"
+    ? await decodeVisualMedia(
+        visual.path,
+        join(outputDirectory, "panel"),
+        node.durationFrames,
+        ffmpegPath,
+        signal,
+      )
+    : visual.path;
+  if (visual.ffmpegVideo === undefined) {
+    return { ...visual, type: "sequence", path: panelPattern };
+  }
+  if (node.kind !== "video") {
+    fail("INTERNAL_ERROR", `FFmpeg Video Motion 宿主 "${node.id}" 不是 video`);
+  }
+  const maskPattern = visual.ffmpegVideo.maskPath.includes("%08d")
+    ? visual.ffmpegVideo.maskPath
+    : await decodeVisualMedia(
+        visual.ffmpegVideo.maskPath,
+        join(outputDirectory, "mask"),
+        node.durationFrames,
+        ffmpegPath,
+        signal,
+      );
+  const compositeDirectory = join(outputDirectory, "composite");
+  await mkdir(compositeDirectory, { recursive: true });
+  // ponytail: one ffmpeg process per frame keeps this rare compatibility path
+  // simple; batch the perspective expressions only if profiling shows it hot.
+  await runPool(
+    node.durationFrames,
+    concurrency,
+    async (frame) => {
+      const surface = visual.ffmpegVideo?.projections[frame];
+      if (surface === undefined) {
+        fail("VIDEO_SURFACE_REQUIRED", `节点 "${node.id}" 缺少 ${frame}f 投影`);
+      }
+      await compositeFfmpegVideoMotionFrame(
+        project,
+        node,
+        surface,
+        frame,
+        panelPattern.replace("%08d", frameFileName(frame).slice(0, -4)),
+        maskPattern.replace("%08d", frameFileName(frame).slice(0, -4)),
+        join(compositeDirectory, frameFileName(frame)),
+        ffmpegPath,
+      );
+    },
+    signal,
+  );
+  const { ffmpegVideo: _ffmpegVideo, ...base } = visual;
+  return {
+    ...base,
+    type: "sequence",
+    path: join(compositeDirectory, "%08d.png"),
+  };
+}
+
 function textCacheIdentity(node: TextNode): Record<string, unknown> {
   return {
     content: node.content,
@@ -1989,6 +2318,35 @@ async function visualNodeCacheKey(input: {
   }, [...files]);
 }
 
+async function shaderCacheKey(input: {
+  project: ResolvedProject;
+  node: Exclude<RenderNode, AudioNode>;
+  shader: ShaderNode;
+  subjectKey: string;
+  digester: VisualContentDigester;
+}): Promise<string> {
+  const dependencies = await collectComponentDependencies(
+    input.shader,
+    input.project.resourceRoots,
+  );
+  return input.digester.digest({
+    phase: "shader",
+    base: baseNodeCacheIdentity(input.project, input.node),
+    subjectKey: input.subjectKey,
+    shader: {
+      id: input.shader.id,
+      component: input.shader.component,
+      exportName: input.shader.exportName,
+      props: input.shader.props,
+      propTypes: input.shader.propTypes,
+      localStartFrame: input.shader.localStartFrame,
+      durationFrames: input.shader.durationFrames,
+      fill: input.shader.fill,
+      layer: input.shader.layer,
+    },
+  }, dependencies);
+}
+
 export async function prepareGeneratedVisuals(
   project: ResolvedProject,
   options: PrepareOptions,
@@ -2013,6 +2371,14 @@ export async function prepareGeneratedVisuals(
         (modifier) => modifier.kind === "motion" && modifier.enabled,
       ),
   );
+  const shaderHosts = project.nodes.filter(
+    (node): node is Exclude<RenderNode, AudioNode> =>
+      node.kind !== "audio" &&
+      node.enabled &&
+      node.modifiers.some(
+        (modifier) => modifier.kind === "shader" && modifier.enabled,
+      ),
+  );
   const staticTextNodes = textNodes.filter(
     (node) =>
       !node.modifiers.some(
@@ -2022,7 +2388,13 @@ export async function prepareGeneratedVisuals(
   const totalUnits =
     staticTextNodes.length +
     reactNodes.reduce((total, node) => total + node.durationFrames, 0) +
-    motionHosts.reduce((total, node) => total + node.durationFrames, 0);
+    motionHosts.reduce((total, node) => total + node.durationFrames, 0) +
+    shaderHosts.reduce(
+      (total, node) => total + node.durationFrames * node.modifiers.filter(
+        (modifier) => modifier.kind === "shader" && modifier.enabled,
+      ).length,
+      0,
+    );
   let completedUnits = 0;
   const report = (message: string, count = 1): void => {
     completedUnits += count;
@@ -2070,6 +2442,7 @@ export async function prepareGeneratedVisuals(
       staticTextNodes: staticTextNodes.length,
       reactNodes: reactNodes.length,
       motionHosts: motionHosts.length,
+      shaderHosts: shaderHosts.length,
       logicalProgressUnits: totalUnits,
     },
   });
@@ -2564,6 +2937,158 @@ export async function prepareGeneratedVisuals(
     } catch (error) {
       await visualCache.discard(staging);
       throw error;
+    }
+  }
+
+  for (const node of shaderHosts) {
+    const shaders = node.modifiers
+      .filter((modifier): modifier is ShaderNode =>
+        modifier.kind === "shader" && modifier.enabled
+      )
+      .sort((left, right) =>
+        left.layer - right.layer || left.declarationOrder - right.declarationOrder
+      );
+    let visual = result.get(node.id);
+    let subjectKey = visual?.cacheKey ?? await visualNodeCacheKey({
+      project,
+      node,
+      digester: contentDigester,
+      phase: "base",
+      ...(options.ffmpegPath === undefined ? {} : { ffmpegPath: options.ffmpegPath }),
+    });
+    for (const shader of shaders) {
+      if (options.signal?.aborted) fail("RENDER_CANCELLED", "渲染已取消");
+      const key = await shaderCacheKey({
+        project,
+        node,
+        shader,
+        subjectKey,
+        digester: contentDigester,
+      });
+      const cached = await visualCache.load(key);
+      if (cached !== undefined) {
+        visual = cached;
+        subjectKey = key;
+        result.set(node.id, cached);
+        report(`已复用 Shader ${shader.id}`, node.durationFrames);
+        continue;
+      }
+      if (visual === undefined) {
+        if (node.kind === "image") {
+          const path = join(generatedDirectory, `shader-subject-${node.id}.png`);
+          await renderImageSubject(node, path);
+          visual = {
+            nodeId: node.id,
+            type: "static",
+            path,
+            width: node.width,
+            height: node.height,
+            cacheKey: subjectKey,
+          };
+        } else if (node.kind === "video") {
+          const directory = join(generatedDirectory, `shader-subject-${node.id}`);
+          await mkdir(directory, { recursive: true });
+          await renderVideoSubjects(
+            project,
+            node,
+            directory,
+            options.ffmpegPath ?? "ffmpeg",
+          );
+          visual = {
+            nodeId: node.id,
+            type: "sequence",
+            path: join(directory, "%08d.png"),
+            width: node.width,
+            height: node.height,
+            cacheKey: subjectKey,
+          };
+        } else {
+          fail("MISSING_GENERATED_VISUAL", `Shader 宿主 "${node.id}" 缺少本体画面`);
+        }
+      }
+      visual = await materializeShaderSubject(
+        project,
+        node,
+        visual,
+        join(generatedDirectory, `shader-materialized-${node.id}-${shader.id}`),
+        options.ffmpegPath ?? "ffmpeg",
+        concurrency,
+        options.signal,
+      );
+      const component = await traceOperation(
+        options,
+        {
+          phase: "preparing",
+          scope: `visual/shader/${shader.id}/bundle`,
+          message: `编译并加载 Shader ${shader.component}`,
+          details: { componentPath: shader.componentPath, host: node.id },
+        },
+        () => inspectSdkArtifact(shader, bundleDirectory, project.resourceRoots),
+      );
+      const staging = await visualCache.createStaging(key);
+      try {
+        const directory = join(staging, "frames");
+        await mkdir(directory, { recursive: true });
+        const timelineArtifact = await traceOperation(
+          options,
+          {
+            phase: "preparing",
+            scope: `visual/shader/${shader.id}`,
+            message: `生成 Shader ${shader.id} 的逐帧画面`,
+            details: { host: node.id, layer: shader.layer, frames: node.durationFrames },
+          },
+          () => renderShaderNode(
+            project,
+            node,
+            shader,
+            visual!,
+            component,
+            directory,
+            concurrency,
+            options.domPages,
+            timelineRuntime,
+            frameReporter(
+              `visual/shader/${shader.id}/frames`,
+              node.durationFrames,
+              `正在生成 Shader ${shader.id}`,
+            ),
+            options.signal,
+            options.onDiagnostic,
+          ),
+        );
+        const packaged = await packageVisualForCache({
+          project,
+          staging,
+          frameCount: node.durationFrames,
+          persistent: persistentVisualCache,
+          ...(options.ffmpegPath === undefined ? {} : { ffmpegPath: options.ffmpegPath }),
+          ...(options.signal === undefined ? {} : { signal: options.signal }),
+          ...(options.onDiagnostic === undefined ? {} : { onDiagnostic: options.onDiagnostic }),
+          visual: {
+            nodeId: node.id,
+            type: "sequence",
+            path: join(directory, "%08d.png"),
+            width: visual.width,
+            height: visual.height,
+            cacheKey: key,
+            timelineArtifacts: Object.freeze([
+              ...(visual.timelineArtifacts ?? []),
+              timelineArtifact,
+            ]),
+          },
+        });
+        visual = await visualCache.commit({
+          key,
+          staging,
+          frameCount: node.durationFrames,
+          visual: packaged,
+        });
+        subjectKey = key;
+        result.set(node.id, visual);
+      } catch (error) {
+        await visualCache.discard(staging);
+        throw error;
+      }
     }
   }
   emitDiagnostic(options, {

@@ -44,6 +44,7 @@ export type {
   ArtifactPropDeclaration,
   MotionPreviewExports,
   SdkArtifactMetadata,
+  SdkDomShaderArtifactMetadata,
   SdkArtifactSchema,
   SdkSchemaField,
   SupportedSdkAbiVersion,

@@ -57,6 +57,7 @@ export type {
 export type {
   MotionContext,
   MotionNode,
+  ShaderNode,
   RenderContext,
   RenderOptions,
   RenderProgress,

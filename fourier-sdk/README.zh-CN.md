@@ -4,7 +4,7 @@
 
 **把前端视觉能力变成 Agent 可理解、可配置、可复用的视频组件。**
 
-Fourier SDK 是 Fourier 宿主与开发者生态之间的类型化创作接口。它既用于声明 Project、Scene 和 Template，也用于开发 React、Motion、Text Motion、Three.js 与程序化视觉 artifact。SDK ABI v1.1 使用真实 DOM/CSS/WAAPI，由 Fourier Core 在宿主给定的绝对有理时间采样；Core/render 继续兼容读取 ABI v1。
+Fourier SDK 是 Fourier 宿主与开发者生态之间的类型化创作接口。它既用于声明 Project、Scene 和 Template，也用于开发 React、Motion、Shader、Text Motion、Three.js 与程序化视觉 artifact。SDK ABI v1.2 使用真实 DOM/CSS/WAAPI/WebGL，由 Fourier Core 在宿主给定的绝对有理时间采样；Core/render 继续兼容读取 ABI v1/v1.1。
 
 ## 为什么选择 Fourier SDK
 
@@ -49,7 +49,7 @@ export default defineProject(
 
 作者属性使用原生 boolean、对象 props、`content`、`tts` 和 `keyframes`；`after`/`with` 使用裸 ID；裁切和导出字段分别是 `sourceIn`/`sourceOut`、`exportName`。声明会编译为引擎 IR，最终仍由 FFmpeg 渲染。
 
-## ABI v1 React
+## ABI v1.2 React
 
 Artifact 使用 `component`，marker 固定为 ABI v1。`component` 只能读取 props；稳定的 width、height、seed 通过 hook 获取，逐帧 frame/fps/progress/time 不进入组件接口。
 
@@ -95,7 +95,7 @@ export default defineReact({
 
 Artifact 源码中的 React hook、`ReactNode`、`CSSProperties`、`RefObject` 等必须从 `@fourier-video/sdk` 或对应的 `/react`、`/motion`、`/three` 入口导入，不直接导入 `react`、`react/jsx-runtime`。3D 组件同样只能从 `@fourier-video/sdk/three` 导入 Three.js class、loader 和类型，不直接依赖 `three`。Core host 会把隐式 JSX runtime 和 SDK alias 到 SDK/render adapter 解析出的版本，因此 artifact 所在视频目录可以完全没有 `package.json` 和 `node_modules`。
 
-## ABI v1 Motion
+## ABI v1.2 Motion
 
 Motion 必须通过 `supportsTextMotion` 显式声明是否支持文本。image/video/react 仍以当前时刻 subject 进入 `component`；文本不会混入该接口：支持文本的 Motion 必须另外实现接收原始字符串的 `textComponent`。结果仍按 `Motion PNG → TSX Transform → FFmpeg layer/blend/opacity` 合成。
 
@@ -157,6 +157,25 @@ export default defineMotion({
 对于支持文本的 Motion，`designPreview().subject` 返回 string 时会自动走文本入口；作者不需要为 preview 编写分支或 renderer。
 
 `fill="none"` 的非 active 区间直接返回原 subject；backwards、forwards、both 分别使用局部 0、连续 active 时间和完整 duration 边界。
+
+## ABI v1.2 Shader 修饰
+
+`defineShader()` 把 SDK 持有的 WebGL2 shader 定义为可复用修饰器。当前宿主画面由 `uFourierSource` 提供；时间、进度、尺寸、时长和 seed 沿用现有 Fourier uniform。`designPreview().subject` 必须是已打包图片 URL 或 data URI。
+
+Shader artifact 放在工程 `shaders/` 下，可在 Image、Video、Text、Subtitle、ReactLayer 中声明多个 `<Shader>`：
+
+```tsx
+<Image {...imageProps}>
+  <Motion id="reveal" at="0f" duration="30f" fill="both" component="Reveal.tsx" />
+  <Shader id="grade" at="0f" duration="30f" fill="both"
+    component="ChannelShader.tsx" props={{ amount: 0.8 }} layer={10} />
+  <Shader id="grain" at="0f" duration="30f" fill="both"
+    component="Grain.tsx" layer={20} />
+  <Transform {...transformProps} />
+</Image>
+```
+
+执行顺序固定为 Motion → Shader → Transform。Shader 按 `layer` 升序，同层按声明顺序；每个 pass 保持宿主尺寸，`fill="none"` 的非活动区直接透传输入画面。完整 artifact 写法见 [ChannelShader.tsx](./example/ChannelShader.tsx)。
 
 ## Timeline 与确定性随机数
 
@@ -329,27 +348,27 @@ bunx fourier-sdk preview ./components --public-port 4321
 fourier check ./components/MetricPanel.tsx
 ```
 
-作者入口只需要默认导出一个 `defineReact()` 或 `defineMotion()` definition；不编写 preview renderer、逐帧 render handler 或单独的 preview config。ABI v1 preview server 只负责编译 definition 和热更新，播放器直接加载同一份 DOM/CSS/WAAPI runtime，并通过时间轴设置动画时间，不从服务端拉取逐帧 PNG。目录模式会按视口惰性挂载卡片 runtime、复用版本化 UI 资源，并在热更新时只重编受影响的 artifact；离开视口或切到后台的预览暂停采样。`designPreview()` 只声明 props、画布、时长和 Motion subject，不参与具体渲染。
+作者入口只需要默认导出一个 `defineReact()`、`defineMotion()` 或 `defineShader()` definition；不编写 preview renderer、逐帧 render handler 或单独的 preview config。ABI v1.2 preview server 只负责编译 definition 和热更新，播放器直接加载同一份 DOM/CSS/WAAPI/WebGL runtime，并通过时间轴设置时间，不从服务端拉取逐帧 PNG。目录模式会按视口惰性挂载卡片 runtime、复用版本化 UI 资源，并在热更新时只重编受影响的 artifact；离开视口或切到后台的预览暂停采样。`designPreview()` 只声明 props、画布、时长和 Motion/Shader subject，不参与具体渲染。
 
 ## 发布到 Fourier World
 
-可发布组件必须有独立的 `package.json`，用标准字段声明包名、版本、描述、MIT license 和待归档的 `files`，并在 `fourier` 字段中声明入口、分类、Agent instruction、适用场景、标签和视觉风格。运行时仍不要求普通视频工程拥有 `package.json`；这个要求只适用于要发布到 World 的组件包。
+一个可发布 npm 包可以包含 1—50 个组件目录。根 `package.json` 的 `fourier.components` 列出各组件的 `package.json`；每个组件继续使用既有入口、分类、Agent instruction、适用场景、标签与视觉风格字段。
 
 ```bash
 fourier-sdk login --email author@example.com
-fourier-sdk publish ./components/MetricPanel --dry-run
-fourier-sdk publish ./components/MetricPanel
+fourier-sdk publish https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3 --dry-run
+fourier-sdk publish https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3
 ```
 
-`--dry-run` 会编译 artifact，并调用 Fourier Core 与 FFmpeg，把同一条确定性时间线渲染为浏览器兼容的 H.264 MP4。真实发布会把该预览视频与带 SHA-256 的源码归档一起上传，将视频绑定到组件的 `preview` 字段，并强制进入 `review`。因此本地发布环境需要 Playwright Chromium 和带 `libx264` 的 FFmpeg。发布者身份来自包名的 namespace 和 World 账号，不从本地清单接受 author ID 或 `published` 状态。审核通过后，可以把组件下载到项目或安全移除：
+`--dry-run` 会下载 npm 精确版本，校验 registry SHA-512 integrity，编译每个组件，并渲染浏览器兼容的 H.264 预览。真实发布只上传预览与 npm 派生元数据；World 不保存源码归档。审核通过后，可以整包安装，也可以用 `#ComponentName` 安装或移除单个组件：
 
 ```bash
 fourier-sdk search "产品发布的电影感标题动画" --type motion --style cinematic --json
-fourier-sdk add @studio/MetricPanel
-fourier-sdk del @studio/MetricPanel
+fourier-sdk add https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3
+fourier-sdk del https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3#MetricPanel
 ```
 
-`search` 无需登录，调用 Fourier World 的关键词 + 语义混合检索；`--json` 会保留包名、Agent instruction、适用/不适用场景、结构化标签、质量指标和可解释匹配分数。程序可以从 `@fourier-video/sdk/search` 导入 `searchFourierWorld()` 获得同一份只读类型结果。`add` 默认写入 `components/@studio/MetricPanel` 和项目级 `.fourier-world.json`；`del` 默认移动到可恢复的 `.fourier-trash`。字段表、账号要求、CI 登录方式和完整指令见 [Fourier World 发布规范](./docs/PUBLISHING.md)。
+`search` 无需登录，调用 Fourier World 的关键词 + 语义混合检索；结果保留既有组件字段，并增加精确的 `npmPackageUrl` / `npmComponentUrl`。`add` 仍写入 `components/@studio/MetricPanel`，并在项目级 `.fourier-world.json` v2 记录已校验来源；`del` 默认移动到可恢复的 `.fourier-trash`。完整 manifest 与命令见 [Fourier World 发布规范](./docs/PUBLISHING.md)。
 
 生产画面不随宿主时间变化的 ABI v1 React 应显式声明 `static: true`。runtime 会验证该组件没有注册 lifecycle、animation、media、SMIL 或 render driver；正式渲染只生成一张 PNG，再按工程节点时长复用。未声明 `static` 时由 runtime 挂载后自动推断。
 

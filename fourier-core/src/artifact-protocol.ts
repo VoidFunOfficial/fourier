@@ -11,8 +11,8 @@ import type {
 export const SDK_ARTIFACT_SYMBOL_KEY = "@fourier-video/sdk/artifact";
 export const SDK_ARTIFACT: unique symbol = Symbol.for(SDK_ARTIFACT_SYMBOL_KEY) as never;
 export const SDK_ARTIFACT_SYMBOL = SDK_ARTIFACT;
-export const SDK_ABI_VERSION = 1.1 as const;
-export const SUPPORTED_SDK_ABI_VERSIONS = Object.freeze([1, SDK_ABI_VERSION] as const);
+export const SDK_ABI_VERSION = 1.2 as const;
+export const SUPPORTED_SDK_ABI_VERSIONS = Object.freeze([1, 1.1, SDK_ABI_VERSION] as const);
 export const SUPPORTED_SDK_ABI_VERSION = SDK_ABI_VERSION;
 export const SDK_SCHEMA_FIELD_PACKAGE = "@fourier-video/sdk/schema-field" as const;
 export const SDK_SCHEMA_VERSION = 1 as const;
@@ -22,7 +22,7 @@ export function isSupportedSdkAbiVersion(value: unknown): value is SupportedSdkA
   return SUPPORTED_SDK_ABI_VERSIONS.some((version) => version === value);
 }
 
-export type ArtifactKind = "react" | "motion";
+export type ArtifactKind = "react" | "motion" | "shader";
 
 export type ArtifactPropDeclaration =
   | "string"
@@ -123,10 +123,21 @@ export interface SdkDomFfmpegVideoMotionArtifactMetadata
   overlay?: never;
 }
 
+export interface SdkDomShaderArtifactMetadata extends SdkArtifactMetadataBase {
+  sdkAbiVersion: typeof SDK_ABI_VERSION;
+  renderer: "dom-timeline";
+  kind: "shader";
+  component(input: {
+    source: string;
+    props: Readonly<Record<string, unknown>>;
+  }): React.ReactNode;
+}
+
 export type SdkArtifactMetadata =
   | SdkDomReactArtifactMetadata
   | SdkDomMotionArtifactMetadata
-  | SdkDomFfmpegVideoMotionArtifactMetadata;
+  | SdkDomFfmpegVideoMotionArtifactMetadata
+  | SdkDomShaderArtifactMetadata;
 
 function isObject(value: unknown): value is Record<PropertyKey, unknown> {
   return typeof value === "object" && value !== null;
@@ -178,6 +189,10 @@ export function readSdkArtifact(
 ): SdkDomMotionArtifactMetadata | SdkDomFfmpegVideoMotionArtifactMetadata | undefined;
 export function readSdkArtifact(
   artifact: unknown,
+  expectedKind: "shader",
+): SdkDomShaderArtifactMetadata | undefined;
+export function readSdkArtifact(
+  artifact: unknown,
   expectedKind?: ArtifactKind,
 ): SdkArtifactMetadata | undefined;
 export function readSdkArtifact(
@@ -207,10 +222,17 @@ export function readSdkArtifact(
       { received: metadata.sdkAbiVersion, supported: SUPPORTED_SDK_ABI_VERSIONS },
     );
   }
-  if (metadata.kind !== "react" && metadata.kind !== "motion") {
+  if (metadata.kind !== "react" && metadata.kind !== "motion" && metadata.kind !== "shader") {
     fail(
       "ARTIFACT_EXPORT_INVALID",
       `SDK artifact kind 无效: ${String(metadata.kind)}`,
+    );
+  }
+  if (metadata.kind === "shader" && metadata.sdkAbiVersion !== SDK_ABI_VERSION) {
+    fail(
+      "SDK_ABI_UNSUPPORTED",
+      `Shader artifact 需要 SDK ABI ${SDK_ABI_VERSION}`,
+      { received: metadata.sdkAbiVersion, required: SDK_ABI_VERSION },
     );
   }
   if (expectedKind !== undefined && metadata.kind !== expectedKind) {

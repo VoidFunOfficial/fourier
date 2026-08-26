@@ -157,6 +157,15 @@ export interface MotionProps extends TimeNodeProps {
   readonly props?: Readonly<Record<string, ProjectPropValue>>;
 }
 
+export interface ShaderProps extends TimeNodeProps {
+  readonly duration: TimeExpression;
+  readonly fill: "none" | "forwards" | "backwards" | "both";
+  readonly component: string;
+  readonly exportName?: string;
+  readonly props?: Readonly<Record<string, ProjectPropValue>>;
+  readonly layer: number;
+}
+
 export interface TransformKeyframe {
   readonly offset: number;
   readonly translateX: number;
@@ -199,6 +208,7 @@ export const ReactLayer = projectNode<ReactLayerProps>("react");
 export const Scene = projectNode<SceneProps>("scene");
 export const Template = projectNode<TemplateProps>("template");
 export const Motion = projectNode<MotionProps>("motion");
+export const Shader = projectNode<ShaderProps>("shader");
 export const Transform = projectNode<TransformProps>("transform");
 
 function nodeTag(type: unknown): string | undefined {

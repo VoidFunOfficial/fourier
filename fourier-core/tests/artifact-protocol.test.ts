@@ -7,14 +7,14 @@ import {
 } from "../src/artifact-protocol.ts";
 
 function artifact(
-  kind: "react" | "motion",
+  kind: "react" | "motion" | "shader",
   overrides: Record<string, unknown> = {},
 ): Function {
   const value = () => null;
   Object.defineProperty(value, SDK_ARTIFACT_SYMBOL, {
     value: {
       package: "@fourier-video/sdk",
-      sdkAbiVersion: 1.1,
+      sdkAbiVersion: 1.2,
       renderer: "dom-timeline",
       kind,
       name: "TestArtifact",
@@ -49,8 +49,20 @@ describe("SDK ABI Adapter", () => {
     }))).toThrow("缺少强制 designPreview");
   });
 
-  test("ABI v1.1 为当前 marker，同时继续读取 ABI v1 artifact", () => {
+  test("ABI v1.2 识别 Shader，并拒绝旧 ABI 冒充", () => {
+    expect(readSdkArtifact(artifact("shader"), "shader")).toMatchObject({
+      sdkAbiVersion: 1.2,
+      kind: "shader",
+    });
+    expect(() => readSdkArtifact(artifact("shader", {
+      sdkAbiVersion: 1.1,
+    }), "shader")).toThrow("Shader artifact 需要 SDK ABI 1.2");
+  });
+
+  test("ABI v1.2 为当前 marker，同时继续读取 ABI v1/v1.1 artifact", () => {
     expect(readSdkArtifact(artifact("react")))
+      .toMatchObject({ sdkAbiVersion: 1.2 });
+    expect(readSdkArtifact(artifact("react", { sdkAbiVersion: 1.1 })))
       .toMatchObject({ sdkAbiVersion: 1.1 });
     expect(readSdkArtifact(artifact("react", { sdkAbiVersion: 1 })))
       .toMatchObject({ sdkAbiVersion: 1 });
@@ -58,7 +70,7 @@ describe("SDK ABI Adapter", () => {
 
   test("ABI v1 只接受 dom-timeline component 且不携带 render", () => {
     expect(readSdkArtifact(artifact("react")))
-      .toMatchObject({ sdkAbiVersion: 1.1, renderer: "dom-timeline" });
+      .toMatchObject({ sdkAbiVersion: 1.2, renderer: "dom-timeline" });
     expect(() => readSdkArtifact(artifact("react", {
       render: () => null,
     }))).toThrow("不能包含 render");
@@ -72,7 +84,7 @@ describe("SDK ABI Adapter", () => {
       supportsTextMotion: undefined,
     }), "motion");
     expect(metadata).toMatchObject({
-      sdkAbiVersion: 1.1,
+      sdkAbiVersion: 1.2,
       renderer: "dom-timeline-ffmpeg-video",
       videoComposition: "ffmpeg",
     });

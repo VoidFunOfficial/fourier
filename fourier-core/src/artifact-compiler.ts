@@ -109,6 +109,8 @@ export interface CompiledVisualArtifact {
   readonly renderProfile: RenderProfile;
   readonly supportsTextMotion?: boolean;
   readonly videoComposition?: "ffmpeg";
+  readonly modifier?: { readonly startFrame: number; readonly durationInFrames: number; readonly fill: ModifierFill };
+  /** @deprecated Use modifier. Kept for ABI 1/1.1 Motion consumers. */
   readonly motion?: { readonly startFrame: number; readonly durationInFrames: number; readonly fill: ModifierFill };
   readonly textSubject?: string;
 }
@@ -133,6 +135,8 @@ export interface CompileVisualArtifactOptions {
   readonly seed?: number;
   /** @deprecated ReactNode values cannot cross the secure evaluator seam. */
   readonly subject?: ArtifactSubject;
+  readonly modifier?: CompiledVisualArtifact["modifier"];
+  /** @deprecated Use modifier. */
   readonly motion?: CompiledVisualArtifact["motion"];
   readonly textSubject?: string;
   readonly snapshotId?: string;
@@ -399,6 +403,9 @@ globalThis.onmessage = (event) => {
     if (typeof preview !== "object" || preview === null || Array.isArray(preview)) {
       throw Object.assign(new Error(metadata.name + ".designPreview() 必须返回对象"), { code: "INVALID_DESIGN_PREVIEW" });
     }
+    if (metadata.kind === "shader" && (typeof preview.subject !== "string" || preview.subject.length === 0)) {
+      throw Object.assign(new Error(metadata.name + ".designPreview().subject 必须是图片 URL 或 data URI"), { code: "INVALID_DESIGN_PREVIEW" });
+    }
     const props = bindSdkArtifactProps(artifact, input.props ?? preview.props ?? {}, { fps: input.composition?.fps ?? 60 });
     const textSubject = input.textSubject ?? (
       metadata.kind === "motion" && metadata.supportsTextMotion && typeof preview.subject === "string" ? preview.subject : undefined
@@ -502,9 +509,9 @@ function parseInspection(value: unknown): ArtifactInspection {
   assertOnlyKeys(result, [
     "sdkAbiVersion", "renderer", "kind", "name", "static", "supportsTextMotion", "videoComposition", "designPreview", "schema", "props",
   ], "artifact inspection");
-  if (result.sdkAbiVersion !== 1 && result.sdkAbiVersion !== 1.1) fail("SECURE_EXECUTION_PROTOCOL_INVALID", "sdkAbiVersion 无效");
+  if (result.sdkAbiVersion !== 1 && result.sdkAbiVersion !== 1.1 && result.sdkAbiVersion !== 1.2) fail("SECURE_EXECUTION_PROTOCOL_INVALID", "sdkAbiVersion 无效");
   if (result.renderer !== "dom-timeline" && result.renderer !== "dom-timeline-ffmpeg-video") fail("SECURE_EXECUTION_PROTOCOL_INVALID", "renderer 无效");
-  if (result.kind !== "react" && result.kind !== "motion") fail("SECURE_EXECUTION_PROTOCOL_INVALID", "kind 无效");
+  if (result.kind !== "react" && result.kind !== "motion" && result.kind !== "shader") fail("SECURE_EXECUTION_PROTOCOL_INVALID", "kind 无效");
   if (typeof result.name !== "string" || result.name.length === 0 || result.name.length > 256) fail("SECURE_EXECUTION_PROTOCOL_INVALID", "name 无效");
   if (typeof result.static !== "boolean") fail("SECURE_EXECUTION_PROTOCOL_INVALID", "static 无效");
   if (result.supportsTextMotion !== undefined && typeof result.supportsTextMotion !== "boolean") fail("SECURE_EXECUTION_PROTOCOL_INVALID", "supportsTextMotion 无效");
@@ -541,9 +548,12 @@ function resolveComposition(explicit: CompileVisualArtifactOptions["composition"
     });
   }
   const source = asRecord(preview.composition, "designPreview.composition");
-  assertOnlyKeys(source, ["width", "height", "durationSeconds"], "designPreview.composition");
+  assertOnlyKeys(source, ["width", "height", "durationSeconds", "fps"], "designPreview.composition");
   const width = positiveInteger(source.width, "designPreview.composition.width");
   const height = positiveInteger(source.height, "designPreview.composition.height");
+  if (source.fps !== undefined && source.fps !== 60) {
+    fail("DESIGN_PREVIEW_FPS_FIXED", "design preview fps 固定为 60，组件不能覆盖", { value: source.fps });
+  }
   const durationSeconds = source.durationSeconds;
   if (!Number.isInteger(durationSeconds) || (durationSeconds as number) < 0 || (durationSeconds as number) > 30) {
     fail("INVALID_DESIGN_PREVIEW", "durationSeconds 必须是 0—30 的整数");
@@ -551,16 +561,19 @@ function resolveComposition(explicit: CompileVisualArtifactOptions["composition"
   return Object.freeze({ width, height, fps: 60, fpsSource: "60", durationInFrames: durationSeconds === 0 ? 1 : (durationSeconds as number) * 60 });
 }
 
-function resolveMotion(explicit: CompileVisualArtifactOptions["motion"], preview: CompiledArtifactDesignPreview): CompiledVisualArtifact["motion"] {
-  const source = explicit ?? preview.motion;
+function resolveModifier(
+  explicit: CompileVisualArtifactOptions["modifier"] | CompileVisualArtifactOptions["motion"],
+  preview?: CompiledArtifactDesignPreview["motion"],
+): CompiledVisualArtifact["modifier"] {
+  const source = explicit ?? preview;
   if (source === undefined) return undefined;
   const startFrame = source.startFrame ?? 0;
   const durationInFrames = source.durationInFrames ?? 1;
   const fill = source.fill ?? "both";
   if (!Number.isSafeInteger(startFrame) || startFrame < 0 || !Number.isSafeInteger(durationInFrames) || durationInFrames <= 0) {
-    fail("INVALID_ARTIFACT_REQUEST", "motion frame 范围无效");
+    fail("INVALID_ARTIFACT_REQUEST", "modifier frame 范围无效");
   }
-  if (!(["none", "forwards", "backwards", "both"] as const).includes(fill)) fail("INVALID_ARTIFACT_REQUEST", "motion.fill 无效");
+  if (!(["none", "forwards", "backwards", "both"] as const).includes(fill)) fail("INVALID_ARTIFACT_REQUEST", "modifier.fill 无效");
   return Object.freeze({ startFrame, durationInFrames, fill });
 }
 
@@ -654,7 +667,10 @@ export async function compileVisualArtifact(
     ];
     const propsDigest = digest(stableValue(inspection.props));
     const dependencyDigest = digest(stableValue(dependencyContents), inspector.hash, bundleSnapshot.hash);
-    const motion = resolveMotion(options.motion, inspection.designPreview);
+    const modifier = resolveModifier(
+      options.modifier ?? options.motion,
+      inspection.kind === "motion" ? inspection.designPreview.motion : undefined,
+    );
     const renderProfile = DOM_RENDER_PROFILE;
     // Production is the fail-safe compatibility default. Callers that want
     // author preview props/subject must opt in explicitly.
@@ -667,7 +683,7 @@ export async function compileVisualArtifact(
       renderProfile.hash,
       stableValue(composition),
       String(seed),
-      stableValue(motion ?? null),
+      stableValue(modifier ?? null),
       textSubject ?? "",
       useDesignPreview ? "design-preview" : "production",
     );
@@ -693,7 +709,8 @@ export async function compileVisualArtifact(
       renderProfile,
       ...(inspection.supportsTextMotion === undefined ? {} : { supportsTextMotion: inspection.supportsTextMotion }),
       ...(inspection.videoComposition === undefined ? {} : { videoComposition: inspection.videoComposition }),
-      ...(motion === undefined ? {} : { motion }),
+      ...(modifier === undefined ? {} : { modifier }),
+      ...(inspection.kind !== "motion" || modifier === undefined ? {} : { motion: modifier }),
       ...(textSubject === undefined ? {} : { textSubject }),
     });
   } catch (error) {

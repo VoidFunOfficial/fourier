@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import { join } from "node:path";
+import { SDK_ABI_VERSION } from "@fourier-video/sdk";
 import { readSdkArtifact } from "../src/artifact-protocol.ts";
 import { loadProject } from "../src/project-compiler.ts";
 import {
@@ -144,7 +145,7 @@ export default defineReact({
     expect(readSdkArtifact(component, "react")).toMatchObject({
       kind: "react",
       name: "BundledPanel",
-      sdkAbiVersion: 1.1,
+      sdkAbiVersion: SDK_ABI_VERSION,
     });
 
     const projectPath = join(directory, "main.tsx");

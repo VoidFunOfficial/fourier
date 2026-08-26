@@ -1,14 +1,14 @@
 # Fourier Agent SDK 操作手册
 
-本文供编程 Agent 在 Fourier 工程中开发、修改和验收 React、Motion、Three.js 视觉 artifact。目标不是罗列所有 API，而是规定一条可重复执行的工程流程。完整类型与边界条件仍以 [API 文档](./API.md) 和 [开发规范](./DEVELOPMENT.md) 为准。
+本文供编程 Agent 在 Fourier 工程中开发、修改和验收 React、Motion、Shader、Three.js 视觉 artifact。目标不是罗列所有 API，而是规定一条可重复执行的工程流程。完整类型与边界条件仍以 [API 文档](./API.md) 和 [开发规范](./DEVELOPMENT.md) 为准。
 
-> SDK ABI v1.1 统一使用 `defineReact({ component })` 或 `defineMotion({ component })`；render engine 保持 ABI v1 读取兼容。
+> SDK ABI v1.2 统一使用 `defineReact({ component })`、`defineMotion({ component })` 或 `defineShader({ shader })`；render engine 保持 ABI v1/v1.1 读取兼容。
 
 ## 1. Agent 的完成标准
 
 一个任务只有同时满足以下条件才算完成：
 
-1. 选择了正确的 artifact 类型，默认导出唯一的 `defineReact()` 或 `defineMotion()` definition。
+1. 选择了正确的 artifact 类型，默认导出唯一的 `defineReact()`、`defineMotion()` 或 `defineShader()` definition。
 2. Props 由 schema 定义并推导类型，设计预览覆盖全部必填输入。
 3. 输出只取决于 props、subject、本地资源、稳定 seed 和宿主绝对时间。
 4. 没有绕过 SDK 直接依赖 React、Three.js、原生 WAAPI、浏览器计时器或网络。
@@ -23,6 +23,7 @@
 | 卡片、字幕排版、图表、UI、静态视觉 | React artifact | `defineReact` | 静态，或 Fourier timeline |
 | 给图片、视频、React subject 添加入场、退场、故障、转场效果 | Motion artifact | `defineMotion` | Fourier timeline |
 | 给源文本逐字、逐词或整体添加效果 | Text Motion | `defineMotion` + `textComponent` | Fourier timeline |
+| 对宿主像素做可串联 GPU 后处理 | Shader artifact | `defineShader` + `defineFourierShader` | Shader frame absolute time |
 | WebGL 场景、模型、相机、灯光、程序化几何体 | 3D React artifact | `defineReact` + `FourierCanvas` | `onFrame` 的绝对时间 |
 | 视频贴到 3D 平面并由 FFmpeg 保留视频像素 | 3D Video Motion | `defineMotion` + `videoComposition: "ffmpeg"` | `FourierCanvas.onFrame` |
 
@@ -31,6 +32,7 @@
 - 组件本身就是画面内容，选 React。
 - 组件接收并改变宿主 subject，选 Motion。
 - Motion 需要处理 text/subtitle 原始字符串时，必须选 Text Motion；普通 `component` 不会收到原始文本。
+- 需要读取上一 pass 像素并串联多个 GPU 效果时选 Shader；工程通过 `layer` 排序。
 - Three.js 只是 React artifact 的渲染实现，不是第三种 definition。
 - 生产画面完全不随宿主时间变化的 React 必须声明 `static: true`。
 - 不确定时先检查相邻 artifact 和 [示例目录](../example)，不要同时实现多个互斥入口。
@@ -413,6 +415,32 @@ export default defineMotion({
 
 不要在同一 Motion 中同时让 `<FourierMotion>` 和自定义 lifecycle 各注册一次，否则会触发重复 lifecycle 错误。
 
+### 6.4 Shader 修饰模板
+
+当效果需要读取宿主像素并与其他 GPU pass 串联时，用 `defineShader()`；不要把它伪装成包裹 subject 的 Motion。Shader 文件放在工程 `shaders/`，fragment shader 从 `uFourierSource` 采样，作者 uniform 由同步 `uniforms({ props, frame })` 返回。
+
+```tsx
+const shader = defineFourierShader({
+  uniforms: { amount: "float" },
+  fragmentShader: `in vec2 vUv; uniform float amount; out vec4 fragColor;
+    void main() { vec4 s = texture(uFourierSource, vUv);
+      fragColor = vec4(mix(s.rgb, s.bgr, amount), s.a); }`,
+});
+
+export default defineShader({
+  name: "ChannelShader",
+  schema: { amount: field.number({ min: 0, max: 1, default: 1 }) },
+  shader,
+  uniforms: ({ props }) => ({ amount: props.amount }),
+  designPreview: () => ({
+    props: {}, subject: imageUrl,
+    composition: { width: 640, height: 360, durationSeconds: 2 },
+  }),
+});
+```
+
+工程可在所有视觉宿主下声明多个 `<Shader>`。不要自行排序：引擎固定先 Motion，再按 `layer` 升序和同层声明顺序执行 Shader，最后应用 Transform；`fill="none"` 非活动区自动透传。
+
 ## 7. Three.js / 3D artifact
 
 ### 7.1 最小 3D React 模板
@@ -581,9 +609,9 @@ bunx fourier-sdk preview ./components
 5. Motion 的普通 subject 与 Text Motion 的 string subject。
 6. 3D 模型加载、相机裁切、灯光、材质和循环首尾。
 
-### 9.2 ABI v1.1 确定性测试
+### 9.2 ABI v1.2 确定性测试
 
-ABI v1.1 必须从路径打开 artifact：
+ABI v1.2 必须从路径打开 artifact：
 
 ```ts
 import { test } from "bun:test";
@@ -652,7 +680,7 @@ Agent 不得把浏览器缺失、类型错误或测试失败描述为“已通�
 
 ## 11. 发布到 Fourier World
 
-只有需要发布的独立组件目录才需要 `package.json`。其 `name`、`version`、`files` 和 `fourier` 元数据必须与 artifact 一致，尤其要为 Agent 写清楚：
+发布包的根 `fourier.components` 列出 1—50 个独立组件 manifest。每个成员的 `name`、`version`、`files` 和 `fourier` 元数据必须与 artifact 一致，尤其要为 Agent 写清楚：
 
 - `fourier.instruction`：什么时候应该选它；
 - `fourier.negativeUseCases`：什么时候不应该选它；
@@ -664,19 +692,19 @@ Agent 不得把浏览器缺失、类型错误或测试失败描述为“已通�
 fourier-sdk search "产品发布的电影感标题动画" --type motion --style cinematic --json
 ```
 
-Agent 选择结果时要同时检查 `instruction`、`negativeUseCases`、`downloadable`、`match.reasons` 和语义/关键词分数。找到合适组件后再运行 `fourier-sdk add <packageName>`；`search` 本身不会修改工程或安装组件。
+Agent 选择结果时要同时检查 `instruction`、`negativeUseCases`、`downloadable`、`npmComponentUrl`、`match.reasons` 和语义/关键词分数。找到合适组件后再运行 `fourier-sdk add <npmComponentUrl>`；`search` 本身不会修改工程或安装组件。
 
 先做无服务器写入的完整检查：
 
 ```bash
-fourier-sdk publish ./ComponentName --dry-run
+fourier-sdk publish https://www.npmjs.com/package/@scope/components/v/1.0.0 --dry-run
 ```
 
 再由用户明确要求并完成登录后发布：
 
 ```bash
 fourier-sdk login --email author@example.com
-fourier-sdk publish ./ComponentName
+fourier-sdk publish https://www.npmjs.com/package/@scope/components/v/1.0.0
 ```
 
 发布会产生外部写入；Agent 不应仅因“开发完成”而自行执行真实发布。完整清单见 [Fourier World 发布规范](./PUBLISHING.md)。

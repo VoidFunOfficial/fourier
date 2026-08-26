@@ -11,10 +11,13 @@ import {
   Project,
   ReactLayer,
   serializeProjectDefinition,
+  Shader,
   Subtitle,
   Template,
+  Text,
   Timeline,
   Transform,
+  Video,
 } from "@fourier-video/sdk/project";
 import {
   compileProjectDeclaration,
@@ -47,6 +50,10 @@ describe("Project JSX compiler", () => {
             layer={3} props={{ count: 2, enabled: true, title: "TSX" }}>
             <Motion id="reveal" at="0f" duration="2f" fill="forwards"
               component="Reveal.ts" props={{ distance: 10, direction: "left" }} />
+            <Shader id="late" at="0f" duration="3f" fill="both"
+              component="Late.tsx" layer={20} props={{ amount: 0.5 }} />
+            <Shader id="early" at="0f" duration="3f" fill="both"
+              component="Early.tsx" layer={10} />
             <Transform id="move" at="0f" duration="3f" fill="both" easing="linear"
               keyframes={[
                 { offset: 0, translateX: 0, translateY: 0, scaleX: 1, scaleY: 1, rotation: 0, opacity: 0 },
@@ -71,6 +78,8 @@ describe("Project JSX compiler", () => {
       propTypes: { count: "number", enabled: "boolean", title: null },
       modifiers: [
         { kind: "motion", localStartFrame: 0, localEndFrame: 2, props: { distance: 10, direction: "left" } },
+        { kind: "shader", id: "late", layer: 20, props: { amount: 0.5 } },
+        { kind: "shader", id: "early", layer: 10, props: {} },
         { kind: "transform", localStartFrame: 0, localEndFrame: 3 },
       ],
     });
@@ -105,6 +114,50 @@ describe("Project JSX compiler", () => {
       durationFrames: 1,
       voice: { sourcePath: "/tmp/voice.wav", volume: 0.75 },
     });
+  });
+
+  test("所有视觉宿主都接受多个 Shader 修饰", () => {
+    const definition = defineProject(
+      <Project id="shader-hosts" version="1.0" audioSampleRate={48_000}>
+        <Canvas width={64} height={64} fps={10} background="#000" colorSpace="sRGB" />
+        <Timeline>
+          <Video id="video" at="0f" duration="2f" src="video.mp4" sourceIn="0f"
+            fit="stretch" audio={false} x={32} y={32} width={64} height={64} layer={0}>
+            <Shader id="video-shader" at="0f" duration="2f" fill="both" component="Pass.tsx" layer={0} />
+          </Video>
+          <Image id="image" at="0f" duration="2f" src="image.png" fit="stretch"
+            x={32} y={32} width={64} height={64} layer={1}>
+            <Shader id="image-shader-a" at="0f" duration="2f" fill="both" component="Pass.tsx" layer={1} />
+            <Shader id="image-shader-b" at="0f" duration="2f" fill="both" component="Pass.tsx" layer={1} />
+          </Image>
+          <Text id="text" at="0f" duration="2f" role="body" content="Text"
+            font="font.ttf" fontSize={12} lineHeight={1} color="#FFF" align="left"
+            x={32} y={16} width={64} height={24} layer={2}>
+            <Shader id="text-shader" at="0f" duration="2f" fill="both" component="Pass.tsx" layer={0} />
+          </Text>
+          <Subtitle id="subtitle" at="0f" duration="2f" content="Subtitle"
+            font="font.ttf" fontSize={12} lineHeight={1} color="#FFF" align="left"
+            x={32} y={48} width={64} height={16} layer={3}>
+            <Shader id="subtitle-shader" at="0f" duration="2f" fill="both" component="Pass.tsx" layer={0} />
+          </Subtitle>
+          <ReactLayer id="react" at="0f" duration="2f" component="Panel.tsx"
+            x={32} y={32} width={64} height={64} layer={4}>
+            <Shader id="react-shader" at="0f" duration="2f" fill="both" component="Pass.tsx" layer={0} />
+          </ReactLayer>
+        </Timeline>
+      </Project>,
+    );
+    const project = compileProjectDeclaration(serializeProjectDefinition(definition), {
+      projectDir: "/tmp/fourier-project-shader-hosts",
+      validateAssets: false,
+    });
+    expect(project.nodes).toHaveLength(5);
+    expect(project.nodes.every((node) =>
+      node.kind !== "audio" && node.modifiers.some((modifier) => modifier.kind === "shader")
+    )).toBe(true);
+    const image = project.nodes.find((node) => node.id === "image");
+    if (image === undefined || image.kind === "audio") throw new Error("expected image node");
+    expect(image.modifiers).toHaveLength(2);
   });
 
   test("Scene 与类型化 Template 都只发现 main.tsx", async () => {

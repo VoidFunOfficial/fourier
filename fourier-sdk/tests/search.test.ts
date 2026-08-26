@@ -18,6 +18,8 @@ function searchBody(): unknown {
       name: "LaunchTitle",
       namespace: "@studio",
       packageName: "@studio/LaunchTitle",
+      npmPackageUrl: "https://www.npmjs.com/package/@studio/components/v/2.1.0",
+      npmComponentUrl: "https://www.npmjs.com/package/@studio/components/v/2.1.0#LaunchTitle",
       downloadable: true,
       version: "2.1.0",
       type: "motion",
@@ -110,6 +112,7 @@ describe("Fourier World semantic search", () => {
       mode: "hybrid",
       results: [{
         packageName: "@studio/LaunchTitle",
+        npmComponentUrl: "https://www.npmjs.com/package/@studio/components/v/2.1.0#LaunchTitle",
         styles: ["cinematic", "elegant"],
         moods: ["energetic"],
         match: { score: 0.874, semanticScore: 0.82 },

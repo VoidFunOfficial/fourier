@@ -1,6 +1,6 @@
 # @fourier-video/sdk API
 
-本文对应 `@fourier-video/sdk@1.1.4`。当前 `SDK_ABI_VERSION` 为 `1.1`；render engine 继续读取 ABI v1 artifact。
+本文对应 `@fourier-video/sdk@2.0.1`。当前 `SDK_ABI_VERSION` 为 `1.2`；render engine 继续读取 ABI v1/v1.1 artifact。
 
 ## Project declarations
 
@@ -12,18 +12,19 @@ defineTemplate({ schema, render }): TemplateDefinition;
 
 Project; Canvas; Timeline; Group;
 Video; Audio; Image; Text; Subtitle; ReactLayer;
-Scene; Template; Motion; Transform;
+Scene; Template; Motion; Shader; Transform;
 ```
 
 这些组件创建 data-only 品牌 JSX 节点，由 render-engine 直接编译为 `ResolvedProject`。时间属性接受 `string | TimeValue`；Artifact `props`、TTS 与 Transform keyframes 使用类型化对象；boolean 属性不做字符串化。Template 的 `render(props)` 类型从 schema 推导，绑定时校验必填、未知字段、默认值与字段类型。
 
 ## Artifact definitions
 
-`defineReact` 和 `defineMotion` 使用 DOM component：
+`defineReact`、`defineMotion` 和 `defineShader` 使用 DOM component：
 
 ```ts
 defineReact({ name, schema, static?, component, designPreview });
 defineMotion({ name, schema, supportsTextMotion: false, component, designPreview, preview?, overlay? });
+defineShader({ name, schema, shader, uniforms?, designPreview });
 ```
 
 每个 Motion 必须显式声明 `supportsTextMotion`。普通 Motion 写 `false`；写 `true` 时必须提供与普通 subject 路径分离的文本实现：
@@ -39,14 +40,14 @@ defineMotion({
 
 省略能力声明会抛出 `TEXT_MOTION_CAPABILITY_REQUIRED`；声明支持但缺少对应实现会抛出 `TEXT_MOTION_IMPLEMENTATION_REQUIRED`。文本宿主使用不支持 Text Motion 的 artifact 时，引擎抛出 `TEXT_MOTION_UNSUPPORTED`。
 
-ABI v1.1 marker 固定包含：
+当前 ABI v1.2 marker 固定包含：
 
 ```ts
 {
   package: "@fourier-video/sdk";
-  sdkAbiVersion: 1.1;
+  sdkAbiVersion: 1.2;
   renderer: "dom-timeline";
-  kind: "react" | "motion";
+  kind: "react" | "motion" | "shader";
   component: Function;
   // schema/name/designPreview，Motion 还包含 supportsTextMotion，
   // 支持文本时包含 textComponent；另可有 preview/overlay
@@ -71,9 +72,16 @@ interface TextMotionComponentInput<Schema> {
   text: string;
   props: Readonly<InferFields<Schema>>;
 }
+
+interface ShaderComponentInput<Schema> {
+  source: string;
+  props: Readonly<InferFields<Schema>>;
+}
 ```
 
 普通 `component` 不会接收文本宿主的原始字符串；文本只进入独立的 `textComponent`。输入中没有 frame、fps、progress 或 time。时间只存在于宿主控制的 CSS/WAAPI timeline。
+
+Shader 使用 `defineFourierShader()` 声明 GLSL 和 typed uniforms。输入纹理名固定为 `uFourierSource`；`uniforms({ props, frame })` 同步计算作者 uniform。工程中的 `<Shader>` 使用与 Motion 相同的 `at/after/with`、`duration`、`fill`、`enabled`，额外用整数 `layer` 排序。执行顺序为 Motion → Shader（layer 升序、同层声明顺序）→ Transform。
 
 ### `loadFont(source, options?)`
 
@@ -393,7 +401,9 @@ SDK 固定 design preview 为 60fps。Motion 还必须提供 subject，可选 ti
 }
 ```
 
-Motion `preview()` 与 `overlay()` 保持纯同步，它们只描述设计预览，不实现渲染。作者的默认导出只需是 `defineReact()`/`defineMotion()` artifact。
+Shader 也必须提供 `subject`，类型仅为已打包图片 URL 或 data URI；它不声明 preview timing，正式时间范围由宿主 `<Shader>` 节点控制。
+
+Motion `preview()` 与 `overlay()` 保持纯同步，它们只描述设计预览，不实现渲染。作者的默认导出只需是 `defineReact()`/`defineMotion()`/`defineShader()` artifact。
 
 ABI v1 React 可声明 `static: true`，表示正式画面在宿主时间内像素不变。DOM runtime 会拒绝同时注册 lifecycle、animation、media、SMIL 或 render driver 的伪静态组件；通过校验后 consumer 只采样一张 PNG。`designPreview().composition.durationSeconds: 0` 只描述设计预览时长，不能代替生产静态声明。
 
@@ -434,7 +444,7 @@ for (const result of response.results) {
 | `sessionId` | 可选的 1—100 字符匿名检索会话标识 |
 | `signal` | 取消当前请求的 `AbortSignal` |
 
-结果中的 `match.score` 是 0—1 混合分数，`semanticScore` 是语义相似度，`keywordScore` 是关键词得分，`reasons` 是给 Agent 的可解释匹配理由。`downloadable: true` 表示当前审核版本可以交给 `fourier-sdk add` 安装。World 返回不符合公开合同的数据时抛 `FourierWorldApiError`，`status` 为 502。
+结果中的 `match.score` 是 0—1 混合分数，`semanticScore` 是语义相似度，`keywordScore` 是关键词得分，`reasons` 是给 Agent 的可解释匹配理由。既有字段保持不变，`npmPackageUrl` 指向审核过的精确 release，`npmComponentUrl` 追加 `#ComponentName`；`downloadable: true` 时把后者交给 `fourier-sdk add`。World 返回不符合公开合同的数据时抛 `FourierWorldApiError`，`status` 为 502。
 
 CLI 使用同一 interface；`--json` 输出稳定的 `WorldSearchResponse`，适合 Agent 直接消费：
 

@@ -6,7 +6,7 @@ import { createArtifactHost } from "../src/index.ts";
 import { componentFixture } from "./test-host.ts";
 
 describe("ArtifactHost integration seam", () => {
-  test("由 integrator adapter 解析 author runtime，并编译 ABI v1.1 artifact", async () => {
+  test("由 integrator adapter 解析 author runtime，并编译 ABI v1.2 artifact", async () => {
     const resolved: string[] = [];
     const host = createArtifactHost({
       resolveAuthorImport(specifier) {
@@ -17,13 +17,13 @@ describe("ArtifactHost integration seam", () => {
     const artifact = await host.compileVisualArtifact({
       entryPath: componentFixture("DomStaticPanel.tsx"),
     });
-    expect(artifact.sdkAbiVersion).toBe(1.1);
+    expect(artifact.sdkAbiVersion).toBe(1.2);
     expect(artifact.renderer).toBe("dom-timeline");
     expect(resolved).toContain("@fourier-video/sdk");
     expect(resolved).toContain("react-dom/client");
   });
 
-  test("同一 host 继续编译 ABI v1 wire metadata", async () => {
+  test("同一 host 继续编译含固定 fps 的 ABI v1 wire metadata", async () => {
     const directory = await mkdtemp(join(tmpdir(), "fourier-core-abi-v1-"));
     try {
       const entryPath = join(directory, "LegacyArtifact.tsx");
@@ -38,7 +38,7 @@ Object.defineProperty(LegacyArtifact, SDK_ARTIFACT, { value: {
   schema: {},
   static: true,
   component: () => <div>legacy</div>,
-  designPreview: () => ({ props: {}, composition: { width: 8, height: 8, durationSeconds: 0 } }),
+  designPreview: () => ({ props: {}, composition: { width: 8, height: 8, durationSeconds: 0, fps: 60 } }),
 } });
 export default LegacyArtifact;`);
       const host = createArtifactHost({
@@ -47,6 +47,7 @@ export default LegacyArtifact;`);
       const artifact = await host.compileVisualArtifact({ entryPath });
       expect(artifact.sdkAbiVersion).toBe(1);
       expect(artifact.name).toBe("LegacyArtifact");
+      expect(artifact.composition.fps).toBe(60);
     } finally {
       await rm(directory, { recursive: true, force: true });
     }

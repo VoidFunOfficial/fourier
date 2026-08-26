@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { mkdtemp, realpath, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { SDK_ABI_VERSION } from "@fourier-video/sdk";
 import { checkArtifact } from "../src/artifact-check.ts";
 import { compileVisualArtifact } from "../src/artifact-compiler.ts";
 
@@ -69,11 +70,11 @@ export default defineReact({
     }
   }, 15_000);
 
-  test("ABI v1 check 使用 DOM runtime 且不返回迁移警告", async () => {
+  test("当前 ABI check 使用 DOM runtime 且不返回迁移警告", async () => {
     const result = await checkArtifact(join(import.meta.dir, "components/DomStaticPanel.tsx"));
     expect(result).toMatchObject({
       valid: true,
-      sdkAbiVersion: 1.1,
+      sdkAbiVersion: SDK_ABI_VERSION,
       renderer: "dom-timeline",
       warnings: [],
     });
@@ -110,7 +111,7 @@ export default defineReact({
 });`);
       const artifact = await compileVisualArtifact({ entryPath });
       expect(artifact).toMatchObject({
-        sdkAbiVersion: 1.1,
+        sdkAbiVersion: SDK_ABI_VERSION,
         renderer: "dom-timeline",
         name: "SdkOwnedReactPanel",
       });

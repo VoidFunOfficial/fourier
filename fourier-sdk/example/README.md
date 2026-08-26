@@ -1,12 +1,21 @@
-# SDK ABI v1.1 Examples
+# SDK ABI v1.2 Examples
 
-示例都生成 ABI v1.1 marker，并由标准 path runtime 在浏览器中直接渲染。
+示例都生成 ABI v1.2 marker，并由标准 path runtime 在浏览器中直接渲染。
 
 示例中的 React hook 和类型全部从 SDK 子路径导入；把文件复制到没有 `package.json`/`node_modules` 的视频工程也无需安装 React。
 
-[`publish`](./publish/README.md) 包含 32 个可直接上传到 Fourier World 的独立组件包。每个目录都有自己的 `package.json`、`files` 归档清单、源码和本地依赖，可以运行 `fourier-sdk publish <目录>`；普通本地 artifact 不需要该文件。按要求，`FourierGallery3D` 与 `CinematicPageFlip3D` 未纳入发布集合。
+需要发布到 Fourier World 时，将一个或多个自包含组件目录放进公开 npm 包，并在根 `fourier.components` 中列出成员 manifest；然后运行 `fourier-sdk publish <精确 npm URL>`。完整格式见 [`docs/PUBLISHING.md`](../docs/PUBLISHING.md)。
 
 这些示例优先使用 SDK [`placeholder`](../placeholder) 目录中的本地占位资源：Motion 和窗口组件从 [`pic`](../placeholder/pic) 导入图片，3D 示例从 [`3d_model`](../placeholder/3d_model) 导入 GLB。这样可以直接验证图片 readiness、静态资源打包和无网络预览；作者复制示例到独立组件时，也应把用到的资源一起复制到组件自己的 `assets/` 目录。
+
+## ChannelShader
+
+[ChannelShader.tsx](./ChannelShader.tsx) 展示 `defineShader()` 的最小可复用写法：fragment shader 从 `uFourierSource` 读取宿主图片，typed `amount` uniform 由 schema props 绑定，并由同一 artifact 的图片 `designPreview()` 验证。工程中把文件放到 `shaders/`，再用多个 `<Shader layer={...}>` 串联。
+
+```bash
+bun run preview ./example/ChannelShader.tsx --open
+fourier check ./example/ChannelShader.tsx
+```
 
 ## Example3D
 

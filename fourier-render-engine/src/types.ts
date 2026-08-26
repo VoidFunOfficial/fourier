@@ -48,7 +48,7 @@ export interface ProjectMetadata {
 
 export interface BaseVisualModifier {
   id: string;
-  kind: "motion" | "transform";
+  kind: "motion" | "shader" | "transform";
   hostId: string;
   localStartFrame: number;
   localEndFrame: number;
@@ -70,6 +70,16 @@ export interface MotionNode extends BaseVisualModifier {
   propTypes?: Record<string, ReactPropType | null>;
 }
 
+export interface ShaderNode extends BaseVisualModifier {
+  kind: "shader";
+  component: string;
+  componentPath: string;
+  exportName: string;
+  props: Record<string, ReactPropValue>;
+  propTypes?: Record<string, ReactPropType | null>;
+  layer: number;
+}
+
 export interface TransformChannels {
   translateX: number;
   translateY: number;
@@ -89,7 +99,7 @@ export interface TransformNode extends BaseVisualModifier {
   keyframes: TransformKeyframe[];
 }
 
-export type VisualModifier = MotionNode | TransformNode;
+export type VisualModifier = MotionNode | ShaderNode | TransformNode;
 
 export interface ResolvedTimeNode {
   id: string;

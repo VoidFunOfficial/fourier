@@ -4,7 +4,7 @@
 
 **把结构化视频工程稳定地编译成可交付结果。**
 
-Fourier Render Engine 是 Fourier 的确定性执行层。它读取 SDK 声明的 `main.tsx`，将品牌 JSX 节点编译为 `ResolvedProject`，准备 React、Motion、文字、媒体和 TTS 内容，最后通过 FFmpeg 合成视频。TSX 是声明层，不是新的浏览器渲染后端。
+Fourier Render Engine 是 Fourier 的确定性执行层。它读取 SDK 声明的 `main.tsx`，将品牌 JSX 节点编译为 `ResolvedProject`，准备 React、Motion、Shader、文字、媒体和 TTS 内容，最后通过 FFmpeg 合成视频。TSX 是声明层，不是新的浏览器渲染后端。
 
 ## 为什么选择 Fourier Render Engine
 
@@ -24,11 +24,11 @@ Fourier Render Engine 是 Fourier 的确定性执行层。它读取 SDK 声明�
 
 Fourier 围绕视频工程的结构做优化，而不是把每次渲染都当成一个全新的黑盒任务：
 
-1. **为依赖建立指纹**：工程声明、Scene/Template bundle、组件源码、本地素材、字体、Motion 时间、TTS 输入、FPS 和渲染配置都会进入缓存身份。
+1. **为依赖建立指纹**：工程声明、Scene/Template bundle、组件源码、本地素材、字体、Motion/Shader 时间、TTS 输入、FPS 和渲染配置都会进入缓存身份。
 2. **复用未变化的层**：模块原始内容、派生裁切区间、已准备视觉结果、静态 artifact 图片、动态视觉输出和合成语音都可以在输入未变化时复用。
 3. **精确失效**：修改一个依赖只会使依赖它的缓存条目失效，不会丢弃无关 Scene 和组件已经完成的工作。
 4. **并发准备独立任务**：视觉节点和 artifact 采样使用有界并发与共享浏览器 runtime，不会为每个节点或每一帧重新启动 Chromium。
-5. **保持快速路径简单**：没有 Motion 的 Image 和 Video 直接交给 FFmpeg，只有 Text、React 与 Motion 内容进入视觉准备阶段。
+5. **保持快速路径简单**：没有 Motion/Shader 的 Image 和 Video 直接交给 FFmpeg，只有 Text、React、Motion 与 Shader 内容进入视觉准备阶段。
 
 这套性能模型建立在确定性之上。缓存条目包含内容哈希与渲染配置信息，使用前会校验，身份或完整性不匹配时会重新构建，从而在加速迭代的同时避免悄悄复用过期像素。
 
@@ -70,7 +70,9 @@ export default defineProject(
 );
 ```
 
-可用节点：`Project`、`Canvas`、`Timeline`、`Group`、`Video`、`Audio`、`Image`、`Text`、`Subtitle`、`ReactLayer`、`Scene`、`Template`、`Motion`、`Transform`。
+可用节点：`Project`、`Canvas`、`Timeline`、`Group`、`Video`、`Audio`、`Image`、`Text`、`Subtitle`、`ReactLayer`、`Scene`、`Template`、`Motion`、`Shader`、`Transform`。
+
+所有视觉宿主都可从工程 `shaders/` 声明任意多个 Shader 修饰。执行顺序固定为 Motion → Shader → Transform；Shader 按 `layer` 升序、同层按声明顺序。每个 pass 保持宿主尺寸，`fill="none"` 的非活动区透传上一张画面。
 
 声明使用原生值：
 
@@ -223,7 +225,7 @@ main.tsx + local static imports
   -> SDK branded JSX declaration
   -> Project Compiler
   -> ResolvedProject IR
-  -> React/Motion visual preparation + TTS
+  -> React/Motion/Shader visual preparation + TTS
   -> FFmpeg plan
   -> media output
 ```

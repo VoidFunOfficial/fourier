@@ -4,7 +4,7 @@ English | [简体中文](./README.zh-CN.md)
 
 **Turn frontend visual capabilities into video components that agents can understand, configure, and reuse.**
 
-Fourier SDK is the typed authoring interface between Fourier hosts and the developer ecosystem. It declares Projects, Scenes, and Templates, and it authors React, Motion, Text Motion, Three.js, and other programmatic visual artifacts. SDK ABI v1.1 uses real DOM/CSS/WAAPI, sampled through Fourier Core at an absolute rational time supplied by the host; Core and the Render Engine remain able to read ABI v1 artifacts.
+Fourier SDK is the typed authoring interface between Fourier hosts and the developer ecosystem. It declares Projects, Scenes, and Templates, and it authors React, Motion, Shader, Text Motion, Three.js, and other programmatic visual artifacts. SDK ABI v1.2 uses real DOM/CSS/WAAPI/WebGL, sampled through Fourier Core at an absolute rational time supplied by the host; Core and the Render Engine remain able to read ABI v1 and v1.1 artifacts.
 
 ## Why Fourier SDK
 
@@ -73,9 +73,9 @@ export default defineProject(
 
 Authoring properties use native booleans, object-valued `props`, `tts`, and `keyframes`, and string `content`. `after` and `with` reference bare IDs. Trimming and artifact export selection use `sourceIn`/`sourceOut` and `exportName`. Declarations compile into the engine IR and are ultimately rendered by FFmpeg.
 
-## ABI v1.1 React artifacts
+## ABI v1.2 React artifacts
 
-An artifact uses `component`, with the ABI v1.1 marker. `component` reads props; stable width, height, and seed values come from hooks. Frame, FPS, progress, and time are deliberately absent from the component interface.
+An artifact uses `component`, with the ABI v1.2 marker. `component` reads props; stable width, height, and seed values come from hooks. Frame, FPS, progress, and time are deliberately absent from the component interface.
 
 ```tsx
 import {
@@ -121,7 +121,7 @@ A React artifact with no lifecycle, animation, media, SMIL, or render driver is 
 
 React hooks and types such as `ReactNode`, `CSSProperties`, and `RefObject` must come from `@fourier-video/sdk` or its `/react`, `/motion`, and `/three` entry points. Do not import `react`, `react/jsx-runtime`, or `three` directly from artifact source. The host aliases the implicit JSX runtime and SDK to the versions resolved from the integrating SDK/render package, so an artifact directory does not need its own `package.json` or `node_modules`.
 
-## ABI v1.1 Motion
+## ABI v1.2 Motion
 
 A Motion explicitly declares whether it supports text. Image, video, and React subjects enter `component` at the current time. Text never enters that interface; a text-capable Motion implements a separate `textComponent` that receives the source string.
 
@@ -181,6 +181,48 @@ export default defineMotion({
 Declaring `supportsTextMotion: true` without `textComponent` fails during definition. A Motion that declares `false` is rejected when applied to a text or subtitle host. A string returned as `designPreview().subject` automatically selects the text entry point.
 
 With `fill="none"`, inactive intervals return the original subject. `backwards`, `forwards`, and `both` use the local start boundary, continuous active time, or full-duration boundary as appropriate.
+
+## ABI v1.2 Shader modifiers
+
+`defineShader()` turns an SDK-owned WebGL2 shader into a reusable modifier. The current host raster is available as `uFourierSource`; the existing time, progress, resolution, duration, and seed uniforms remain available. `designPreview().subject` is a bundled image URL or data URI.
+
+```tsx
+import { defineFourierShader, defineShader, field } from "@fourier-video/sdk";
+
+const shader = defineFourierShader({
+  uniforms: { amount: "float" },
+  fragmentShader: `in vec2 vUv; uniform float amount; out vec4 fragColor;
+    void main() { vec4 s = texture(uFourierSource, vUv);
+      fragColor = vec4(mix(s.rgb, s.bgr, amount), s.a); }`,
+});
+
+export default defineShader({
+  name: "ChannelShader",
+  schema: { amount: field.number({ min: 0, max: 1, default: 1 }) },
+  shader,
+  uniforms: ({ props }) => ({ amount: props.amount }),
+  designPreview: () => ({
+    props: {},
+    subject: imageUrl,
+    composition: { width: 640, height: 360, durationSeconds: 3 },
+  }),
+});
+```
+
+Place shader artifacts in `shaders/`, then nest any number of `<Shader>` nodes under an Image, Video, Text, Subtitle, or ReactLayer host:
+
+```tsx
+<Image {...imageProps}>
+  <Motion id="reveal" at="0f" duration="30f" fill="both" component="Reveal.tsx" />
+  <Shader id="grade" at="0f" duration="30f" fill="both"
+    component="ChannelShader.tsx" props={{ amount: 0.8 }} layer={10} />
+  <Shader id="grain" at="0f" duration="30f" fill="both"
+    component="Grain.tsx" layer={20} />
+  <Transform {...transformProps} />
+</Image>
+```
+
+The engine evaluates Motion, then enabled Shader passes by ascending `layer` (declaration order breaks ties), then Transform. Every pass keeps the host dimensions. `fill="none"` passes the input raster through outside the active interval.
 
 ## Timeline and deterministic randomness
 
@@ -353,7 +395,7 @@ bunx fourier-sdk preview ./components --public-port 4321
 fourier check ./components/MetricPanel.tsx
 ```
 
-An authoring entry point only needs one default-exported `defineReact()` or `defineMotion()` definition. Do not create a separate preview renderer, frame endpoint, or preview configuration. `designPreview()` declares props, canvas, duration, and an optional Motion subject; it does not implement rendering.
+An authoring entry point only needs one default-exported `defineReact()`, `defineMotion()`, or `defineShader()` definition. Do not create a separate preview renderer, frame endpoint, or preview configuration. `designPreview()` declares props, canvas, duration, and the required subject for Motion/Shader artifacts; it does not implement rendering.
 
 An ABI v1 React artifact whose production image never changes with host time should declare `static: true`. The runtime verifies that it did not register a lifecycle, animation, media element, SMIL animation, or render driver, then renders one PNG and reuses it for the node duration. Without an explicit declaration, the mounted runtime infers whether the artifact is static.
 
@@ -382,23 +424,23 @@ try {
 
 ## Publish to Fourier World
 
-A publishable component has its own `package.json` with standard name, version, description, license, and `files` fields. Its `fourier` field declares the entry point, category, agent instruction, use cases, tags, and visual style. Ordinary runtime video projects do not need a `package.json`; this applies only to component packages submitted to World.
+A publishable npm package contains 1—50 component directories. The root `fourier.components` array lists their `package.json` files; every member keeps the existing entry, category, Agent guidance, use cases, tags, and visual style fields.
 
 ```bash
 fourier-sdk login --email author@example.com
-fourier-sdk publish ./components/MetricPanel --dry-run
-fourier-sdk publish ./components/MetricPanel
+fourier-sdk publish https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3 --dry-run
+fourier-sdk publish https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3
 ```
 
-A dry run compiles the artifact and uses three Fourier Core DOM Timeline pages plus FFmpeg to render the same deterministic timeline into a browser-compatible H.264 MP4. Static artifacts still sample one DOM frame. A real publish uploads that preview together with the SHA-256-addressed source archive, binds it to the component's `preview` field, and places the component in `review`. Local publishing therefore requires Playwright Chromium and FFmpeg with `libx264`. After approval, install or safely remove it with:
+A dry run downloads the exact public npm version, verifies its registry SHA-512 integrity, compiles every member, and renders browser-compatible H.264 previews. A real publish uploads only those previews and npm metadata; World never stores source archives. After approval, install all members or one `#ComponentName` with:
 
 ```bash
 fourier-sdk search "cinematic title animation for a product launch" --type motion --style cinematic --json
-fourier-sdk add @studio/MetricPanel
-fourier-sdk del @studio/MetricPanel
+fourier-sdk add https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3
+fourier-sdk del https://www.npmjs.com/package/@studio/fourier-components/v/1.2.3#MetricPanel
 ```
 
-`search` requires no login and runs Fourier World's hybrid keyword/semantic retrieval. `--json` preserves package identity, agent instructions, positive and negative use cases, structured tags, quality metrics, and explainable match scores. Programs can import `searchFourierWorld()` from `@fourier-video/sdk/search` for the same readonly typed result. `add` defaults to `components/@studio/MetricPanel` and records the installation in `.fourier-world.json`. `del` moves the component into the recoverable `.fourier-trash` directory by default. See the [Fourier World Publishing Guide](./docs/PUBLISHING.md) for package fields, account requirements, CI authentication, and the full workflow.
+`search` requires no login and runs Fourier World's hybrid keyword/semantic retrieval. Results retain the existing component fields and add exact `npmPackageUrl` / `npmComponentUrl` references. Installation still targets `components/@studio/MetricPanel` and records the verified source in `.fourier-world.json` v2. `del` moves managed components into `.fourier-trash` by default. See the [Fourier World Publishing Guide](./docs/PUBLISHING.md) for the complete manifest.
 
 ## Documentation and examples
 

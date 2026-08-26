@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  SDK_ABI_VERSION,
   SDK_ARTIFACT,
   FourierMotion,
   motion,
@@ -22,7 +23,7 @@ describe("Fourier declarative Motion interface", () => {
     expect(typeof FourierMotion).toBe("function");
   });
 
-  test("common animation examples are ABI v1 Motion artifacts", () => {
+  test("common animation examples use the current Motion ABI", () => {
     for (const artifact of [
       ElegantEntranceMotion,
       CinematicDriftMotion,
@@ -31,7 +32,7 @@ describe("Fourier declarative Motion interface", () => {
       expect(artifact[SDK_ARTIFACT]).toMatchObject({
         kind: "motion",
         renderer: "dom-timeline",
-        sdkAbiVersion: 1.1,
+        sdkAbiVersion: SDK_ABI_VERSION,
       });
       expect(artifact[SDK_ARTIFACT].designPreview().composition.durationSeconds)
         .toBeGreaterThan(0);
