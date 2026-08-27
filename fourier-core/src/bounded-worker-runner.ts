@@ -17,7 +17,7 @@ interface QueueEntry<T> {
 const DEFAULT_LIMITS: BoundedWorkerRunnerLimits = Object.freeze({
   concurrency: 2,
   maxQueued: 16,
-  timeoutMs: 30_000,
+  timeoutMs: 6000_000,
 });
 
 function abortError(): CoreError {

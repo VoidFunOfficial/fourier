@@ -103,14 +103,13 @@ describeDom("VisualTimelineRuntime production DOM Adapter", () => {
         secondary.open({ entryPath }),
       ]);
       expect(launches).toBe(1);
-      // macOS 每个实际渲染 context 还会包含一个独立的渲染状态标签页。
-      const expectedPages = process.platform === "darwin" ? 5 : 2;
-      expect(pages).toBe(expectedPages);
+      // One shared keep-alive page plus one rendering page per runtime.
+      expect(pages).toBe(3);
 
       await second.close();
       second = undefined;
       second = await secondary.open({ entryPath });
-      expect(pages).toBe(expectedPages);
+      expect(pages).toBe(3);
       await second.close();
       second = undefined;
       await secondary.close();

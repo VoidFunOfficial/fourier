@@ -40,5 +40,5 @@ export const DOM_RENDER_PROFILE = profile({
   commitMode: BROWSER_COMMIT_MODE,
   // Bump whenever launch/commit semantics can change rendered pixels so stale
   // frame caches from the previous runtime are never reused.
-  runtimeRevision: "5",
+  runtimeRevision: "6",
 });

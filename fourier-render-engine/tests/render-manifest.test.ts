@@ -49,7 +49,7 @@ describe("render manifest", () => {
       sdk: { version: "1.2.0", abiVersion: SDK_ABI_VERSION },
       playwright: { version: "1.62.0" },
       chromium: { version: "151.0.7922.34", revision: "1234" },
-      profiles: [{ runtimeRevision: "5" }],
+      profiles: [{ runtimeRevision: "6" }],
       project: {
         id: "manifest-test",
         totalFrames: 3,

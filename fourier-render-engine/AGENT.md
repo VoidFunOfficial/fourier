@@ -105,7 +105,7 @@ ReactLayer / Motion artifact
 ### DOM runtime 与浏览器资源
 
 - 一次正式渲染共享一个 `VisualTimelineRuntime`；不要按节点或按帧启动 Chromium。每个 `TimelineInstance` 串行采样自身 page，不同 instance 通过 page pool 并行。
-- macOS 使用 headed page capture，其他平台使用 headless BeginFrame。Linux 无论调用方请求多少 `domPages` 都固定为 1，并保留单 renderer/process 的容器约束和有界恢复路径。
+- macOS 使用静默的 headless page capture，其他平台使用 headless BeginFrame。Linux 无论调用方请求多少 `domPages` 都固定为 1，并保留单 renderer/process 的容器约束和有界恢复路径。
 - 截图前后 animation/media state 必须相同；透明背景必须保留 alpha。修改虚拟时间、BeginFrame、media seek 或 lifecycle barrier 时必须运行真实 DOM suite。
 - 所有 browser、context、page、CDP session、TimelineInstance 和 runtime 都必须在成功、失败、超时和取消路径关闭。不要用外层竞速超时包住 Playwright launch 并留下孤儿进程。
 - 任何可能改变像素的 browser/runtime 语义都要评估 `DOM_RENDER_PROFILE.runtimeRevision`、snapshot identity、视觉缓存和 render manifest；不能让旧像素缓存被误命中。

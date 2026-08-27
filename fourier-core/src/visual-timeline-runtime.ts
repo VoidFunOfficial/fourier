@@ -37,7 +37,6 @@ import {
   type RationalTime,
   type RationalTimeInput,
 } from "./time.ts";
-import { FOURIER_RENDERING_STATUS_URL } from "./rendering-status-page.ts";
 import type { ResolveAuthorImport } from "./integration-types.ts";
 
 export interface TimelineSampleRequest {
@@ -423,8 +422,6 @@ class BrowserPagePool {
   readonly #contexts = new Set<BrowserContext>();
   readonly #retiredContexts = new Set<BrowserContext>();
   readonly #contextResourceCounts = new Map<BrowserContext, number>();
-  readonly #renderingStatusPages = new Map<BrowserContext, Page>();
-  readonly #renderingStatusUpdates = new Map<BrowserContext, Promise<void>>();
   readonly #idlePages: PooledPage[] = [];
   #initialKeepAlivePage: Page | undefined;
   #activePages = 0;
@@ -485,57 +482,6 @@ class BrowserPagePool {
     }
   }
 
-  async #placeRenderingStatusPageLast(context: BrowserContext): Promise<void> {
-    if (BROWSER_COMMIT_MODE !== "headed-page-capture") return;
-    const previousUpdate = this.#renderingStatusUpdates.get(context) ?? Promise.resolve();
-    const update = previousUpdate.catch(() => undefined).then(async () => {
-      const previousPage = this.#renderingStatusPages.get(context);
-      this.#renderingStatusPages.delete(context);
-      await withTimeout(
-        "Chromium previous rendering status page close",
-        previousPage?.close() ?? Promise.resolve(),
-        5_000,
-      ).catch(() => undefined);
-      if (this.#closed || context.isClosed()) return;
-
-      const statusPage = await withTimeout(
-        "Chromium rendering status page initialization",
-        context.newPage(),
-      );
-      try {
-        await withTimeout(
-          "Chromium rendering status page viewport",
-          statusPage.setViewportSize({ width: 460, height: 240 }),
-        );
-        await withTimeout(
-          "Chromium rendering status document initialization",
-          statusPage.goto(FOURIER_RENDERING_STATUS_URL, { waitUntil: "load" }),
-        );
-        this.#renderingStatusPages.set(context, statusPage);
-        statusPage.once("close", () => {
-          if (this.#renderingStatusPages.get(context) === statusPage) {
-            this.#renderingStatusPages.delete(context);
-          }
-        });
-      } catch (error) {
-        await withTimeout(
-          "Chromium failed rendering status page close",
-          statusPage.close(),
-          5_000,
-        ).catch(() => undefined);
-        throw error;
-      }
-    });
-    this.#renderingStatusUpdates.set(context, update);
-    try {
-      await update;
-    } finally {
-      if (this.#renderingStatusUpdates.get(context) === update) {
-        this.#renderingStatusUpdates.delete(context);
-      }
-    }
-  }
-
   async #createResource(width: number, height: number): Promise<PooledPage> {
     let page: Page | undefined;
     let context: BrowserContext | undefined;
@@ -582,7 +528,6 @@ class BrowserPagePool {
           }),
         );
       }
-      await this.#placeRenderingStatusPageLast(context);
       return resource;
     } catch (error) {
       if (context !== undefined && recoverableBrowserFailure(error)) {
@@ -703,8 +648,6 @@ class BrowserPagePool {
     this.#contexts.delete(context);
     this.#retiredContexts.delete(context);
     this.#contextResourceCounts.delete(context);
-    this.#renderingStatusPages.delete(context);
-    this.#renderingStatusUpdates.delete(context);
     await withTimeout("Chromium retired context close", context.close(), 5_000)
       .catch(() => undefined);
   }
@@ -734,8 +677,6 @@ class BrowserPagePool {
     this.#contexts.clear();
     this.#retiredContexts.clear();
     this.#contextResourceCounts.clear();
-    this.#renderingStatusPages.clear();
-    this.#renderingStatusUpdates.clear();
     await sharedBrowserHost.release();
   }
 }

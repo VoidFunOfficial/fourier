@@ -2,7 +2,7 @@ import type { CDPSession, LaunchOptions, Page } from "playwright";
 import { CoreError } from "./errors.ts";
 
 export type BrowserCommitMode =
-  | "headed-page-capture"
+  | "headless-page-capture"
   | "headless-begin-frame";
 
 export type LinuxHeadlessProcessMode =
@@ -10,7 +10,7 @@ export type LinuxHeadlessProcessMode =
   | "single-renderer";
 
 export const BROWSER_COMMIT_MODE: BrowserCommitMode = process.platform === "darwin"
-  ? "headed-page-capture"
+  ? "headless-page-capture"
   : "headless-begin-frame";
 
 const commonArgs = [
@@ -69,7 +69,7 @@ export function chromiumLaunchOptions(
 ): LaunchOptions {
   if (platform === "darwin") {
     return {
-      headless: false,
+      headless: true,
       args: [...commonArgs],
     };
   }
@@ -104,7 +104,7 @@ export async function captureCommittedViewport(
   page: Page,
   headlessFrameControl?: HeadlessFrameControl,
 ): Promise<{ data: string; hasDamage?: boolean }> {
-  if (BROWSER_COMMIT_MODE === "headed-page-capture") {
+  if (BROWSER_COMMIT_MODE === "headless-page-capture") {
     const png = await page.screenshot({
       type: "png",
       omitBackground: true,

@@ -19,7 +19,13 @@ function cdpMock(
   } as unknown as CDPSession;
 }
 
-describe("Linux headless compositor capture", () => {
+describe("Chromium compositor capture", () => {
+  test("macOS 使用无窗口 Chromium，并保留 page capture 参数", () => {
+    const options = chromiumLaunchOptions("darwin");
+    expect(options.headless).toBe(true);
+    expect(options.args).toContain("--run-all-compositor-stages-before-draw");
+  });
+
   test("Linux 只启动一个 browser/renderer process，并使用容器安全参数", () => {
     const options = chromiumLaunchOptions("linux");
     expect(options.headless).toBe(true);
