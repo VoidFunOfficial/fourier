@@ -73,6 +73,9 @@ describe("Fourier World npm client", () => {
       token: "token",
       fetch: asFetch(async (request) => {
         const path = new URL(request.url).pathname;
+        if (path === "/api/users/me") {
+          return Response.json({ user: { id: 7, email: "author@example.com", name: "@studio", role: "user" } });
+        }
         if (path === "/api/media") {
           expect(request.method).toBe("POST");
           const form = await request.formData();
@@ -100,6 +103,20 @@ describe("Fourier World npm client", () => {
       integrity: "sha512-test",
       previews: [{ name: "MetricPanel", mediaId: 31 }, { name: "LaunchTitle", mediaId: 32 }],
     });
+  });
+
+  test("上传预览前拒绝跨 namespace npm scope", async () => {
+    let requests = 0;
+    const client = new FourierWorldClient({
+      worldUrl: "https://world.test",
+      token: "token",
+      fetch: asFetch(() => {
+        requests += 1;
+        return Response.json({ user: { id: 8, email: "other@example.com", name: "@other", role: "user" } });
+      }),
+    });
+    await expect(client.publish(prepared())).rejects.toMatchObject({ status: 403 });
+    expect(requests).toBe(1);
   });
 
   test("只接受 World 已发布的精确 npm release", async () => {

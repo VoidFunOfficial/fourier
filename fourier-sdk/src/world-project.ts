@@ -106,6 +106,10 @@ async function readLock(projectDirectory: string): Promise<WorldProjectLock> {
     if (!/^@[a-z0-9][a-z0-9._-]*\/[A-Za-z][A-Za-z0-9_-]*$/.test(packageName) || !installedComponent(component)) {
       throw new TypeError(`项目安装清单中的 ${packageName} 格式无效`);
     }
+    const reference = parseNpmPackageReference(component.npmComponentUrl);
+    if (reference.componentName === undefined || `${reference.namespace}/${reference.componentName}` !== packageName || reference.version !== component.version) {
+      throw new TypeError(`项目安装清单中的 ${packageName} npm 身份不一致`);
+    }
     components[packageName] = Object.freeze({ ...component });
   }
   return Object.freeze({ version: 2, components: Object.freeze(components) });

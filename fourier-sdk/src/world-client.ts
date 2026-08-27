@@ -623,6 +623,10 @@ export class FourierWorldClient {
 
   async publish(prepared: PreparedWorldPackage): Promise<WorldPublishResult> {
     if (this.token === undefined) throw new TypeError("Fourier World token 缺失");
+    const user = await this.currentUser();
+    if (user.role !== "user" || user.name !== prepared.npmPackage.reference.namespace) {
+      throw new FourierWorldApiError(403, `npm scope 必须等于当前普通用户 namespace ${user.name}`);
+    }
     const uploadedMedia: Array<string | number> = [];
     const cleanup = async (): Promise<void> => {
       await Promise.all(uploadedMedia.map((id) =>
