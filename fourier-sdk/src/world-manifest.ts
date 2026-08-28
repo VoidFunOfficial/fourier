@@ -4,6 +4,7 @@ import { basename, dirname, isAbsolute, relative, resolve } from "node:path";
 export const WORLD_COMPONENT_TYPES = [
   "card",
   "motion",
+  "shader",
   "graphic",
   "scene-template",
   "other",

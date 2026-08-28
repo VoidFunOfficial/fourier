@@ -59,6 +59,7 @@ https://www.npmjs.com/package/@scope/package-name/v/1.2.3#ComponentName
 ```
 
 根包、成员和登录用户必须使用相同 scope；成员版本必须等于根版本。每个成员的 `entry`、`files` 和编译依赖必须留在自己的目录中。
+Motion 和 Shader artifact 的 `fourier.type` 必须分别为 `motion` 和 `shader`；React artifact 不能使用这两个类型。
 
 ## 发布
 

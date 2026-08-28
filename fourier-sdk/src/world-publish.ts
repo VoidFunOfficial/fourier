@@ -43,7 +43,7 @@ export interface PreparedWorldComponent {
   readonly preview: WorldPreviewVideo;
   readonly artifact: {
     readonly name: string;
-    readonly kind: "react" | "motion";
+    readonly kind: "react" | "motion" | "shader";
     readonly sdkAbiVersion: 1 | 1.1 | 1.2;
     readonly renderer: "dom-timeline" | "dom-timeline-ffmpeg-video";
     readonly dependencies: readonly string[];
@@ -69,8 +69,8 @@ export async function prepareWorldPackage(
     const components: PreparedWorldComponent[] = [];
     for (const componentPackage of npmPackage.components) {
       const compiled = await compileVisualArtifact({ entryPath: componentPackage.entryPath });
-      if (compiled.kind !== "react" && compiled.kind !== "motion") {
-        throw new TypeError(`Fourier World 组件 ${compiled.name} 只支持 React 或 Motion artifact`);
+      if (compiled.kind !== "react" && compiled.kind !== "motion" && compiled.kind !== "shader") {
+        throw new TypeError(`Fourier World 组件 ${compiled.name} 只支持 React、Motion 或 Shader artifact`);
       }
       if (compiled.name !== componentPackage.componentName) {
         throw new TypeError(`${componentPackage.manifest.name} 与 artifact definition.name ${compiled.name} 不一致`);
@@ -79,8 +79,11 @@ export async function prepareWorldPackage(
       if (compiled.kind === "motion" && manifestType !== "motion") {
         throw new TypeError(`Motion artifact ${compiled.name} 的 fourier.type 必须是 motion`);
       }
-      if (compiled.kind === "react" && manifestType === "motion") {
-        throw new TypeError(`React artifact ${compiled.name} 的 fourier.type 不能是 motion`);
+      if (compiled.kind === "shader" && manifestType !== "shader") {
+        throw new TypeError(`Shader artifact ${compiled.name} 的 fourier.type 必须是 shader`);
+      }
+      if (compiled.kind === "react" && (manifestType === "motion" || manifestType === "shader")) {
+        throw new TypeError(`React artifact ${compiled.name} 的 fourier.type 不能是 ${manifestType}`);
       }
       await assertDeclaredDependencies(componentPackage, compiled.dependencies);
       components.push(Object.freeze({

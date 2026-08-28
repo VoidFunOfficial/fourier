@@ -18,7 +18,7 @@ async function packageDirectory(overrides: Record<string, unknown> = {}): Promis
     files: ["WorldCard.tsx"],
     fourier: {
       entry: "./WorldCard.tsx",
-      type: "card",
+      type: "shader",
       summary: "在产品视频中展示结构化指标。",
       instruction: "需要清晰展示一组关键指标时使用。",
       useCases: ["产品功能介绍", "数据摘要"],
@@ -53,7 +53,7 @@ describe("Fourier World package.json", () => {
         license: "MIT",
         files: ["WorldCard.tsx"],
         fourier: {
-          type: "card",
+          type: "shader",
           style: ["minimal", "corporate"],
           languages: ["en", "zh-CN"],
         },

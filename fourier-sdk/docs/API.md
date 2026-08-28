@@ -437,7 +437,7 @@ for (const result of response.results) {
 | 字段 | 行为 |
 | --- | --- |
 | `worldUrl` | Fourier World 地址；默认 `https://www.fourier.video` |
-| `type` | `card`、`motion`、`graphic`、`scene-template`、`other` |
+| `type` | `card`、`motion`、`shader`、`graphic`、`scene-template`、`other` |
 | `styles` / `moods` / `languages` | 与 World manifest 相同的结构化枚举筛选 |
 | `contentDomains` / `author` | 内容领域或发布者 namespace 筛选 |
 | `page` / `limit` | 从 1 开始分页；limit 为 1—48，默认 12 |
@@ -463,7 +463,7 @@ openArtifact(entryPath: string, { exportName?: "default" }): Promise<ArtifactFix
 
 ```ts
 interface ArtifactFixture {
-  readonly kind: "react" | "motion";
+  readonly kind: "react" | "motion" | "shader";
   readonly name: string;
   readonly snapshotId: string;
   renderFrame({ frame, signal? }): Promise<FrameResult>;
