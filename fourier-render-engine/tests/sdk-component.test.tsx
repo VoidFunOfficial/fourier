@@ -97,6 +97,25 @@ describe("SDK component production Adapter", () => {
     )).resolves.toEqual([componentPath, fontPath].sort());
   });
 
+  test("嵌套 Scene 导入的 GLB 作为二进制叶子依赖保留", async () => {
+    const directory = await mkdtemp(join(import.meta.dir, ".sdk-component-glb-"));
+    directories.push(directory);
+    const sceneDirectory = join(directory, "scenes", "hero");
+    const assets = join(directory, "assets");
+    await Promise.all([mkdir(sceneDirectory, { recursive: true }), mkdir(assets)]);
+    const componentPath = join(sceneDirectory, "Carrier.tsx");
+    const modelPath = join(assets, "carrier.glb");
+    await Promise.all([
+      Bun.write(componentPath, `import modelUrl from "../../assets/carrier.glb";\nexport default () => <div data-model={modelUrl} />;`),
+      // Binary glTF header plus bytes that must never reach a source transpiler.
+      Bun.write(modelPath, new Uint8Array([103, 108, 84, 70, 2, 0, 0, 0, 255, 0, 128, 0])),
+    ]);
+    await expect(collectComponentDependencies(
+      { id: "carrier", kind: "react", component: "Carrier.tsx", componentPath, exportName: "default" },
+      [sceneDirectory, directory],
+    )).resolves.toEqual([componentPath, modelPath].sort());
+  });
+
   test("组件 import policy 允许 SDK，并在 bundle 后保留 ABI marker", async () => {
     const directory = await mkdtemp(join(import.meta.dir, ".sdk-component-"));
     directories.push(directory);

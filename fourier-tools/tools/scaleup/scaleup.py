@@ -4,28 +4,29 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
+from threading import Lock
 
 import numpy as np
 from PIL import Image
+from tools.runtime import ModelSlot
 
 
 DEFAULT_MODEL_PATH = Path(__file__).resolve().parents[2] / "models" / "scaleup_model"
 _pipelines: dict[str, Any] = {}
+_pipelines_lock = Lock()
 
 
 def _load_pipeline(model_path: str | Path) -> Any:
-    from modelscope.pipelines import pipeline
-    from modelscope.utils.constant import Tasks
-
     resolved = str(Path(model_path).expanduser().resolve())
-    super_resolution = _pipelines.get(resolved)
-    if super_resolution is None:
-        super_resolution = pipeline(
-            Tasks.image_super_resolution,
-            model=resolved,
-        )
-        _pipelines[resolved] = super_resolution
-    return super_resolution
+    def load():
+        from modelscope.pipelines import pipeline
+        from modelscope.utils.constant import Tasks
+        return pipeline(Tasks.image_super_resolution, model=resolved)
+
+    with _pipelines_lock:
+        if resolved not in _pipelines:
+            _pipelines[resolved] = ModelSlot(load)
+        return _pipelines[resolved]
 
 
 def _save_modelscope_image(image: Any, output_path: Path) -> None:
@@ -60,7 +61,7 @@ def upscale_image(
 
     destination = Path(output_path).expanduser().resolve()
     destination.parent.mkdir(parents=True, exist_ok=True)
-    result = _load_pipeline(model_directory)(str(source))
+    result = _load_pipeline(model_directory).run(lambda model: model(str(source)))
     output_image = result[OutputKeys.OUTPUT_IMG]
     _save_modelscope_image(output_image, destination)
     with Image.open(destination) as saved:
@@ -75,5 +76,5 @@ def upscale_image(
 if __name__ == "__main__":
     print(DEFAULT_MODEL_PATH)
     raise SystemExit(
-        "Use upscale_image(...) or run the unified project/mcp-server.py service."
+        "Use upscale_image(...) or run python main.py from fourier-tools."
     )

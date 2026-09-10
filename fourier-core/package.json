@@ -1,6 +1,6 @@
 {
   "name": "@fourier-video/core",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "license": "MIT",
   "type": "module",
   "description": "Shared artifact compilation and deterministic timeline runtime for Fourier",

@@ -1,1 +1,1 @@
-"""Reusable media tools exposed by the unified MCP server."""
+"""Reusable media tools exposed by the Fourier HTTP server."""

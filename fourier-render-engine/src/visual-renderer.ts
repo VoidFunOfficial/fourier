@@ -496,6 +496,7 @@ function resolveLocalImport(importer: string, specifier: string): string {
 
 const componentBinaryAssetExtensions = new Set([
   ...imageAssetExtensions,
+  ".glb",
   ".otf",
   ".ttf",
   ".woff",

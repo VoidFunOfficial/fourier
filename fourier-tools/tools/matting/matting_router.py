@@ -1,7 +1,7 @@
 """Background-removal tools.
 
 The lightweight colour-based implementation only depends on Pillow and NumPy.
-The BiRefNet implementation is imported lazily so the MCP server can start
+The BiRefNet implementation is imported lazily so the HTTP server can start
 without loading a model or importing PyTorch.
 """
 
@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Sequence
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageChops, ImageFilter
 
 
 def _validated_color(target_color: Sequence[int]) -> tuple[int, int, int]:
@@ -48,8 +48,9 @@ def remove_color_background(
         raise FileNotFoundError(f"input image does not exist: {source}")
 
     rgb_color = _validated_color(target_color)
-    image = Image.open(source).convert("RGB")
-    image_array = np.asarray(image, dtype=np.float32)
+    with Image.open(source) as opened:
+        image = opened.convert("RGBA")
+    image_array = np.asarray(image.convert("RGB"), dtype=np.float32)
     target = np.asarray(rgb_color, dtype=np.float32)
     distance = np.linalg.norm(image_array - target, axis=2)
 
@@ -58,6 +59,7 @@ def remove_color_background(
     alpha_image = Image.fromarray(alpha, mode="L").filter(
         ImageFilter.GaussianBlur(radius=1)
     )
+    alpha_image = ImageChops.multiply(alpha_image, image.getchannel("A"))
 
     result = image.copy()
     result.putalpha(alpha_image)
@@ -81,7 +83,7 @@ def matting(
     if matting_method == "color":
         return remove_color_background(image_path, **kwargs)
     if matting_method == "ai":
-        from .BiRefNet.matting_ai import extract_object
+        from .ai import extract_object
 
         return extract_object(image_path, **kwargs)
     raise ValueError(f"unsupported matting method: {matting_method}")

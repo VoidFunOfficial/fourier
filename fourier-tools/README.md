@@ -1,86 +1,73 @@
 # Fourier Tools
 
-English | [简体中文](./README.zh-CN.md)
+English | [简体中文 / detailed examples](./README.zh-CN.md)
 
-**Media acquisition and processing capabilities for video agents.**
+HTTP media processing for video agents: upload an asset, call a tool using its file ID, and pass the resulting asset to Fourier SDK and Render Engine.
 
-The Render Engine answers “how should this be presented reliably?” Fourier Tools answers “where should the media come from, and how should it be prepared?” It keeps matting, upscaling, and external-model capabilities separate from visual design so an agent can prepare assets before passing them to SDK components and the Render Engine.
+## Run
 
-## Why Fourier Tools
+From `fourier-tools`, with Python 3.10+:
 
-- **Media processing is decoupled from design:** changing a model or provider does not require rewriting Projects, Scenes, or components.
-- **Inputs and outputs are traceable:** tools operate on explicit files and parameters, so results can be cached, inspected, and reused.
-- **Local-model friendly:** current capabilities can run against repository-local models, reducing runtime network dependencies and improving reproducibility.
-- **Composable by agents:** small, explicit function boundaries let an agent build workflows such as search → matting → upscaling → entrance animation.
-
-## Current capabilities
-
-| Capability | Entry point | Description |
-| --- | --- | --- |
-| Color background removal | `tools/matting/matting_router.py` | Pillow/NumPy implementation that writes a transparent PNG and alpha mask |
-| AI matting | `tools/matting/BiRefNet/matting_ai.py` | Uses local BiRefNet weights and selects CUDA, MPS, or CPU automatically |
-| Image upscaling | `tools/scaleup/scaleup.py` | Loads a local RealESRGAN model through ModelScope and writes the enlarged result |
-| Local model assets | `models/` | Contains matting, upscaling, CLIP, and speech-related models; not every model is exposed as a public Tool yet |
-
-> This directory is currently a capability prototype and local-model collection. It does not yet provide a unified dependency manifest, CLI, or service entry point, and the root `main.py` is not implemented. Install dependencies for the specific capability you use and call its module directly.
-
-## Examples
-
-Run these examples from `fourier-tools`. Basic color removal requires `numpy` and `Pillow`:
-
-```python
-from tools.matting.matting_router import remove_color_background
-
-remove_color_background(
-    "input.png",
-    target_color=(255, 255, 255),
-    tolerance=30,
-    output_path="output/subject.png",
-    mask_path="output/mask.png",
-)
+```sh
+python main.py
+# Or: uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-Use the local BiRefNet model for AI matting:
+Interactive documentation: `http://127.0.0.1:8000/docs`; schema: `/openapi.json`. `requirements-http.txt` declares HTTP and color-matting dependencies only. Model environment provisioning, deployment configuration, and weight-download management remain outside this module's scope. The default listener is loopback; authentication and tenant isolation are not implemented.
 
-```python
-from tools.matting.matting_router import matting
+## API
 
-subject, mask = matting("input.png", "ai", device="auto")
-subject.save("output/subject.png")
-mask.save("output/mask.png")
+| Route | Behavior |
+| --- | --- |
+| `GET /health` | Process liveness without loading models |
+| `GET /v1/tools` | Capabilities and model states: unloaded, loading, ready, unavailable |
+| `POST /v1/files` | Multipart upload using the `file` field |
+| `GET /v1/files/{id}` | File metadata |
+| `GET /v1/files/{id}/content` | Download |
+| `DELETE /v1/files/{id}` | Delete an uploaded file or generated artifact |
+| `POST /v1/matting` | Color removal or BiRefNet; returns image, mask, width, height |
+| `POST /v1/scaleup` | ModelScope RealESRGAN; returns image, width, height |
+| `POST /v1/transcribe` | SenseVoiceSmall with FSMN-VAD; returns plain/rich text and raw tags |
+| `POST /v1/clip` | FG-CLIP2 image-to-text ranking using cosine similarity |
+| `POST /v1/tts` | VoxCPM2 or CosyVoice3; returns WAV, sample rate and duration in seconds |
+
+All tool requests use JSON and reject unknown fields. Upload responses and generated files share `{id, name, size, mediaType, url}`. URLs are relative to the service. Generated IDs can be reused as tool inputs. Files persist under `.data/` across restarts until explicitly deleted. Intermediate files are removed after each operation, including failures. Callers cannot supply server filesystem paths, output paths, or model locations.
+
+Each file is limited to 100 MiB by default; HTTP requests allow an additional 1 MiB for multipart framing. Image inputs are limited to 16 million pixels. Models load on first use and are reused in process. Each model serializes initialization and inference; synchronous routes run in worker threads. Failed loads can be retried. Health does not imply model readiness.
+
+## Requests
+
+```sh
+curl -F 'file=@input.png' http://127.0.0.1:8000/v1/files
+
+# Replace fileId with the upload response's id.
+curl http://127.0.0.1:8000/v1/matting \
+  -H 'Content-Type: application/json' \
+  -d '{"fileId":"0123456789abcdef0123456789abcdef","method":"color","targetColor":[255,255,255]}'
 ```
 
-AI matting also requires compatible PyTorch, Transformers, and model dependencies. The first load is slower; model instances are reused in-process by model path and device.
+- Matting: `{fileId, method?, targetColor?, tolerance?, strength?, imageSize?}`. Defaults: AI, white, 30, 1, 1024. Tolerance must be positive and at most 442; strength is 0–1; AI imageSize is 64–2048. Existing alpha is preserved.
+- Upscaling: `{fileId}`. Uses the model's native scale.
+- Transcription: `{fileId, language?, useItn?}`. Languages: auto (default), zh, en, yue, ja, ko, nospeech. ITN defaults to true. Returns `{model, language, text, richText, utterances}`; utterances contain text, richText, rawText and tags. The language field echoes the request; detected language is in the tags. No timestamps, diarization or aligned subtitles are fabricated. Local `models/transcribe_model/` is preferred; otherwise FunASR resolves `iic/SenseVoiceSmall` from ModelScope. VAD handles long-audio segmentation.
+- CLIP: `{fileId, texts}`. Accepts 1–64 candidates of up to 2000 characters. Returns descending matches with original index, text and cosine score, not probability. Tokenization truncates to 196 tokens. No vector database is maintained.
+- TTS: `{text, provider?, referenceFileId?, promptText?}`. Provider defaults to voxcpm. CosyVoice requires a reference: with promptText it uses zero-shot inference, otherwise cross-lingual inference. VoxCPM supports text alone or reference-based synthesis. Text fields allow up to 10000 characters. All chunks are combined into mono PCM16 WAV using the model's sample rate. Empty or non-finite audio fails instead of publishing an artifact.
 
-Use the local upscaling model:
+Audio/reference containers: WAV, MP3, FLAC, OGG, M4A, AAC, OPUS, AIFF, WEBM, MP4. Actual decoding depends on the runtime; video containers require an audio track.
 
-```python
-from tools.scaleup.scaleup import upscale_image
+## Runtime boundaries and errors
 
-result = upscale_image("input.png", "output/upscaled.png")
-print(result)  # outputPath, width, height
+Default local model directories: `models/matting_model`, `scaleup_model`, `clip_model`, `tts_model`, `tts_cosy`. Compatible model dependencies are provisioned separately: PyTorch/Transformers, ModelScope, FunASR, VoxCPM, and the official CosyVoice source package with its dependencies. HTTP startup does not import these frameworks or load weights. The Fourier-owned BiRefNet adapter does not require modifying the nested upstream checkout.
+
+Errors use `{error: {code, message, details?}}`: 404 missing file, 413 upload limit, 422 invalid request/input, 503 unavailable model/runtime, 500 processing failure. Internal exception traces are logged server-side. Missing models never return placeholder success.
+
+## Development
+
+`main.py` starts the app. `server/` contains routing, request schemas, file storage, and orchestration. `tools/` contains reusable model adapters and the lazy model lifecycle.
+
+```sh
+python -m pytest -q tests
 ```
 
-Upscaling also requires ModelScope and its model runtime dependencies.
+Tests require pytest, httpx, torch, soundfile, and HTTP dependencies. Color matting, file lifecycle, and PNG/WAV encoding use real implementations. Model adapters use replacement inference models to check arguments, result conversion, ranking, chunk assembly, concurrency, and failures without downloading weights. Real model inference quality requires separate acceptance in a provisioned environment.
 
-## Directory layout
-
-```text
-fourier-tools/
-├── models/            # Local model weights and model-specific documentation
-├── tools/
-│   ├── matting/       # Color removal and BiRefNet AI matting
-│   └── scaleup/       # RealESRGAN image upscaling
-└── main.py            # Reserved unified entry point; currently unimplemented
-```
-
-## Relationship to the other projects
-
-Tools does not decide visual design and does not render video directly. The recommended data flow is:
-
-```text
-Raw media → Fourier Tools → reproducible project asset → SDK Scene/component → Render Engine
-```
-
-Once a capability becomes a stable Tool, an agent can use it to prepare media. Presentation remains the responsibility of components created with the [Fourier SDK](../fourier-sdk/README.md) and discovered through [Fourier World](../fourier-world/README.md).
-
+Upstream contracts: [SenseVoiceSmall](https://www.modelscope.cn/models/iic/SenseVoiceSmall/summary), [FG-CLIP](https://github.com/360CVGroup/FG-CLIP), [VoxCPM](https://github.com/OpenBMB/VoxCPM), [CosyVoice](https://github.com/QwenAudio/CosyVoice).
