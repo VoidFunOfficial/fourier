@@ -1,0 +1,4 @@
+import { defineReact, motion } from "@fourier-video/sdk";
+import { Stage } from "../../components/Stage";
+import { Dots } from "../../components/Icons";
+export default defineReact({name:"WorkPlayLockup",schema:{},component(){return <Stage dark><motion.div animate={[{scale:1,offset:0},{scale:.89,offset:1}]} transition={{ease:"linear"}} style={{position:"absolute",left:483,top:322,width:296,height:76,display:"flex",alignItems:"center",gap:18,fontSize:42,fontWeight:500,letterSpacing:"-.025em"}}><span>Work</span><motion.div animate={[{rotate:10,offset:0},{rotate:160,offset:1}]} transition={{ease:"linear"}} style={{width:64,height:64,flexShrink:0}}><Dots/></motion.div><span>Play</span></motion.div></Stage>;},designPreview(){return {props:{},composition:{width:1920,height:1080,durationSeconds:56/24}};}});

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "engine": {
+    "name": "@fourier-video/render-engine",
+    "version": "2.0.0"
+  },
+  "sdk": {
+    "name": "@fourier-video/sdk",
+    "version": "1.2.0",
+    "abiVersion": 1.2
+  },
+  "playwright": {
+    "version": "1.62.0"
+  },
+  "chromium": {
+    "version": "151.0.7922.34",
+    "revision": "1234"
+  },
+  "project": {
+    "id": "mac-mini-m6-film",
+    "totalFrames": 4800,
+    "fps": 60,
+    "executionRevision": "project-wire-v1",
+    "sourceFingerprint": "9fffbd3758a61d5d8138611f3f5b9c1cd2c0a73943752c4fa24201a278cde873"
+  },
+  "output": {
+    "path": "/Users/voidfun/Project/Fourier-Project/ad-apple/output/Mac-mini-M6-1080p60.mp4",
+    "sha256": "76b1086fdc68ed53a7a5d413174674e8064bbd7503b1009cc50f5b1b33151825"
+  },
+  "profiles": [],
+  "snapshots": []
+}

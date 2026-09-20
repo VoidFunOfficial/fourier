@@ -1,0 +1,19 @@
+{
+  "fixed": true,
+  "localSamples": [
+    0.35,
+    1.05,
+    1.75,
+    2.45,
+    3.15,
+    3.85
+  ],
+  "maximumChannelErrors": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ]
+}

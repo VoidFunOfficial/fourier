@@ -1,0 +1,2 @@
+import { Canvas, defineProject, Project, ReactLayer, Timeline } from "@fourier-video/sdk/project";
+export default defineProject(<Project id="mac-mini-13-wireless" version="1.0" audioSampleRate={48000}><Canvas width={1920} height={1080} fps={60} background="#f5f5f7" colorSpace="sRGB"/><Timeline><ReactLayer id="composition" preview at="0f" duration="240f" component="Visual.tsx" x={960} y={540} width={1920} height={1080} layer={1}/></Timeline></Project>);

@@ -1,0 +1,168 @@
+{
+  "page": "https://www.apple.com/mac-mini/",
+  "checked": "2026-09-04",
+  "assets": [
+    {
+      "file": "assets/official/ai_agentic__bdref58mxbma_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/ai/ai_agentic__bdref58mxbma_large_2x.jpg",
+      "bytes": 280466,
+      "sha256": "733c70af7829c8f1a29ae953ab6de1c8f8e20ecf25fd2f1cf2de188201d90368"
+    },
+    {
+      "file": "assets/official/ai_tools__dwqc9wshbmy6_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/ai/ai_tools__dwqc9wshbmy6_large_2x.jpg",
+      "bytes": 239028,
+      "sha256": "30f878a5f1f890fa34e9460909385ea2df0f5a4564210f3288223f6a44fe8d64"
+    },
+    {
+      "file": "assets/official/design_pb__cxvqbmm5dfcm_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/design/design_pb__cxvqbmm5dfcm_large_2x.jpg",
+      "bytes": 62778,
+      "sha256": "c2ae614fe4393f64e02cc8d9ddb708b3d307f3bb39cadcd37793eb597f9f1e79"
+    },
+    {
+      "file": "assets/official/design_pf__c25gukz0vwgi_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/design/design_pf__c25gukz0vwgi_large_2x.jpg",
+      "bytes": 68048,
+      "sha256": "7eb4efc5582aa7c57dab47f62e19b64432983c7837c6fed6e11b4abe3f288035"
+    },
+    {
+      "file": "assets/official/ports_startframe__f0wr03ggmsii_large_2x.png",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/design/ports_startframe__f0wr03ggmsii_large_2x.png",
+      "bytes": 342538,
+      "sha256": "1da7178007ed658b813a704fb2f79d6e30c890a6a6e1e5054d84dd15fa6fe770"
+    },
+    {
+      "file": "assets/official/mac_iphone_airdrop__duo56yt9n2ie_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/mac-iphone/mac_iphone_airdrop__duo56yt9n2ie_large_2x.jpg",
+      "bytes": 306566,
+      "sha256": "221f2be4c299d5587540d5b8d5eeb4a4a08ea08e3145cab95139dc3b14e85e5b"
+    },
+    {
+      "file": "assets/official/mac_iphone_mirroring__f420q7238wuy_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/mac-iphone/mac_iphone_mirroring__f420q7238wuy_large_2x.jpg",
+      "bytes": 291127,
+      "sha256": "ccc61a7d9b7030c681fc411cf16f22527ee309fe2432b9ced1e7758b225f1a62"
+    },
+    {
+      "file": "assets/official/macos__dc9oy014voia_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/macos/macos__dc9oy014voia_large_2x.jpg",
+      "bytes": 506845,
+      "sha256": "356e034cd6e65e03b102ba78f271bbc9dec44e7e88ec1d6b497e0af29d41e779"
+    },
+    {
+      "file": "assets/official/performance_thermal__f28l49zfao2m_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/modal/performance_thermal__f28l49zfao2m_large_2x.jpg",
+      "bytes": 301091,
+      "sha256": "520964b4bc0e81791628e92db2cd93e80878b6ca946d990ed01adcc6161c847e"
+    },
+    {
+      "file": "assets/official/performance_chip_mx__gis8y0lp52eu_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_chip_mx__gis8y0lp52eu_large_2x.jpg",
+      "bytes": 10477,
+      "sha256": "adfac6f7c6c1a82d1f086d4b0f2811fc5d1afdd0c7dba7ea3d03335b450d5307"
+    },
+    {
+      "file": "assets/official/performance_coding_1__dm83k6b69is2_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_coding_1__dm83k6b69is2_large_2x.jpg",
+      "bytes": 228680,
+      "sha256": "fbf383ec590ad24faa6de5ea8b92d75677466e2b267b2869f6a56dd7305a777c"
+    },
+    {
+      "file": "assets/official/performance_coding_2__b8ybr062yjo2_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_coding_2__b8ybr062yjo2_large_2x.jpg",
+      "bytes": 161380,
+      "sha256": "35cdab5f0c8fdfe664f8d7f8d68fdd0493074f060eb12a09b49f733234f40873"
+    },
+    {
+      "file": "assets/official/performance_creativity_1__fqwakkhqpm2q_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_creativity_1__fqwakkhqpm2q_large_2x.jpg",
+      "bytes": 202025,
+      "sha256": "72366e8b00111450fd5d9a0a4f6589df3f69b8e78705bc458c2331f0d77b9e0f"
+    },
+    {
+      "file": "assets/official/performance_creativity_2__dza6766qhqye_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_creativity_2__dza6766qhqye_large_2x.jpg",
+      "bytes": 399909,
+      "sha256": "eafae056819dbefc24da97970dbb05f7c6209046770f2d72b24d11cacb1f2a21"
+    },
+    {
+      "file": "assets/official/performance_gaming_1__4f5hs0u1cgie_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_gaming_1__4f5hs0u1cgie_large_2x.jpg",
+      "bytes": 152087,
+      "sha256": "0e40f0f30363be5435707439b57833446e0fd4dfc709b19c5b90a8bf721acd6b"
+    },
+    {
+      "file": "assets/official/performance_gaming_2__cyr5zva871aq_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_gaming_2__cyr5zva871aq_large_2x.jpg",
+      "bytes": 156241,
+      "sha256": "a78a48b917b52a06bd13ce4554d386ca3ed8b711e8d1908c98baff427883d559"
+    },
+    {
+      "file": "assets/official/performance_hw_display__bo6ks7s2l9si_large_2x.png",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_hw_display__bo6ks7s2l9si_large_2x.png",
+      "bytes": 250834,
+      "sha256": "10099da4c172763ac45252ee09ed3bf52ae884764e15e0d2d312988ca1ca662b"
+    },
+    {
+      "file": "assets/official/performance_hw_display_mac_mini__duzudvllj8sy_large_2x.png",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_hw_display_mac_mini__duzudvllj8sy_large_2x.png",
+      "bytes": 517200,
+      "sha256": "8d331d47b3bccb3ebf97905ad75de57f22a6cb9e7d721aa92e77258917f26897"
+    },
+    {
+      "file": "assets/official/performance_productivity_1__d40pebfrlqmq_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_productivity_1__d40pebfrlqmq_large_2x.jpg",
+      "bytes": 97700,
+      "sha256": "b5dc749ba96cd5c9b0301851ab276f643c41c82086445cf511244e6f2733e3b3"
+    },
+    {
+      "file": "assets/official/performance_productivity_2__do0p70ktiuuu_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_productivity_2__do0p70ktiuuu_large_2x.jpg",
+      "bytes": 258425,
+      "sha256": "f3933c1cc93b3db11392893a72c9c72dc13c1ec77ef68c5627e3e2279b9fd830"
+    },
+    {
+      "file": "assets/official/performance_screen_left__c5fg5tgdnhiu_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_screen_left__c5fg5tgdnhiu_large_2x.jpg",
+      "bytes": 449620,
+      "sha256": "94b36ef0b3621ff3410d308ca51baac9cc1e13ac25f7482ea374d51a781dd23c"
+    },
+    {
+      "file": "assets/official/performance_screen_middle__faxq2r83s7u6_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_screen_middle__faxq2r83s7u6_large_2x.jpg",
+      "bytes": 642541,
+      "sha256": "c256b0831a17a13a220602473d7071bf1c6cbdcd87078047a082af5b4e642a32"
+    },
+    {
+      "file": "assets/official/performance_screen_right__e2ef7479cbee_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_screen_right__e2ef7479cbee_large_2x.jpg",
+      "bytes": 354989,
+      "sha256": "e6b070ffd1eeaca126806505949dcb53e7754deef160348e91d7ded5d7bd048a"
+    },
+    {
+      "file": "assets/official/performance_stem_1__bmu2eay841xy_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_stem_1__bmu2eay841xy_large_2x.jpg",
+      "bytes": 159979,
+      "sha256": "8027145daea0ded43081bb1d6579fa2f1c25dad9897017a22b03b1c024c2b9f8"
+    },
+    {
+      "file": "assets/official/performance_stem_2__bjc3rh4n7dw2_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/performance/performance_stem_2__bjc3rh4n7dw2_large_2x.jpg",
+      "bytes": 240889,
+      "sha256": "ffdfebfc96742a79b0c96a14c52c418dd41f5925d58daab596aee8ff0bf5bec4"
+    },
+    {
+      "file": "assets/official/welcome_hero__ckmy0qsqi8ia_large_2x.jpg",
+      "url": "https://www.apple.com/v/mac-mini/ab/images/overview/welcome/welcome_hero__ckmy0qsqi8ia_large_2x.jpg",
+      "bytes": 48988,
+      "sha256": "c5ed6465e3b172c7789fe0efbf0c3975bc3a857b87f170a86b1b4999f561d7a4"
+    },
+    {
+      "file": "assets/official/mac-mini-silver.usdz",
+      "url": "https://www.apple.com/105/media/us/mac-mini/2026/2140fd43-1461-420d-942c-6f254535a9a4/ar/mac-mini-silver.usdz",
+      "bytes": 3611106,
+      "sha256": "3d36f189975cb24e2614e1aadabc1ae6112c8a298722c2eabc67f56a4d986ace"
+    }
+  ]
+}

@@ -1,0 +1,1082 @@
+{
+  "01-outline": [
+    {
+      "at": 0.02,
+      "sound": "pen",
+      "duration": 0.72,
+      "level": 0.09,
+      "pan": -0.3,
+      "rate": 1
+    },
+    {
+      "at": 0.31,
+      "sound": "pen",
+      "duration": 0.63,
+      "level": 0.07,
+      "pan": 0.25,
+      "rate": 1
+    },
+    {
+      "at": 0.93,
+      "sound": "air",
+      "duration": 0.69,
+      "level": 0.18,
+      "pan": [
+        -0.3,
+        0.3
+      ],
+      "rate": 1
+    },
+    {
+      "at": 1.46,
+      "sound": "thump",
+      "duration": 0.4,
+      "level": 0.23,
+      "pan": 0,
+      "rate": 1
+    }
+  ],
+  "02-object": [
+    {
+      "at": -0.12,
+      "sound": "shua",
+      "duration": 0.58,
+      "level": 0.19,
+      "pan": [
+        -0.4,
+        0.45
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.25,
+      "sound": "tick",
+      "duration": 0.1,
+      "level": 0.1,
+      "pan": 0.25,
+      "rate": 1
+    },
+    {
+      "at": 1.7,
+      "sound": "air",
+      "duration": 0.55,
+      "level": 0.12,
+      "pan": [
+        0.3,
+        -0.2
+      ],
+      "rate": 1
+    }
+  ],
+  "03-footprint": [
+    {
+      "at": -0.12,
+      "sound": "whoosh",
+      "duration": 0.3,
+      "level": 0.2,
+      "pan": [
+        0.4,
+        0
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.3,
+      "sound": "click",
+      "duration": 0.085,
+      "level": 0.13,
+      "pan": -0.3,
+      "rate": 1.1
+    },
+    {
+      "at": 0.51,
+      "sound": "click",
+      "duration": 0.085,
+      "level": 0.13,
+      "pan": 0.2,
+      "rate": 1.1
+    },
+    {
+      "at": 0.74,
+      "sound": "click",
+      "duration": 0.085,
+      "level": 0.13,
+      "pan": 0,
+      "rate": 1.1
+    },
+    {
+      "at": 2.36,
+      "sound": "air",
+      "duration": 0.55,
+      "level": 0.18,
+      "pan": [
+        0.2,
+        0
+      ],
+      "rate": 1
+    }
+  ],
+  "04-silicon": [
+    {
+      "at": 0,
+      "sound": "thump",
+      "duration": 0.49,
+      "level": 0.27,
+      "pan": 0,
+      "rate": 1
+    },
+    {
+      "at": 0.16,
+      "sound": "tick",
+      "duration": 0.047,
+      "level": 0.048,
+      "pan": 0.3,
+      "rate": 1.0
+    },
+    {
+      "at": 0.23399999999999999,
+      "sound": "tick",
+      "duration": 0.047,
+      "level": 0.048,
+      "pan": -0.3,
+      "rate": 1.07
+    },
+    {
+      "at": 0.308,
+      "sound": "tick",
+      "duration": 0.047,
+      "level": 0.048,
+      "pan": 0.3,
+      "rate": 1.1400000000000001
+    },
+    {
+      "at": 0.382,
+      "sound": "tick",
+      "duration": 0.047,
+      "level": 0.048,
+      "pan": -0.3,
+      "rate": 1.21
+    },
+    {
+      "at": 0.45599999999999996,
+      "sound": "tick",
+      "duration": 0.047,
+      "level": 0.048,
+      "pan": 0.3,
+      "rate": 1.28
+    },
+    {
+      "at": 0.53,
+      "sound": "tick",
+      "duration": 0.047,
+      "level": 0.048,
+      "pan": -0.3,
+      "rate": 1.35
+    },
+    {
+      "at": 0.48,
+      "sound": "air",
+      "duration": 1.25,
+      "level": 0.09,
+      "pan": [
+        -0.4,
+        0.4
+      ],
+      "rate": 1
+    },
+    {
+      "at": 3.26,
+      "sound": "whoosh",
+      "duration": 0.71,
+      "level": 0.23,
+      "pan": [
+        0,
+        0.4
+      ],
+      "rate": 0.86
+    }
+  ],
+  "05-cpu": [
+    {
+      "at": 0.03,
+      "sound": "thump",
+      "duration": 0.28,
+      "level": 0.24,
+      "pan": 0,
+      "rate": 1
+    },
+    {
+      "at": 0.16,
+      "sound": "click",
+      "duration": 0.058,
+      "level": 0.095,
+      "pan": -0.25,
+      "rate": 1.0
+    },
+    {
+      "at": 0.256,
+      "sound": "click",
+      "duration": 0.058,
+      "level": 0.095,
+      "pan": -0.15,
+      "rate": 1.08
+    },
+    {
+      "at": 0.352,
+      "sound": "click",
+      "duration": 0.058,
+      "level": 0.095,
+      "pan": -0.04999999999999999,
+      "rate": 1.16
+    },
+    {
+      "at": 0.44800000000000006,
+      "sound": "click",
+      "duration": 0.058,
+      "level": 0.095,
+      "pan": 0.050000000000000044,
+      "rate": 1.24
+    },
+    {
+      "at": 0.544,
+      "sound": "click",
+      "duration": 0.058,
+      "level": 0.095,
+      "pan": 0.15000000000000002,
+      "rate": 1.32
+    },
+    {
+      "at": 0.64,
+      "sound": "click",
+      "duration": 0.058,
+      "level": 0.095,
+      "pan": 0.25,
+      "rate": 1.4
+    },
+    {
+      "at": 0.9,
+      "sound": "tick",
+      "duration": 0.12,
+      "level": 0.11,
+      "pan": 0,
+      "rate": 1
+    }
+  ],
+  "06-gpu": [
+    {
+      "at": -0.2,
+      "sound": "shua",
+      "duration": 0.5,
+      "level": 0.17,
+      "pan": [
+        0.4,
+        -0.2
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.22,
+      "sound": "air",
+      "duration": 1.15,
+      "level": 0.12,
+      "pan": [
+        -0.4,
+        0.5
+      ],
+      "rate": 1
+    },
+    {
+      "at": 1.12,
+      "sound": "tick",
+      "duration": 0.1,
+      "level": 0.08,
+      "pan": 0.3,
+      "rate": 1
+    }
+  ],
+  "07-neural": [
+    {
+      "at": -0.14,
+      "sound": "whoosh",
+      "duration": 0.35,
+      "level": 0.19,
+      "pan": [
+        0.3,
+        0
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.1,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.065,
+      "pan": 0.32,
+      "rate": 1.0
+    },
+    {
+      "at": 0.25,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.065,
+      "pan": -0.32,
+      "rate": 1.03
+    },
+    {
+      "at": 0.4,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.065,
+      "pan": 0.32,
+      "rate": 1.06
+    },
+    {
+      "at": 0.5499999999999999,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.065,
+      "pan": -0.32,
+      "rate": 1.09
+    },
+    {
+      "at": 0.7,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.065,
+      "pan": 0.32,
+      "rate": 1.12
+    },
+    {
+      "at": 0.85,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.065,
+      "pan": -0.32,
+      "rate": 1.15
+    },
+    {
+      "at": 0.9999999999999999,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.065,
+      "pan": 0.32,
+      "rate": 1.18
+    },
+    {
+      "at": 1.1500000000000001,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.065,
+      "pan": -0.32,
+      "rate": 1.21
+    },
+    {
+      "at": 1.2,
+      "sound": "air",
+      "duration": 0.65,
+      "level": 0.13,
+      "pan": [
+        -0.4,
+        0.4
+      ],
+      "rate": 1
+    },
+    {
+      "at": 3.55,
+      "sound": "shua",
+      "duration": 0.46,
+      "level": 0.18,
+      "pan": [
+        0.4,
+        0
+      ],
+      "rate": 1.2
+    }
+  ],
+  "08-memory": [
+    {
+      "at": 0.02,
+      "sound": "thump",
+      "duration": 0.3,
+      "level": 0.2,
+      "pan": 0,
+      "rate": 1
+    },
+    {
+      "at": 0.3,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.075,
+      "pan": 0.22,
+      "rate": 0.9
+    },
+    {
+      "at": 0.44,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.075,
+      "pan": 0.22,
+      "rate": 0.96
+    },
+    {
+      "at": 0.5800000000000001,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.075,
+      "pan": 0.22,
+      "rate": 1.02
+    },
+    {
+      "at": 0.72,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.075,
+      "pan": 0.22,
+      "rate": 1.08
+    },
+    {
+      "at": 0.8600000000000001,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.075,
+      "pan": 0.22,
+      "rate": 1.1400000000000001
+    },
+    {
+      "at": 1.0,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.075,
+      "pan": 0.22,
+      "rate": 1.2
+    },
+    {
+      "at": 1.1400000000000001,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.075,
+      "pan": 0.22,
+      "rate": 1.26
+    },
+    {
+      "at": 1.28,
+      "sound": "tick",
+      "duration": 0.05,
+      "level": 0.075,
+      "pan": 0.22,
+      "rate": 1.32
+    },
+    {
+      "at": 3.35,
+      "sound": "whoosh",
+      "duration": 0.56,
+      "level": 0.25,
+      "pan": [
+        -0.2,
+        0.55
+      ],
+      "rate": 1
+    }
+  ],
+  "09-bandwidth": [
+    {
+      "at": 0.01,
+      "sound": "thump",
+      "duration": 0.32,
+      "level": 0.23,
+      "pan": 0,
+      "rate": 1
+    },
+    {
+      "at": 0.12,
+      "sound": "air",
+      "duration": 0.24,
+      "level": 0.09,
+      "pan": [
+        -0.55,
+        0.55
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.48,
+      "sound": "air",
+      "duration": 0.24,
+      "level": 0.097,
+      "pan": [
+        -0.55,
+        0.55
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.84,
+      "sound": "air",
+      "duration": 0.24,
+      "level": 0.104,
+      "pan": [
+        -0.55,
+        0.55
+      ],
+      "rate": 1
+    },
+    {
+      "at": 1.2000000000000002,
+      "sound": "air",
+      "duration": 0.24,
+      "level": 0.111,
+      "pan": [
+        -0.55,
+        0.55
+      ],
+      "rate": 1
+    },
+    {
+      "at": 1.56,
+      "sound": "air",
+      "duration": 0.24,
+      "level": 0.118,
+      "pan": [
+        -0.55,
+        0.55
+      ],
+      "rate": 1
+    },
+    {
+      "at": 2.14,
+      "sound": "tick",
+      "duration": 0.08,
+      "level": 0.12,
+      "pan": 0,
+      "rate": 1
+    }
+  ],
+  "10-media": [
+    {
+      "at": -0.17,
+      "sound": "shua",
+      "duration": 0.51,
+      "level": 0.2,
+      "pan": [
+        -0.55,
+        0.4
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.1,
+      "sound": "click",
+      "duration": 0.065,
+      "level": 0.095,
+      "pan": -0.4,
+      "rate": 1.1
+    },
+    {
+      "at": 0.24000000000000002,
+      "sound": "click",
+      "duration": 0.065,
+      "level": 0.095,
+      "pan": -0.2,
+      "rate": 1.1600000000000001
+    },
+    {
+      "at": 0.38,
+      "sound": "click",
+      "duration": 0.065,
+      "level": 0.095,
+      "pan": 0.0,
+      "rate": 1.2200000000000002
+    },
+    {
+      "at": 0.52,
+      "sound": "click",
+      "duration": 0.065,
+      "level": 0.095,
+      "pan": 0.20000000000000007,
+      "rate": 1.28
+    },
+    {
+      "at": 0.66,
+      "sound": "click",
+      "duration": 0.065,
+      "level": 0.095,
+      "pan": 0.4,
+      "rate": 1.34
+    },
+    {
+      "at": 1.02,
+      "sound": "tick",
+      "duration": 0.042,
+      "level": 0.045,
+      "pan": -0.2,
+      "rate": 1
+    },
+    {
+      "at": 1.17,
+      "sound": "tick",
+      "duration": 0.042,
+      "level": 0.045,
+      "pan": -0.1,
+      "rate": 1
+    },
+    {
+      "at": 1.32,
+      "sound": "tick",
+      "duration": 0.042,
+      "level": 0.045,
+      "pan": 0.0,
+      "rate": 1
+    },
+    {
+      "at": 1.47,
+      "sound": "tick",
+      "duration": 0.042,
+      "level": 0.045,
+      "pan": 0.10000000000000003,
+      "rate": 1
+    },
+    {
+      "at": 1.62,
+      "sound": "tick",
+      "duration": 0.042,
+      "level": 0.045,
+      "pan": 0.2,
+      "rate": 1
+    },
+    {
+      "at": 3.44,
+      "sound": "whoosh",
+      "duration": 0.58,
+      "level": 0.25,
+      "pan": [
+        0,
+        0.4
+      ],
+      "rate": 1.1
+    }
+  ],
+  "11-front": [
+    {
+      "at": 0.0,
+      "sound": "thump",
+      "duration": 0.26,
+      "level": 0.19,
+      "pan": 0,
+      "rate": 1
+    },
+    {
+      "at": 0.68,
+      "sound": "latch",
+      "duration": 0.14,
+      "level": 0.11,
+      "pan": -0.3,
+      "rate": 1.15
+    },
+    {
+      "at": 0.82,
+      "sound": "latch",
+      "duration": 0.14,
+      "level": 0.11,
+      "pan": 0.4,
+      "rate": 1.15
+    },
+    {
+      "at": 0.89,
+      "sound": "pen",
+      "duration": 0.24,
+      "level": 0.06,
+      "pan": -0.2,
+      "rate": 1
+    },
+    {
+      "at": 3.24,
+      "sound": "air",
+      "duration": 0.58,
+      "level": 0.14,
+      "pan": [
+        0.4,
+        -0.4
+      ],
+      "rate": 1
+    }
+  ],
+  "12-back": [
+    {
+      "at": -0.1,
+      "sound": "whoosh",
+      "duration": 0.3,
+      "level": 0.17,
+      "pan": [
+        -0.3,
+        0.3
+      ],
+      "rate": 1
+    },
+    {
+      "at": 1.08,
+      "sound": "latch",
+      "duration": 0.12,
+      "level": 0.1,
+      "pan": -0.35,
+      "rate": 1.0
+    },
+    {
+      "at": 1.21,
+      "sound": "latch",
+      "duration": 0.12,
+      "level": 0.1,
+      "pan": 0.0,
+      "rate": 1.1
+    },
+    {
+      "at": 1.34,
+      "sound": "latch",
+      "duration": 0.12,
+      "level": 0.1,
+      "pan": 0.35,
+      "rate": 1.2
+    }
+  ],
+  "13-wireless": [
+    {
+      "at": -0.16,
+      "sound": "shua",
+      "duration": 0.43,
+      "level": 0.17,
+      "pan": [
+        -0.5,
+        0
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.32,
+      "sound": "air",
+      "duration": 0.42,
+      "level": 0.095,
+      "pan": [
+        -0.2,
+        0.2
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.5800000000000001,
+      "sound": "air",
+      "duration": 0.42,
+      "level": 0.095,
+      "pan": [
+        -0.2,
+        0.2
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.8400000000000001,
+      "sound": "air",
+      "duration": 0.42,
+      "level": 0.095,
+      "pan": [
+        -0.2,
+        0.2
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.77,
+      "sound": "tick",
+      "duration": 0.1,
+      "level": 0.1,
+      "pan": 0.4,
+      "rate": 1
+    }
+  ],
+  "14-thermal": [
+    {
+      "at": -0.14,
+      "sound": "whoosh",
+      "duration": 0.38,
+      "level": 0.14,
+      "pan": [
+        0.3,
+        0
+      ],
+      "rate": 0.8
+    },
+    {
+      "at": 0.55,
+      "sound": "wind",
+      "duration": 1.42,
+      "level": 0.16,
+      "pan": [
+        0.3,
+        -0.3
+      ],
+      "rate": 0.83
+    },
+    {
+      "at": 2.21,
+      "sound": "air",
+      "duration": 0.7,
+      "level": 0.09,
+      "pan": [
+        -0.25,
+        0.2
+      ],
+      "rate": 1
+    }
+  ],
+  "15-displays": [
+    {
+      "at": -0.15,
+      "sound": "shua",
+      "duration": 0.48,
+      "level": 0.18,
+      "pan": [
+        0,
+        0.4
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.12,
+      "sound": "whoosh",
+      "duration": 0.24,
+      "level": 0.105,
+      "pan": -0.4,
+      "rate": 1.1
+    },
+    {
+      "at": 0.8,
+      "sound": "click",
+      "duration": 0.075,
+      "level": 0.1,
+      "pan": -0.4,
+      "rate": 1
+    },
+    {
+      "at": 0.28,
+      "sound": "whoosh",
+      "duration": 0.24,
+      "level": 0.105,
+      "pan": 0.0,
+      "rate": 1.1800000000000002
+    },
+    {
+      "at": 0.9600000000000001,
+      "sound": "click",
+      "duration": 0.075,
+      "level": 0.1,
+      "pan": 0.0,
+      "rate": 1
+    },
+    {
+      "at": 0.44,
+      "sound": "whoosh",
+      "duration": 0.24,
+      "level": 0.105,
+      "pan": 0.4,
+      "rate": 1.26
+    },
+    {
+      "at": 1.12,
+      "sound": "click",
+      "duration": 0.075,
+      "level": 0.1,
+      "pan": 0.4,
+      "rate": 1
+    }
+  ],
+  "16-continuity": [
+    {
+      "at": -0.21,
+      "sound": "air",
+      "duration": 0.71,
+      "level": 0.16,
+      "pan": [
+        0.45,
+        -0.2
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.73,
+      "sound": "click",
+      "duration": 0.09,
+      "level": 0.12,
+      "pan": -0.2,
+      "rate": 1
+    },
+    {
+      "at": 0.9,
+      "sound": "air",
+      "duration": 0.36,
+      "level": 0.085,
+      "pan": [
+        -0.3,
+        0.3
+      ],
+      "rate": 1
+    }
+  ],
+  "17-create": [
+    {
+      "at": -0.15,
+      "sound": "whoosh",
+      "duration": 0.4,
+      "level": 0.18,
+      "pan": [
+        0.3,
+        -0.1
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.3,
+      "sound": "tick",
+      "duration": 0.1,
+      "level": 0.14,
+      "pan": 0,
+      "rate": 1
+    }
+  ],
+  "18-signature": [
+    {
+      "at": -0.1,
+      "sound": "whoosh",
+      "duration": 0.2,
+      "level": 0.17,
+      "pan": [
+        -0.2,
+        0.2
+      ],
+      "rate": 1.25
+    },
+    {
+      "at": 0.015,
+      "sound": "snap",
+      "duration": 0.105,
+      "level": 0.18,
+      "pan": 0,
+      "rate": 1.0
+    },
+    {
+      "at": 0.6,
+      "sound": "whoosh",
+      "duration": 0.2,
+      "level": 0.17,
+      "pan": [
+        -0.2,
+        0.2
+      ],
+      "rate": 1.35
+    },
+    {
+      "at": 0.715,
+      "sound": "snap",
+      "duration": 0.105,
+      "level": 0.18,
+      "pan": 0,
+      "rate": 1.04
+    },
+    {
+      "at": 1.2999999999999998,
+      "sound": "whoosh",
+      "duration": 0.2,
+      "level": 0.17,
+      "pan": [
+        -0.2,
+        0.2
+      ],
+      "rate": 1.45
+    },
+    {
+      "at": 1.4149999999999998,
+      "sound": "snap",
+      "duration": 0.105,
+      "level": 0.18,
+      "pan": 0,
+      "rate": 1.08
+    },
+    {
+      "at": 1.9999999999999996,
+      "sound": "whoosh",
+      "duration": 0.2,
+      "level": 0.17,
+      "pan": [
+        -0.2,
+        0.2
+      ],
+      "rate": 1.55
+    },
+    {
+      "at": 2.1149999999999998,
+      "sound": "snap",
+      "duration": 0.105,
+      "level": 0.18,
+      "pan": 0,
+      "rate": 1.12
+    },
+    {
+      "at": 2.6999999999999997,
+      "sound": "whoosh",
+      "duration": 0.2,
+      "level": 0.17,
+      "pan": [
+        -0.2,
+        0.2
+      ],
+      "rate": 1.65
+    },
+    {
+      "at": 2.815,
+      "sound": "snap",
+      "duration": 0.105,
+      "level": 0.21,
+      "pan": 0,
+      "rate": 1.16
+    }
+  ],
+  "19-all-in": [
+    {
+      "at": -0.08,
+      "sound": "air",
+      "duration": 0.16,
+      "level": 0.06,
+      "pan": [
+        0,
+        0
+      ],
+      "rate": 1
+    }
+  ],
+  "20-credits": [
+    {
+      "at": 0.08,
+      "sound": "air",
+      "duration": 0.43,
+      "level": 0.1,
+      "pan": [
+        -0.2,
+        0
+      ],
+      "rate": 1
+    },
+    {
+      "at": 0.39,
+      "sound": "tick",
+      "duration": 0.075,
+      "level": 0.1,
+      "pan": 0,
+      "rate": 1
+    },
+    {
+      "at": 1.07,
+      "sound": "thump",
+      "duration": 0.23,
+      "level": 0.1,
+      "pan": 0,
+      "rate": 1
+    }
+  ]
+}

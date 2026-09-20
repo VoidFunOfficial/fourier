@@ -1,0 +1,31 @@
+[
+  {
+    "asset": "assets/fonts/Apple-Credits-SF-Pro.woff",
+    "source": "ad-apple/assets/fonts/SF-Pro-subset.woff",
+    "sha256": "e3afaebd2febad3003070750bc799f43314470c331e3b38b5ec496e6c1dbf178"
+  },
+  {
+    "asset": "assets/fonts/Apple-Credits-Heiti.woff",
+    "source": "ad-apple/assets/fonts/Heiti-subset.woff",
+    "sha256": "ef58109ff152443c73a16a581a222c002eec45218234cdec435e78bcfcd5c073"
+  },
+  {
+    "asset": "assets/audio/credits-sfx.wav",
+    "source": "ad-apple/assets/audio/sfx-master.wav",
+    "sourceRangeSeconds": [
+      71,
+      75
+    ],
+    "sha256": "64902bea486ad2280ea5ae0ea25822e04e3163661da8ca3b40cb8a7d60faced3"
+  },
+  {
+    "asset": "assets/audio/film-master.wav",
+    "composition": "reference-master.wav 0–19.05s + credits-sfx.wav 0–4s",
+    "sha256": "370f1c23e724bf9c14435cc82fe4efbfe6cc3f00607c3cf82183c29cce20f2e6"
+  },
+  {
+    "asset": "scenes/09-this-video/Visual.tsx",
+    "source": "ad-apple/templates/ending/scenes/20-credits/Visual.tsx",
+    "method": "Local source snapshot; only dependency paths changed. Original typography and motion retained."
+  }
+]

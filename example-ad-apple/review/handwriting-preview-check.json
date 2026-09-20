@@ -1,0 +1,33 @@
+{
+  "progressiveReveal": true,
+  "samples": [
+    {
+      "localSeconds": 0.1,
+      "darkPixels": 0
+    },
+    {
+      "localSeconds": 0.8,
+      "darkPixels": 8834
+    },
+    {
+      "localSeconds": 1.6,
+      "darkPixels": 16407
+    },
+    {
+      "localSeconds": 2.5,
+      "darkPixels": 33932
+    },
+    {
+      "localSeconds": 3.3,
+      "darkPixels": 50153
+    },
+    {
+      "localSeconds": 4.1,
+      "darkPixels": 62955
+    },
+    {
+      "localSeconds": 4.9,
+      "darkPixels": 62955
+    }
+  ]
+}

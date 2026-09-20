@@ -1,0 +1,11 @@
+{
+  "chineseCharactersChecked": 80,
+  "missingChinese": [],
+  "endingLatinMissing": [],
+  "handwritingMissing": [],
+  "fonts": [
+    "SF-Pro-subset.woff",
+    "Heiti-subset.woff",
+    "Beuty Rush.otf"
+  ]
+}

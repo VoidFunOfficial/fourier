@@ -1,0 +1,25 @@
+{
+  "scene": "05-play",
+  "kind": "react",
+  "deterministic": true,
+  "samples": [
+    {
+      "frame": 0,
+      "sha256": "323eaafe440c3f49dcd3e0b1d2642f01cbd03f2855ccd9acf6eb1ff06c792284",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "frame": 60,
+      "sha256": "5102aa29a9d6918dbf9ff6b7d1c80d1f437c3878a8e6fb028f48177cf8207cbf",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "frame": 132,
+      "sha256": "de2ef341a4b6fb3086f65ccb55bb23c361c36bc2f831b4378d06f7459000bde9",
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}

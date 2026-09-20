@@ -1,0 +1,17 @@
+ 95 |   promise: Promise<T>,
+ 96 |   milliseconds = browserOperationTimeout(),
+ 97 | ): Promise<T> {
+ 98 |   return new Promise<T>((resolve, reject) => {
+ 99 |     const timer = setTimeout(
+100 |       () => reject(new CoreError(
+                         ^
+RenderEngineError: Chromium context initialization 超过 15000ms
+ details: {
+  operation: "Chromium context initialization",
+  timeoutMs: 15000,
+},
+    code: "DOM_RUNTIME_TIMEOUT"
+
+      at <anonymous> (/Users/voidfun/Project/Fourier-Project/fourier-core/src/visual-timeline-runtime.ts:100:20)
+
+Bun v1.3.14 (macOS arm64)

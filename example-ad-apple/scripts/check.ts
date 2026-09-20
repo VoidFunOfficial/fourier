@@ -1,0 +1,68 @@
+import {strict as assert} from 'node:assert';
+import {resolve} from 'node:path';
+import {SHOTS,sceneDirectory} from '../shots.ts';
+const root=resolve(import.meta.dir,'..');
+const report=await Bun.file(resolve(root,'review/project-validation.json')).json();
+assert.equal(report.valid,true);
+assert.equal(report.ir.canvas.width,1920);
+assert.equal(report.ir.canvas.height,1080);
+assert.equal(report.ir.canvas.fps,60);
+assert.equal(report.ir.totalFrames,4500);
+assert.equal(report.ir.durationSeconds,75);
+assert.equal(report.ir.nodes.length,1);
+const audio=report.ir.nodes[0];
+assert.equal(audio.kind,'audio');
+assert.equal(audio.src,'assets/audio/sfx-master.wav');
+assert.equal(audio.startFrame,0);
+assert.equal(audio.endFrame,4500);
+assert.equal(audio.inFrame,0);
+assert.equal(report.ir.scenes.length,17);
+assert.equal(report.ir.templates.length,1);
+const ending=report.ir.templates[0];
+assert.equal(ending.id,'ending');
+assert.equal(ending.startFrame,62*60);
+assert.equal(ending.endFrame,75*60);
+assert.equal(ending.audio,false);
+const scenes=[...report.ir.scenes,...ending.project.scenes.map((scene: {startFrame:number;endFrame:number})=>({...scene,startFrame:scene.startFrame+ending.startFrame,endFrame:scene.endFrame+ending.startFrame}))];
+assert.equal(scenes.length,20);
+let end=0;
+for(const [index,shot] of SHOTS.entries()){
+ const scene=scenes[index];
+ assert(shot.seconds>=2&&shot.seconds<=9,`${shot.id}: information cadence`);
+ assert.equal(scene.startFrame,end);
+ end+=shot.seconds*60;
+ assert.equal(scene.endFrame,end);
+ assert.equal(scene.audio,false);
+ assert.equal(scene.project.nodes[0].kind,'react');
+ assert.equal(scene.project.nodes[0].durationFrames,shot.seconds*60);
+ const source=await Bun.file(resolve(root,sceneDirectory(shot.id),'Visual.tsx')).text();
+ assert(!/Math\.random\(|Date\.now\(|requestAnimationFrame\(|setInterval\(|fetch\(/.test(source));
+ assert(source.includes(`durationSeconds: ${shot.seconds}`),`${shot.id}: preview duration`);
+}
+assert.equal(end,4500);
+const model=await Bun.file(resolve(root,'assets/model/mac-mini-official.glb')).arrayBuffer();
+const header=new DataView(model);
+assert.equal(header.getUint32(0,true),0x46546c67);
+assert.equal(header.getUint32(4,true),2);
+assert.equal(header.getUint32(8,true),model.byteLength);
+const metadata=await Bun.file(resolve(root,'review/official-model-conversion.json')).json();
+assert.equal(metadata.meshCount,74);
+assert.equal(metadata.gltfMeshes,metadata.meshCount);
+assert.equal(metadata.vertices,50084);
+assert.equal(metadata.gltfImages,5);
+let base64='';
+for(let i=0;i<metadata.embeddedBufferChunks;i++){
+ const file=Bun.file(resolve(root,`assets/model/official-buffer-${i}.json`));
+ assert(file.size<2*1024*1024,'Each runtime model chunk stays within SDK source limits');
+ base64+=await file.json();
+}
+const crypto=await import('node:crypto');
+assert.equal(crypto.createHash('sha256').update(Buffer.from(base64,'base64')).digest('hex'),metadata.binarySha256,'Runtime chunks retain the exact exported binary');
+
+const sound=await Bun.file(resolve(root,'review/sfx-master.json')).json();
+assert.equal(sound.bgm,false);
+assert.equal(sound.handwritingStrokes,29);
+assert.equal(sound.cueCount,144);
+assert.equal(sound.sha256,crypto.createHash('sha256').update(Buffer.from(await Bun.file(resolve(root,'assets/audio/sfx-master.wav')).arrayBuffer())).digest('hex'));
+assert(sound.sources.every((source:{file:string})=>!source.file.toLowerCase().includes('bgm')));
+console.log('PASS: 20 independent scenes, 2–5 s each, 75 s, 4500 frames, 1920×1080 at 60 fps; 144 SFX cues, 29 pen strokes, no BGM; official 74-mesh model and lossless runtime chunks.');

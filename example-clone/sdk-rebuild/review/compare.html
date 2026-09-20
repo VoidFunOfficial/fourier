@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Work / Play · 参考对照</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#181719;color:#e7e5e7;font:14px -apple-system,BlinkMacSystemFont,sans-serif}main{max-width:1800px;margin:auto;padding:42px 36px}header{display:flex;justify-content:space-between;align-items:end;margin-bottom:28px}h1{font-size:30px;font-weight:500;letter-spacing:-1px;margin:0}p{color:#aaa6ad;line-height:1.6}small{color:#928b96}.pair{display:grid;grid-template-columns:1fr 1fr;gap:24px}.label{display:flex;justify-content:space-between;margin-bottom:12px;font-size:12px;letter-spacing:.04em}video{width:100%;background:#242225;border-radius:10px;display:block}.control{display:flex;align-items:center;gap:18px;margin-top:28px}button,select{border:1px solid #504b55;background:#2d2a30;color:#e8e6e9;border-radius:7px;padding:10px 16px;font:inherit;cursor:pointer}button:hover{background:#3c3741}input{flex:1;accent-color:#779cec}output{font-variant-numeric:tabular-nums;min-width:118px;color:#bdb8c2}.notes{display:flex;justify-content:space-between;margin-top:24px;font-size:12px;color:#928b96}a{color:#98b1e8;text-decoration:none}@media(max-width:800px){.pair{grid-template-columns:1fr}main{padding:24px 16px}.control{gap:8px;flex-wrap:wrap}header{display:block}input{min-width:160px}.notes{display:block}}
+</style></head><body><main>
+<header><div><h1>Work / Play</h1><p>参考片与 Fourier SDK 复刻版，同步对照。</p></div><small>9 scenes · 23.05 s · Editable motion</small></header>
+<div class="pair"><section><div class="label"><span>REFERENCE</span><small>1280 × 720 · 24 fps</small></div><video id="reference" src="../../clone.mp4" preload="auto" muted playsinline></video></section><section><div class="label"><span>FOURIER SDK</span><small>1920 × 1080 · 60 fps</small></div><video id="rebuild" src="../output/Work-Play-1080p60.mp4" preload="auto" playsinline></video></section></div>
+<div class="control"><button id="play">播放 / 暂停</button><button id="restart">从头</button><input id="scrub" type="range" min="0" max="23.05" step="0.0166667" value="0" aria-label="时间"><output id="time">0.00 / 23.05 s</output><select id="rate" aria-label="播放速度"><option value="1">1 ×</option><option value="0.5">0.5 ×</option><option value="0.25">0.25 ×</option></select></div>
+<div class="notes"><span>仅播放已经编码的文件。声音来自右侧复刻版；原片静音；19.05 秒后播放新增 this video 片尾。</span><span><a href="../output/Work-Play-1080p60.mp4">打开成片</a> · <a href="media-verification.json">验证记录</a></span></div>
+</main><script>
+const source=document.querySelector('#reference'),film=document.querySelector('#rebuild'),scrub=document.querySelector('#scrub'),time=document.querySelector('#time');
+function seek(value){film.currentTime=value;source.currentTime=Math.min(value,19.04);}
+document.querySelector('#play').onclick=async()=>{if(film.paused){if(film.ended)seek(0);source.currentTime=Math.min(film.currentTime,19.04);await Promise.all([source.play(),film.play()]);}else{source.pause();film.pause();}};
+document.querySelector('#restart').onclick=()=>seek(0);
+scrub.oninput=()=>seek(Number(scrub.value));
+document.querySelector('#rate').onchange=e=>{source.playbackRate=film.playbackRate=Number(e.target.value);};
+film.ontimeupdate=()=>{scrub.value=film.currentTime;time.textContent=film.currentTime.toFixed(2)+' / 23.05 s';if(!film.paused&&Math.abs(source.currentTime-film.currentTime)>.08)source.currentTime=Math.min(film.currentTime,19.04);};
+film.onended=()=>source.pause();
+</script></body></html>

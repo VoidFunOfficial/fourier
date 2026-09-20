@@ -1,0 +1,16 @@
+105 |   async #execute(entry: QueueEntry<unknown>): Promise<void> {
+106 |     const controller = new AbortController();
+107 |     const externalAbort = () => controller.abort(abortError());
+108 |     entry.externalSignal?.addEventListener("abort", externalAbort, { once: true });
+109 |     const timeout = setTimeout(() => {
+110 |       controller.abort(new CoreError(
+                             ^
+RenderEngineError: 安全执行超过 30000ms
+ details: {
+  timeoutMs: 30000,
+},
+    code: "SECURE_EXECUTION_TIMEOUT"
+
+      at <anonymous> (/Users/voidfun/Project/Fourier-Project/fourier-core/src/bounded-worker-runner.ts:110:24)
+
+Bun v1.3.14 (macOS arm64)

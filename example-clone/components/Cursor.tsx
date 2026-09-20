@@ -1,0 +1,3 @@
+export function Cursor({colour=false,size=44}:{colour?:boolean;size?:number}) {
+  return <svg width={size} height={size*1.25} viewBox="0 0 64 80" style={{overflow:"visible",filter:colour?"drop-shadow(7px 13px 7px #4562d755)":"drop-shadow(4px 6px 4px #48588666)"}}><defs><linearGradient id="pointer-color" x1="0" y1="0" x2=".5" y2="1"><stop stopColor="#ff7b7d"/><stop offset=".28" stopColor="#6175dd"/><stop offset="1" stopColor="#576dd8"/></linearGradient></defs>{colour?<path d="M4 4Q1 2 2 8L22 68Q24 75 29 70L42 46 64 34Q69 30 62 27Z" fill="url(#pointer-color)"/>:<path d="M9 5 50 48 32 47 40 68 30 72 22 50 7 61Z" fill="#292b30" stroke="#e6e5e7" strokeWidth="2.5"/>}</svg>;
+}

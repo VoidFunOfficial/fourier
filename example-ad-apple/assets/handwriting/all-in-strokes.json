@@ -1,0 +1,212 @@
+{
+  "text": "ALL IN MAC mini",
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "durationFrames": 300,
+  "strokes": [
+    {
+      "id": "A-left",
+      "d": "M 650 508 Q 672 455 709 349",
+      "width": 18,
+      "startFrame": 8,
+      "endFrame": 17
+    },
+    {
+      "id": "A-right",
+      "d": "M 709 349 Q 728 420 748 506",
+      "width": 19,
+      "startFrame": 18,
+      "endFrame": 26
+    },
+    {
+      "id": "A-bar",
+      "d": "M 671 457 Q 706 451 741 451",
+      "width": 15,
+      "startFrame": 27,
+      "endFrame": 32
+    },
+    {
+      "id": "L1-down",
+      "d": "M 800 352 Q 793 430 786 506",
+      "width": 19,
+      "startFrame": 34,
+      "endFrame": 42
+    },
+    {
+      "id": "L1-base",
+      "d": "M 786 506 Q 829 510 867 502",
+      "width": 16,
+      "startFrame": 43,
+      "endFrame": 48
+    },
+    {
+      "id": "L2-down",
+      "d": "M 916 349 Q 909 421 902 506",
+      "width": 19,
+      "startFrame": 50,
+      "endFrame": 58
+    },
+    {
+      "id": "L2-base",
+      "d": "M 902 506 Q 944 510 982 502",
+      "width": 16,
+      "startFrame": 59,
+      "endFrame": 64
+    },
+    {
+      "id": "I-top",
+      "d": "M 1046 357 Q 1073 352 1112 352",
+      "width": 15,
+      "startFrame": 67,
+      "endFrame": 70
+    },
+    {
+      "id": "I-down",
+      "d": "M 1083 354 Q 1077 430 1072 506",
+      "width": 18,
+      "startFrame": 71,
+      "endFrame": 78
+    },
+    {
+      "id": "I-base",
+      "d": "M 1039 508 Q 1070 505 1103 505",
+      "width": 15,
+      "startFrame": 79,
+      "endFrame": 83
+    },
+    {
+      "id": "N-left",
+      "d": "M 1151 508 Q 1154 434 1165 351",
+      "width": 18,
+      "startFrame": 86,
+      "endFrame": 93
+    },
+    {
+      "id": "N-diagonal",
+      "d": "M 1165 351 Q 1195 426 1237 508",
+      "width": 18,
+      "startFrame": 94,
+      "endFrame": 102
+    },
+    {
+      "id": "N-right",
+      "d": "M 1237 508 Q 1245 425 1256 348",
+      "width": 19,
+      "startFrame": 103,
+      "endFrame": 110
+    },
+    {
+      "id": "M-left",
+      "d": "M 543 748 Q 548 685 562 589",
+      "width": 19,
+      "startFrame": 116,
+      "endFrame": 123
+    },
+    {
+      "id": "M-valley",
+      "d": "M 562 589 Q 580 646 604 690 Q 634 643 669 590",
+      "width": 17,
+      "startFrame": 124,
+      "endFrame": 134
+    },
+    {
+      "id": "M-right",
+      "d": "M 669 590 Q 664 677 657 750",
+      "width": 20,
+      "startFrame": 135,
+      "endFrame": 142
+    },
+    {
+      "id": "A2-left",
+      "d": "M 702 750 Q 727 680 754 591",
+      "width": 18,
+      "startFrame": 143,
+      "endFrame": 150
+    },
+    {
+      "id": "A2-right",
+      "d": "M 754 591 Q 778 675 794 748",
+      "width": 19,
+      "startFrame": 151,
+      "endFrame": 158
+    },
+    {
+      "id": "A2-bar",
+      "d": "M 723 697 Q 755 690 783 691",
+      "width": 15,
+      "startFrame": 159,
+      "endFrame": 163
+    },
+    {
+      "id": "C-curve",
+      "d": "M 944 609 C 909 572 866 594 853 654 C 835 720 863 773 930 739",
+      "width": 19,
+      "startFrame": 166,
+      "endFrame": 177
+    },
+    {
+      "id": "m-down",
+      "d": "M 1016 660 Q 1011 703 1009 748",
+      "width": 16,
+      "startFrame": 180,
+      "endFrame": 184
+    },
+    {
+      "id": "m-first",
+      "d": "M 1012 704 C 1037 642 1071 644 1067 697 L 1064 748",
+      "width": 17,
+      "startFrame": 185,
+      "endFrame": 193
+    },
+    {
+      "id": "m-second",
+      "d": "M 1067 697 C 1097 642 1130 650 1122 702 Q 1116 743 1136 747",
+      "width": 17,
+      "startFrame": 194,
+      "endFrame": 201
+    },
+    {
+      "id": "i1-down",
+      "d": "M 1180 663 Q 1172 706 1171 734 Q 1171 751 1186 746",
+      "width": 16,
+      "startFrame": 203,
+      "endFrame": 209
+    },
+    {
+      "id": "i1-dot",
+      "d": "M 1185 625 L 1184 628",
+      "width": 20,
+      "startFrame": 210,
+      "endFrame": 212
+    },
+    {
+      "id": "n-down",
+      "d": "M 1228 662 Q 1222 705 1220 748",
+      "width": 16,
+      "startFrame": 214,
+      "endFrame": 219
+    },
+    {
+      "id": "n-arch",
+      "d": "M 1224 703 C 1256 642 1293 643 1283 702 Q 1277 747 1298 746",
+      "width": 17,
+      "startFrame": 220,
+      "endFrame": 228
+    },
+    {
+      "id": "i2-down",
+      "d": "M 1346 660 Q 1339 710 1339 735 Q 1339 752 1357 744",
+      "width": 16,
+      "startFrame": 230,
+      "endFrame": 236
+    },
+    {
+      "id": "i2-dot",
+      "d": "M 1351 623 L 1350 626",
+      "width": 20,
+      "startFrame": 237,
+      "endFrame": 238
+    }
+  ]
+}

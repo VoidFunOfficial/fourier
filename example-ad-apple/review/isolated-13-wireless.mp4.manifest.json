@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "engine": {
+    "name": "@fourier-video/render-engine",
+    "version": "2.0.0"
+  },
+  "sdk": {
+    "name": "@fourier-video/sdk",
+    "version": "1.2.0",
+    "abiVersion": 1.2
+  },
+  "playwright": {
+    "version": "1.62.0"
+  },
+  "chromium": {
+    "version": "151.0.7922.34",
+    "revision": "1234"
+  },
+  "project": {
+    "id": "mac-mini-review",
+    "totalFrames": 300,
+    "fps": 60,
+    "executionRevision": "project-wire-v1",
+    "sourceFingerprint": "851f9e01b67d98e0824c50f8d6824791451fb613a67fa85df1d6d1ec49169919"
+  },
+  "output": {
+    "path": "/Users/voidfun/Project/Fourier-Project/ad-apple/review/isolated-13-wireless.mp4",
+    "sha256": "b21cc10a19a461bc7b77a8c5ca27e3f88f4ed050a92a09581f7b2c91f1bb4c9a"
+  },
+  "profiles": [],
+  "snapshots": []
+}

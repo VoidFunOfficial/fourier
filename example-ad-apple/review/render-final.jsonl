@@ -1,0 +1,207 @@
+{"schemaVersion":1,"type":"start","command":"render","input":{"project":"/Users/voidfun/Project/Fourier-Project/ad-apple/main.tsx","options":{"output":"/Users/voidfun/Project/Fourier-Project/ad-apple/output/Mac-mini-M6-1080p60.mp4","overwrite":true,"validateMedia":true,"keepTemporaryFiles":false,"crf":17,"preset":"medium","frameConcurrency":1,"domPages":1,"tts":{"baseUrl":"http://127.0.0.1:8765"}},"verbose":false}}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"validating","progress":0,"totalFrames":0,"message":"正在编译并校验工程，并生成字幕音频"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"validating","progress":1,"totalFrames":4800,"message":"工程校验通过"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.05555555555555555,"totalFrames":4800,"message":"已准备 Scene shot-01-outline"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.1111111111111111,"totalFrames":4800,"message":"已准备 Scene shot-02-object"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.16666666666666666,"totalFrames":4800,"message":"已准备 Scene shot-03-footprint"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.2222222222222222,"totalFrames":4800,"message":"已准备 Scene shot-04-silicon"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.2777777777777778,"totalFrames":4800,"message":"已准备 Scene shot-05-cpu"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.3333333333333333,"totalFrames":4800,"message":"已准备 Scene shot-06-gpu"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.3888888888888889,"totalFrames":4800,"message":"已准备 Scene shot-07-neural"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.4444444444444444,"totalFrames":4800,"message":"已准备 Scene shot-08-memory"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.5,"totalFrames":4800,"message":"已准备 Scene shot-09-bandwidth"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.5555555555555556,"totalFrames":4800,"message":"已准备 Scene shot-10-media"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.6111111111111112,"totalFrames":4800,"message":"已准备 Scene shot-11-front"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.6666666666666666,"totalFrames":4800,"message":"已准备 Scene shot-12-back"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.7222222222222222,"totalFrames":4800,"message":"已准备 Scene shot-13-wireless"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.7777777777777778,"totalFrames":4800,"message":"已准备 Scene shot-14-thermal"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.8333333333333334,"totalFrames":4800,"message":"已准备 Scene shot-15-displays"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.8888888888888888,"totalFrames":4800,"message":"已准备 Scene shot-16-continuity"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.9444444444444444,"totalFrames":4800,"message":"已准备 Scene shot-17-create"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":1,"totalFrames":4800,"message":"已准备 Scene shot-18-signature"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0,"frame":0,"totalFrames":4800,"message":"FFmpeg 已编码 0/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.005416666666666667,"frame":26,"totalFrames":4800,"message":"FFmpeg 已编码 26/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.010833333333333334,"frame":52,"totalFrames":4800,"message":"FFmpeg 已编码 52/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.01625,"frame":78,"totalFrames":4800,"message":"FFmpeg 已编码 78/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.021875,"frame":105,"totalFrames":4800,"message":"FFmpeg 已编码 105/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.027291666666666665,"frame":131,"totalFrames":4800,"message":"FFmpeg 已编码 131/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.03270833333333333,"frame":157,"totalFrames":4800,"message":"FFmpeg 已编码 157/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.03833333333333333,"frame":184,"totalFrames":4800,"message":"FFmpeg 已编码 184/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.04375,"frame":210,"totalFrames":4800,"message":"FFmpeg 已编码 210/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.049166666666666664,"frame":236,"totalFrames":4800,"message":"FFmpeg 已编码 236/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.05458333333333333,"frame":262,"totalFrames":4800,"message":"FFmpeg 已编码 262/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.06,"frame":288,"totalFrames":4800,"message":"FFmpeg 已编码 288/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.065625,"frame":315,"totalFrames":4800,"message":"FFmpeg 已编码 315/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.07104166666666667,"frame":341,"totalFrames":4800,"message":"FFmpeg 已编码 341/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.07645833333333334,"frame":367,"totalFrames":4800,"message":"FFmpeg 已编码 367/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.081875,"frame":393,"totalFrames":4800,"message":"FFmpeg 已编码 393/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.08729166666666667,"frame":419,"totalFrames":4800,"message":"FFmpeg 已编码 419/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.09291666666666666,"frame":446,"totalFrames":4800,"message":"FFmpeg 已编码 446/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.09833333333333333,"frame":472,"totalFrames":4800,"message":"FFmpeg 已编码 472/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.10395833333333333,"frame":499,"totalFrames":4800,"message":"FFmpeg 已编码 499/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.10916666666666666,"frame":524,"totalFrames":4800,"message":"FFmpeg 已编码 524/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.11479166666666667,"frame":551,"totalFrames":4800,"message":"FFmpeg 已编码 551/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.12020833333333333,"frame":577,"totalFrames":4800,"message":"FFmpeg 已编码 577/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.125625,"frame":603,"totalFrames":4800,"message":"FFmpeg 已编码 603/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.13104166666666667,"frame":629,"totalFrames":4800,"message":"FFmpeg 已编码 629/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.13645833333333332,"frame":655,"totalFrames":4800,"message":"FFmpeg 已编码 655/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.14208333333333334,"frame":682,"totalFrames":4800,"message":"FFmpeg 已编码 682/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.1475,"frame":708,"totalFrames":4800,"message":"FFmpeg 已编码 708/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.15291666666666667,"frame":734,"totalFrames":4800,"message":"FFmpeg 已编码 734/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.15833333333333333,"frame":760,"totalFrames":4800,"message":"FFmpeg 已编码 760/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.16354166666666667,"frame":785,"totalFrames":4800,"message":"FFmpeg 已编码 785/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.16895833333333332,"frame":811,"totalFrames":4800,"message":"FFmpeg 已编码 811/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.174375,"frame":837,"totalFrames":4800,"message":"FFmpeg 已编码 837/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.17979166666666666,"frame":863,"totalFrames":4800,"message":"FFmpeg 已编码 863/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.185,"frame":888,"totalFrames":4800,"message":"FFmpeg 已编码 888/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.19041666666666668,"frame":914,"totalFrames":4800,"message":"FFmpeg 已编码 914/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.19583333333333333,"frame":940,"totalFrames":4800,"message":"FFmpeg 已编码 940/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.20145833333333332,"frame":967,"totalFrames":4800,"message":"FFmpeg 已编码 967/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.20666666666666667,"frame":992,"totalFrames":4800,"message":"FFmpeg 已编码 992/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.21208333333333335,"frame":1018,"totalFrames":4800,"message":"FFmpeg 已编码 1018/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.2175,"frame":1044,"totalFrames":4800,"message":"FFmpeg 已编码 1044/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.223125,"frame":1071,"totalFrames":4800,"message":"FFmpeg 已编码 1071/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.22854166666666667,"frame":1097,"totalFrames":4800,"message":"FFmpeg 已编码 1097/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.23395833333333332,"frame":1123,"totalFrames":4800,"message":"FFmpeg 已编码 1123/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.239375,"frame":1149,"totalFrames":4800,"message":"FFmpeg 已编码 1149/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.24479166666666666,"frame":1175,"totalFrames":4800,"message":"FFmpeg 已编码 1175/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.2502083333333333,"frame":1201,"totalFrames":4800,"message":"FFmpeg 已编码 1201/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.2554166666666667,"frame":1226,"totalFrames":4800,"message":"FFmpeg 已编码 1226/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.260625,"frame":1251,"totalFrames":4800,"message":"FFmpeg 已编码 1251/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.265625,"frame":1275,"totalFrames":4800,"message":"FFmpeg 已编码 1275/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.2708333333333333,"frame":1300,"totalFrames":4800,"message":"FFmpeg 已编码 1300/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.2758333333333333,"frame":1324,"totalFrames":4800,"message":"FFmpeg 已编码 1324/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.2810416666666667,"frame":1349,"totalFrames":4800,"message":"FFmpeg 已编码 1349/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.2864583333333333,"frame":1375,"totalFrames":4800,"message":"FFmpeg 已编码 1375/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.291875,"frame":1401,"totalFrames":4800,"message":"FFmpeg 已编码 1401/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.2975,"frame":1428,"totalFrames":4800,"message":"FFmpeg 已编码 1428/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.30270833333333336,"frame":1453,"totalFrames":4800,"message":"FFmpeg 已编码 1453/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.308125,"frame":1479,"totalFrames":4800,"message":"FFmpeg 已编码 1479/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.31354166666666666,"frame":1505,"totalFrames":4800,"message":"FFmpeg 已编码 1505/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.31854166666666667,"frame":1529,"totalFrames":4800,"message":"FFmpeg 已编码 1529/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.32395833333333335,"frame":1555,"totalFrames":4800,"message":"FFmpeg 已编码 1555/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.32916666666666666,"frame":1580,"totalFrames":4800,"message":"FFmpeg 已编码 1580/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.33458333333333334,"frame":1606,"totalFrames":4800,"message":"FFmpeg 已编码 1606/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.33979166666666666,"frame":1631,"totalFrames":4800,"message":"FFmpeg 已编码 1631/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.34520833333333334,"frame":1657,"totalFrames":4800,"message":"FFmpeg 已编码 1657/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.350625,"frame":1683,"totalFrames":4800,"message":"FFmpeg 已编码 1683/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.35604166666666665,"frame":1709,"totalFrames":4800,"message":"FFmpeg 已编码 1709/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.3614583333333333,"frame":1735,"totalFrames":4800,"message":"FFmpeg 已编码 1735/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.3670833333333333,"frame":1762,"totalFrames":4800,"message":"FFmpeg 已编码 1762/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.3725,"frame":1788,"totalFrames":4800,"message":"FFmpeg 已编码 1788/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.3777083333333333,"frame":1813,"totalFrames":4800,"message":"FFmpeg 已编码 1813/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.383125,"frame":1839,"totalFrames":4800,"message":"FFmpeg 已编码 1839/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.3885416666666667,"frame":1865,"totalFrames":4800,"message":"FFmpeg 已编码 1865/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.39395833333333335,"frame":1891,"totalFrames":4800,"message":"FFmpeg 已编码 1891/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.39958333333333335,"frame":1918,"totalFrames":4800,"message":"FFmpeg 已编码 1918/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.405,"frame":1944,"totalFrames":4800,"message":"FFmpeg 已编码 1944/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.41041666666666665,"frame":1970,"totalFrames":4800,"message":"FFmpeg 已编码 1970/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.41583333333333333,"frame":1996,"totalFrames":4800,"message":"FFmpeg 已编码 1996/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.42125,"frame":2022,"totalFrames":4800,"message":"FFmpeg 已编码 2022/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.426875,"frame":2049,"totalFrames":4800,"message":"FFmpeg 已编码 2049/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.4322916666666667,"frame":2075,"totalFrames":4800,"message":"FFmpeg 已编码 2075/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.4377083333333333,"frame":2101,"totalFrames":4800,"message":"FFmpeg 已编码 2101/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.443125,"frame":2127,"totalFrames":4800,"message":"FFmpeg 已编码 2127/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.44854166666666667,"frame":2153,"totalFrames":4800,"message":"FFmpeg 已编码 2153/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.45416666666666666,"frame":2180,"totalFrames":4800,"message":"FFmpeg 已编码 2180/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.45958333333333334,"frame":2206,"totalFrames":4800,"message":"FFmpeg 已编码 2206/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.46479166666666666,"frame":2231,"totalFrames":4800,"message":"FFmpeg 已编码 2231/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.47041666666666665,"frame":2258,"totalFrames":4800,"message":"FFmpeg 已编码 2258/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.47583333333333333,"frame":2284,"totalFrames":4800,"message":"FFmpeg 已编码 2284/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.48104166666666665,"frame":2309,"totalFrames":4800,"message":"FFmpeg 已编码 2309/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.4866666666666667,"frame":2336,"totalFrames":4800,"message":"FFmpeg 已编码 2336/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.4920833333333333,"frame":2362,"totalFrames":4800,"message":"FFmpeg 已编码 2362/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.4975,"frame":2388,"totalFrames":4800,"message":"FFmpeg 已编码 2388/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.503125,"frame":2415,"totalFrames":4800,"message":"FFmpeg 已编码 2415/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5083333333333333,"frame":2440,"totalFrames":4800,"message":"FFmpeg 已编码 2440/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5139583333333333,"frame":2467,"totalFrames":4800,"message":"FFmpeg 已编码 2467/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.519375,"frame":2493,"totalFrames":4800,"message":"FFmpeg 已编码 2493/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5247916666666667,"frame":2519,"totalFrames":4800,"message":"FFmpeg 已编码 2519/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5302083333333333,"frame":2545,"totalFrames":4800,"message":"FFmpeg 已编码 2545/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5354166666666667,"frame":2570,"totalFrames":4800,"message":"FFmpeg 已编码 2570/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5408333333333334,"frame":2596,"totalFrames":4800,"message":"FFmpeg 已编码 2596/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.54625,"frame":2622,"totalFrames":4800,"message":"FFmpeg 已编码 2622/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5514583333333334,"frame":2647,"totalFrames":4800,"message":"FFmpeg 已编码 2647/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.556875,"frame":2673,"totalFrames":4800,"message":"FFmpeg 已编码 2673/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5625,"frame":2700,"totalFrames":4800,"message":"FFmpeg 已编码 2700/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5677083333333334,"frame":2725,"totalFrames":4800,"message":"FFmpeg 已编码 2725/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5735416666666666,"frame":2753,"totalFrames":4800,"message":"FFmpeg 已编码 2753/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5789583333333334,"frame":2779,"totalFrames":4800,"message":"FFmpeg 已编码 2779/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5841666666666666,"frame":2804,"totalFrames":4800,"message":"FFmpeg 已编码 2804/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5897916666666667,"frame":2831,"totalFrames":4800,"message":"FFmpeg 已编码 2831/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5952083333333333,"frame":2857,"totalFrames":4800,"message":"FFmpeg 已编码 2857/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6002083333333333,"frame":2881,"totalFrames":4800,"message":"FFmpeg 已编码 2881/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6058333333333333,"frame":2908,"totalFrames":4800,"message":"FFmpeg 已编码 2908/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6110416666666667,"frame":2933,"totalFrames":4800,"message":"FFmpeg 已编码 2933/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6164583333333333,"frame":2959,"totalFrames":4800,"message":"FFmpeg 已编码 2959/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6220833333333333,"frame":2986,"totalFrames":4800,"message":"FFmpeg 已编码 2986/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6277083333333333,"frame":3013,"totalFrames":4800,"message":"FFmpeg 已编码 3013/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.633125,"frame":3039,"totalFrames":4800,"message":"FFmpeg 已编码 3039/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6383333333333333,"frame":3064,"totalFrames":4800,"message":"FFmpeg 已编码 3064/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6439583333333333,"frame":3091,"totalFrames":4800,"message":"FFmpeg 已编码 3091/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.649375,"frame":3117,"totalFrames":4800,"message":"FFmpeg 已编码 3117/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6547916666666667,"frame":3143,"totalFrames":4800,"message":"FFmpeg 已编码 3143/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.66,"frame":3168,"totalFrames":4800,"message":"FFmpeg 已编码 3168/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.665625,"frame":3195,"totalFrames":4800,"message":"FFmpeg 已编码 3195/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6710416666666666,"frame":3221,"totalFrames":4800,"message":"FFmpeg 已编码 3221/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.67625,"frame":3246,"totalFrames":4800,"message":"FFmpeg 已编码 3246/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.681875,"frame":3273,"totalFrames":4800,"message":"FFmpeg 已编码 3273/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6875,"frame":3300,"totalFrames":4800,"message":"FFmpeg 已编码 3300/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6929166666666666,"frame":3326,"totalFrames":4800,"message":"FFmpeg 已编码 3326/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6983333333333334,"frame":3352,"totalFrames":4800,"message":"FFmpeg 已编码 3352/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.70375,"frame":3378,"totalFrames":4800,"message":"FFmpeg 已编码 3378/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7089583333333334,"frame":3403,"totalFrames":4800,"message":"FFmpeg 已编码 3403/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.714375,"frame":3429,"totalFrames":4800,"message":"FFmpeg 已编码 3429/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.72,"frame":3456,"totalFrames":4800,"message":"FFmpeg 已编码 3456/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7254166666666667,"frame":3482,"totalFrames":4800,"message":"FFmpeg 已编码 3482/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7310416666666667,"frame":3509,"totalFrames":4800,"message":"FFmpeg 已编码 3509/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7364583333333333,"frame":3535,"totalFrames":4800,"message":"FFmpeg 已编码 3535/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.741875,"frame":3561,"totalFrames":4800,"message":"FFmpeg 已编码 3561/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7475,"frame":3588,"totalFrames":4800,"message":"FFmpeg 已编码 3588/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7527083333333333,"frame":3613,"totalFrames":4800,"message":"FFmpeg 已编码 3613/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.758125,"frame":3639,"totalFrames":4800,"message":"FFmpeg 已编码 3639/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.76375,"frame":3666,"totalFrames":4800,"message":"FFmpeg 已编码 3666/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7691666666666667,"frame":3692,"totalFrames":4800,"message":"FFmpeg 已编码 3692/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7745833333333333,"frame":3718,"totalFrames":4800,"message":"FFmpeg 已编码 3718/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7802083333333333,"frame":3745,"totalFrames":4800,"message":"FFmpeg 已编码 3745/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.785625,"frame":3771,"totalFrames":4800,"message":"FFmpeg 已编码 3771/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7908333333333334,"frame":3796,"totalFrames":4800,"message":"FFmpeg 已编码 3796/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7960416666666666,"frame":3821,"totalFrames":4800,"message":"FFmpeg 已编码 3821/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8014583333333334,"frame":3847,"totalFrames":4800,"message":"FFmpeg 已编码 3847/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8066666666666666,"frame":3872,"totalFrames":4800,"message":"FFmpeg 已编码 3872/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8120833333333334,"frame":3898,"totalFrames":4800,"message":"FFmpeg 已编码 3898/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8172916666666666,"frame":3923,"totalFrames":4800,"message":"FFmpeg 已编码 3923/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8225,"frame":3948,"totalFrames":4800,"message":"FFmpeg 已编码 3948/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8275,"frame":3972,"totalFrames":4800,"message":"FFmpeg 已编码 3972/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.833125,"frame":3999,"totalFrames":4800,"message":"FFmpeg 已编码 3999/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8383333333333334,"frame":4024,"totalFrames":4800,"message":"FFmpeg 已编码 4024/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.84375,"frame":4050,"totalFrames":4800,"message":"FFmpeg 已编码 4050/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8491666666666666,"frame":4076,"totalFrames":4800,"message":"FFmpeg 已编码 4076/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.854375,"frame":4101,"totalFrames":4800,"message":"FFmpeg 已编码 4101/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8597916666666666,"frame":4127,"totalFrames":4800,"message":"FFmpeg 已编码 4127/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8652083333333334,"frame":4153,"totalFrames":4800,"message":"FFmpeg 已编码 4153/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8702083333333334,"frame":4177,"totalFrames":4800,"message":"FFmpeg 已编码 4177/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.875625,"frame":4203,"totalFrames":4800,"message":"FFmpeg 已编码 4203/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.880625,"frame":4227,"totalFrames":4800,"message":"FFmpeg 已编码 4227/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8860416666666666,"frame":4253,"totalFrames":4800,"message":"FFmpeg 已编码 4253/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.89125,"frame":4278,"totalFrames":4800,"message":"FFmpeg 已编码 4278/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.89625,"frame":4302,"totalFrames":4800,"message":"FFmpeg 已编码 4302/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.90125,"frame":4326,"totalFrames":4800,"message":"FFmpeg 已编码 4326/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9064583333333334,"frame":4351,"totalFrames":4800,"message":"FFmpeg 已编码 4351/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9116666666666666,"frame":4376,"totalFrames":4800,"message":"FFmpeg 已编码 4376/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.916875,"frame":4401,"totalFrames":4800,"message":"FFmpeg 已编码 4401/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9222916666666666,"frame":4427,"totalFrames":4800,"message":"FFmpeg 已编码 4427/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9275,"frame":4452,"totalFrames":4800,"message":"FFmpeg 已编码 4452/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9329166666666666,"frame":4478,"totalFrames":4800,"message":"FFmpeg 已编码 4478/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9383333333333334,"frame":4504,"totalFrames":4800,"message":"FFmpeg 已编码 4504/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.94375,"frame":4530,"totalFrames":4800,"message":"FFmpeg 已编码 4530/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9489583333333333,"frame":4555,"totalFrames":4800,"message":"FFmpeg 已编码 4555/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.954375,"frame":4581,"totalFrames":4800,"message":"FFmpeg 已编码 4581/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9595833333333333,"frame":4606,"totalFrames":4800,"message":"FFmpeg 已编码 4606/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.965,"frame":4632,"totalFrames":4800,"message":"FFmpeg 已编码 4632/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9704166666666667,"frame":4658,"totalFrames":4800,"message":"FFmpeg 已编码 4658/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9758333333333333,"frame":4684,"totalFrames":4800,"message":"FFmpeg 已编码 4684/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9810416666666667,"frame":4709,"totalFrames":4800,"message":"FFmpeg 已编码 4709/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":1,"frame":4800,"totalFrames":4800,"message":"FFmpeg 已编码 4800/4800 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"completed","progress":1,"frame":4800,"totalFrames":4800,"message":"渲染完成"}
+{"schemaVersion":1,"type":"result","command":"render","data":{"output":"/Users/voidfun/Project/Fourier-Project/ad-apple/output/Mac-mini-M6-1080p60.mp4","manifestPath":"/Users/voidfun/Project/Fourier-Project/ad-apple/output/Mac-mini-M6-1080p60.mp4.manifest.json","projectId":"mac-mini-m6-film","totalFrames":4800,"durationSeconds":80,"elapsedMs":129377}}

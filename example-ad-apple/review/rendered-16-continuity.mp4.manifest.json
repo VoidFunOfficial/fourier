@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "engine": {
+    "name": "@fourier-video/render-engine",
+    "version": "2.0.0"
+  },
+  "sdk": {
+    "name": "@fourier-video/sdk",
+    "version": "1.2.0",
+    "abiVersion": 1.2
+  },
+  "playwright": {
+    "version": "1.62.0"
+  },
+  "chromium": {
+    "version": "151.0.7922.34",
+    "revision": "1234"
+  },
+  "project": {
+    "id": "mac-mini-m6-film",
+    "totalFrames": 240,
+    "fps": 60,
+    "executionRevision": "project-wire-v1",
+    "sourceFingerprint": "5cb02e919f80ddeca2dc6c8e0cbfa34be6f58e9a2a192312431517f87b6ae02c"
+  },
+  "output": {
+    "path": "/Users/voidfun/Project/Fourier-Project/ad-apple/review/rendered-16-continuity.mp4",
+    "sha256": "bca75246110c2f5608715f90b93970a758845266c81475fde67810dba9a376de"
+  },
+  "profiles": [],
+  "snapshots": []
+}

@@ -1,0 +1,25 @@
+{
+  "scene": "02-edit",
+  "kind": "react",
+  "deterministic": true,
+  "samples": [
+    {
+      "frame": 0,
+      "sha256": "cc2bb98ca9e1a1daabbad9af68b061ddad9a55a656bd4b04bd6f59a13eb29525",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "frame": 141,
+      "sha256": "6e98b36a9a19e77dc7ec3c7eeb3da0c06e8e3a201ee3cbf08ff90edf43db69fe",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "frame": 304,
+      "sha256": "c100f117de7cbac77ca68499222d3d163aeb5defa9e28ff43fce7b7506fd62f9",
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}

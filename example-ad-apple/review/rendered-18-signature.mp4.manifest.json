@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "engine": {
+    "name": "@fourier-video/render-engine",
+    "version": "2.0.0"
+  },
+  "sdk": {
+    "name": "@fourier-video/sdk",
+    "version": "1.2.0",
+    "abiVersion": 1.2
+  },
+  "playwright": {
+    "version": "1.62.0"
+  },
+  "chromium": {
+    "version": "151.0.7922.34",
+    "revision": "1234"
+  },
+  "project": {
+    "id": "mac-mini-m6-film",
+    "totalFrames": 240,
+    "fps": 60,
+    "executionRevision": "project-wire-v1",
+    "sourceFingerprint": "af7c1e6b527d94412116fb0889bfb0c975da7c6da3b88df30dad28e7f81e02d5"
+  },
+  "output": {
+    "path": "/Users/voidfun/Project/Fourier-Project/ad-apple/review/rendered-18-signature.mp4",
+    "sha256": "18abe9740ad02b81fb9427d4f7f24357ad144db4d7b812d6ea9b6871fa0113d9"
+  },
+  "profiles": [],
+  "snapshots": []
+}

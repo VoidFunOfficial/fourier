@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "engine": {
+    "name": "@fourier-video/render-engine",
+    "version": "2.0.0"
+  },
+  "sdk": {
+    "name": "@fourier-video/sdk",
+    "version": "1.2.0",
+    "abiVersion": 1.2
+  },
+  "playwright": {
+    "version": "1.62.0"
+  },
+  "chromium": {
+    "version": "151.0.7922.34",
+    "revision": "1234"
+  },
+  "project": {
+    "id": "mac-mini-m6-film",
+    "totalFrames": 180,
+    "fps": 60,
+    "executionRevision": "project-wire-v1",
+    "sourceFingerprint": "00c734c6214470b64416a6fc560018c859f73b0dd161cd9ea6127424b07897a5"
+  },
+  "output": {
+    "path": "/Users/voidfun/Project/Fourier-Project/ad-apple/review/rendered-03-footprint.mp4",
+    "sha256": "942628c4f9518084e81963997265cc60560cf8f7f208ae7317d0eff2dca68996"
+  },
+  "profiles": [],
+  "snapshots": []
+}

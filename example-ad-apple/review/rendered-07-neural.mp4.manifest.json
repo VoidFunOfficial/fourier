@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "engine": {
+    "name": "@fourier-video/render-engine",
+    "version": "2.0.0"
+  },
+  "sdk": {
+    "name": "@fourier-video/sdk",
+    "version": "1.2.0",
+    "abiVersion": 1.2
+  },
+  "playwright": {
+    "version": "1.62.0"
+  },
+  "chromium": {
+    "version": "151.0.7922.34",
+    "revision": "1234"
+  },
+  "project": {
+    "id": "mac-mini-m6-film",
+    "totalFrames": 240,
+    "fps": 60,
+    "executionRevision": "project-wire-v1",
+    "sourceFingerprint": "dccd7df1f7f5c7ac4025ddf181e27c9505e842bd8598da3201cb79e079d3ef99"
+  },
+  "output": {
+    "path": "/Users/voidfun/Project/Fourier-Project/ad-apple/review/rendered-07-neural.mp4",
+    "sha256": "8c542982ee7e3d973d0eeece9b6c5e2bfc1fce6b051fa3f104b11253246c112e"
+  },
+  "profiles": [],
+  "snapshots": []
+}

@@ -1,0 +1,233 @@
+Info: No new files have been packed
+INFO Draco mesh compression is available, use library at /Applications/Blender.app/Contents/Resources/5.1/scripts/addons_core/io_scene_gltf2/libextern_draco.dylib
+21:16:13 | INFO: Starting glTF 2.0 export
+21:16:13 | INFO: Extracting primitive: dHmJzrzbLYkStJe
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: jpgLunnZbxUzlXU
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: VpayQYYKsPmlXRl
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: VvMLzqHMXOOsWzs
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: CsFmvMEZAtRNEWA
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: IByvJGHqsMkhctq
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: jFVGNqhgdtMrKjp
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: IdVqbhwEfVkHkMD
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: XXlUxhRlCYgZBMZ
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: rMHtcvhlJhIrFkE
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: RYwlKYlgDJmODjl
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: UMHlESUvGZmxiXU
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: bStUTwzWJJOznpX
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: fpPmCYrujYsiPkx
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: NSIYUnWzVKBbqgR
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: NWRIQXpZVDMEuaT
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: pLIBxYhikmjgkTo
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: sANJHJYGxMgtEXp
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: TJFYvIgzkMAsKoH
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: tNQRqVwtEyjEGPv
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: UmHmqtjHduyryem
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: bqjkVeiQBMAuIvX
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: cdWJBmiaFpwOKxt
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: enePuQpwVlMVziI
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: jueGvkZsneDEOgo
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: syTpeVzFpuAOEUL
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: VGEmXniqmnCqYao
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: awEGmRdxpGlDlmQ
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: gTDVRtehCZLzuNv
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: hvQEmGoCDaxSjRg
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: iSNoNZcAZntLMez
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: KUXgGEwFDDUaNOm
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: vrabLVLhKVqgHLw
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: DbKeFrLgkWGpiOR
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: TsDYqRCgWkUrQIg
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: WmLmFYZItSXLOoC
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: ZqQFTGxvJywnaMC
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: PQcAxUOhWImUmnC
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: eIvRaEbOEPbffVW
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: lKAqMFVsfFTePPn
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: rkGPMlqzoTunXyc
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: rUpFxcowhmDQZoj
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: uMpAxznhVAHmIlJ
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: gEcYPEKrVEZGzzK
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: LWKweVjYnNsnYOq
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: otlgELWfiivGGuc
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: shTkrYVYKuvIfTh
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: tIaytSNBgLuRZlm
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: vuAjnbGmcVVEoXS
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: DJIbhHcNqpkHzwn
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: LhkvJyVVGIarYgt
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: NagMnzbZnwVCsUQ
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: PEqAcBBpcAkegSd
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: XgzKbUjAxLJNWsI
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: YEgKKFfdjarHzFW
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: dBOMwMKJLABlLME
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: kpaLqQvWiXjhyxi
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: POFRHzUaMKVYOtM
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: SFWZbMVCoPvdlvW
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: WmNOYLyNsKbnHQa
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: ztoVzYdnuncbUNA
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: dbhxqdfQqxUFHIV
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: dFRQiWtptPVvcue
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: KKzPUxZQmDEuYtz
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: PpyNvesGmNECjGZ
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: SbSKhgKKpghulOZ
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: ULQmSAwZLQGWRcS
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: UtoMbXZxLcSIftX
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: XCyuchjHpBelvsZ
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: ZQSKpZIrRXqvncV
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: rgwHuwZDpgIZVpi
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: TqsBWgpcrUAqODe
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: YpVQkHyVsMqJXNT
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Extracting primitive: pGQCHXyndsfVISX
+21:16:13 | WARNING: The active Vertex Color will not be exported, as it is not used in the node tree of the material
+21:16:13 | INFO: Primitives created: 1
+21:16:13 | INFO: Finished glTF 2.0 export in 0.1868119239807129 s
+
+Info: Saved as "mac-mini-official.blend"
+OFFICIAL_MODEL_READY {"source": "assets/official/mac-mini-silver.usdz", "sourceSha256": "3d36f189975cb24e2614e1aadabc1ae6112c8a298722c2eabc67f56a4d986ace", "geometryOperation": "None; original mesh topology, normals and UVs retained. glTF export triangulates faces.", "meshCount": 74, "vertices": 50084, "polygons": 40629, "boundsMeters": {"min": [-0.06352803111076355, -0.06357146054506302, -0.00019958331540692598], "max": [0.06352807581424713, 0.06359171867370605, 0.04951361194252968], "size": [0.12705610692501068, 0.12716317176818848, 0.049713194370269775]}, "textures": [{"name": "ATPYSTQZbfGEtyr.jpg", "size": [512, 512]}, {"name": "ltHQMONVWMBieXx.png", "size": [256, 256]}, {"name": "qmJNyraMVVwFRbW.png", "size": [256, 256]}, {"name": "rmwCficadfoNiXl.png", "size": [512, 512]}, {"name": "YppflPJppkbyyLM.jpg", "size": [512, 512]}], "glbBytes": 5084160, "glbSha256": "d3740ab680eb90a600b5b4dc3f27577f30eb580e2512bec3ef94b2d831adacf4", "gltfMeshes": 74, "gltfMaterials": 18, "gltfImages": 5, "embeddedBufferChunks": 7, "chunkLimit": 1048576, "binarySha256": "014377916225a2c3361473f7b7fcd8779fd42fa48844b5aac152511a6d709965"}
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:30:33)
+USD import of '/Users/voidfun/Project/Fourier-Project/ad-apple/assets/official/mac-mini-silver.usdz' took 45.83 ms
+
+Blender quit

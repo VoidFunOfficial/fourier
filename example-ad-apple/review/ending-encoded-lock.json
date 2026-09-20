@@ -1,0 +1,53 @@
+{
+  "fixed": true,
+  "samples": [
+    {
+      "phase": 0,
+      "bestPixelOffset": [
+        0,
+        0
+      ],
+      "meanPixelError": 0.0
+    },
+    {
+      "phase": 1,
+      "bestPixelOffset": [
+        0,
+        0
+      ],
+      "meanPixelError": 0.24034166666666668
+    },
+    {
+      "phase": 2,
+      "bestPixelOffset": [
+        0,
+        0
+      ],
+      "meanPixelError": 0.24034166666666668
+    },
+    {
+      "phase": 3,
+      "bestPixelOffset": [
+        0,
+        0
+      ],
+      "meanPixelError": 0.2437
+    },
+    {
+      "phase": 4,
+      "bestPixelOffset": [
+        0,
+        0
+      ],
+      "meanPixelError": 0.2437
+    },
+    {
+      "phase": 5,
+      "bestPixelOffset": [
+        0,
+        0
+      ],
+      "meanPixelError": 0.24658333333333332
+    }
+  ]
+}

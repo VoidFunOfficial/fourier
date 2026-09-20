@@ -1,0 +1,38 @@
+{"schemaVersion":1,"type":"start","command":"render","input":{"project":"/Users/voidfun/Project/Fourier-Project/ad-clone/sdk-rebuild/main.tsx","options":{"output":"/Users/voidfun/Project/Fourier-Project/ad-clone/sdk-rebuild/output/Work-Play-1080p60.mp4","overwrite":true,"validateMedia":true,"keepTemporaryFiles":false,"crf":17,"preset":"medium","frameConcurrency":1,"domPages":1,"tts":{"baseUrl":"http://127.0.0.1:8765"}},"verbose":false}}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"validating","progress":0,"totalFrames":0,"message":"正在编译并校验工程，并生成字幕音频"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"validating","progress":1,"totalFrames":1143,"message":"工程校验通过"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.125,"totalFrames":1143,"message":"已准备 Scene shot-01-orbit"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.25,"totalFrames":1143,"message":"已准备 Scene shot-02-edit"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.375,"totalFrames":1143,"message":"已准备 Scene shot-03-export"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.5,"totalFrames":1143,"message":"已准备 Scene shot-04-switch"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.625,"totalFrames":1143,"message":"已准备 Scene shot-05-play"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.75,"totalFrames":1143,"message":"已准备 Scene shot-06-playstation"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":0.875,"totalFrames":1143,"message":"已准备 Scene shot-07-work-play"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":1,"totalFrames":1143,"message":"已准备 Scene shot-08-credit"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0,"frame":0,"totalFrames":1143,"message":"FFmpeg 已编码 0/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.01399825021872266,"frame":16,"totalFrames":1143,"message":"FFmpeg 已编码 16/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.05249343832020997,"frame":60,"totalFrames":1143,"message":"FFmpeg 已编码 60/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.09623797025371829,"frame":110,"totalFrames":1143,"message":"FFmpeg 已编码 110/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.13910761154855644,"frame":159,"totalFrames":1143,"message":"FFmpeg 已编码 159/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.1837270341207349,"frame":210,"totalFrames":1143,"message":"FFmpeg 已编码 210/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.22659667541557305,"frame":259,"totalFrames":1143,"message":"FFmpeg 已编码 259/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.268591426071741,"frame":307,"totalFrames":1143,"message":"FFmpeg 已编码 307/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.310586176727909,"frame":355,"totalFrames":1143,"message":"FFmpeg 已编码 355/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.352580927384077,"frame":403,"totalFrames":1143,"message":"FFmpeg 已编码 403/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.3963254593175853,"frame":453,"totalFrames":1143,"message":"FFmpeg 已编码 453/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.44006999125109364,"frame":503,"totalFrames":1143,"message":"FFmpeg 已编码 503/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.48556430446194226,"frame":555,"totalFrames":1143,"message":"FFmpeg 已编码 555/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5301837270341208,"frame":606,"totalFrames":1143,"message":"FFmpeg 已编码 606/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.5748031496062992,"frame":657,"totalFrames":1143,"message":"FFmpeg 已编码 657/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6167979002624672,"frame":705,"totalFrames":1143,"message":"FFmpeg 已编码 705/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6491688538932633,"frame":742,"totalFrames":1143,"message":"FFmpeg 已编码 742/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.6832895888013998,"frame":781,"totalFrames":1143,"message":"FFmpeg 已编码 781/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7226596675415573,"frame":826,"totalFrames":1143,"message":"FFmpeg 已编码 826/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.7611548556430446,"frame":870,"totalFrames":1143,"message":"FFmpeg 已编码 870/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8022747156605424,"frame":917,"totalFrames":1143,"message":"FFmpeg 已编码 917/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8407699037620298,"frame":961,"totalFrames":1143,"message":"FFmpeg 已编码 961/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8827646544181977,"frame":1009,"totalFrames":1143,"message":"FFmpeg 已编码 1009/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.9230096237970253,"frame":1055,"totalFrames":1143,"message":"FFmpeg 已编码 1055/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":1,"frame":1143,"totalFrames":1143,"message":"FFmpeg 已编码 1143/1143 帧"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"completed","progress":1,"frame":1143,"totalFrames":1143,"message":"渲染完成"}
+{"schemaVersion":1,"type":"result","command":"render","data":{"output":"/Users/voidfun/Project/Fourier-Project/ad-clone/sdk-rebuild/output/Work-Play-1080p60.mp4","manifestPath":"/Users/voidfun/Project/Fourier-Project/ad-clone/sdk-rebuild/output/Work-Play-1080p60.mp4.manifest.json","projectId":"work-play-reference-rebuild","totalFrames":1143,"durationSeconds":19.05,"elapsedMs":215257}}

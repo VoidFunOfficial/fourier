@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "engine": {
+    "name": "@fourier-video/render-engine",
+    "version": "2.0.0"
+  },
+  "sdk": {
+    "name": "@fourier-video/sdk",
+    "version": "1.2.0",
+    "abiVersion": 1.2
+  },
+  "playwright": {
+    "version": "1.62.0"
+  },
+  "chromium": {
+    "version": "151.0.7922.34",
+    "revision": "1234"
+  },
+  "project": {
+    "id": "mac-mini-m6-film",
+    "totalFrames": 180,
+    "fps": 60,
+    "executionRevision": "project-wire-v1",
+    "sourceFingerprint": "e6556eb87915da664118151dac3585442e61b80acf501a76fa16e63b2cdfd8e4"
+  },
+  "output": {
+    "path": "/Users/voidfun/Project/Fourier-Project/ad-apple/review/rendered-02-object.mp4",
+    "sha256": "9707bb8ed4c025e1bf28251c464988479fb113babfa70ae05ea05b680f8dfaa1"
+  },
+  "profiles": [],
+  "snapshots": []
+}

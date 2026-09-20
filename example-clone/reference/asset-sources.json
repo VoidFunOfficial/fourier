@@ -1,0 +1,50 @@
+[
+  {
+    "asset": "warrior.svg",
+    "sourceFrame": "0321.png",
+    "sourceRegion": [
+      330,
+      132,
+      410,
+      475
+    ],
+    "method": "Connected contour tracing, simplified to SVG paths; no reference video layer",
+    "sha256": "db8fe7808de81fa6d7a2ea245aa563bb52473a55256f4ab202fbf426eaff2fe0"
+  },
+  {
+    "asset": "playstation.svg",
+    "sourceFrame": "0358.png",
+    "sourceRegion": [
+      550,
+      287,
+      182,
+      143
+    ],
+    "method": "Connected contour tracing, simplified to SVG paths; no reference video layer",
+    "sha256": "161051861d32e88c658116d25b9f2f4940069a1190838f6b376d0137f861e31c"
+  },
+  {
+    "asset": "SF-Pro.woff",
+    "source": "/System/Library/Fonts/SFNS.ttf",
+    "method": "ASCII font subset",
+    "sha256": "fca2ac3f7d17907aed1e1d5a3b7185e4448be1eddec201d50e792008109f3e68"
+  },
+  {
+    "asset": "Montserrat-Medium.woff",
+    "source": "/Users/voidfun/Project/Fourier-Project/fourier-ad/fonts/Montserrat-Medium.ttf",
+    "method": "ASCII font subset",
+    "sha256": "3c66a250a861c5c990dacf3be4bb5add0cac3ae661cfd3f6565cfcbaeefee1e2"
+  },
+  {
+    "asset": "cursor.svg",
+    "source": "fourier-ad/pic/svg/default.svg",
+    "method": "Unmodified reuse",
+    "sha256": "16fa916f0733ee5c8bfb3291a2f642bfe894bdb672024b8a7083011b1e4a912a"
+  },
+  {
+    "asset": "reference-master.wav",
+    "source": "clone.mp4, supplied by user",
+    "method": "Decoded original audio; padded/trimmed to 19.05 seconds",
+    "sha256": "7a0cb54eb8b2a0a73e6ea6e16bb7d0da7d140733152510095ca47ab3cfc1f7e8"
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "engine": {
+    "name": "@fourier-video/render-engine",
+    "version": "2.0.0"
+  },
+  "sdk": {
+    "name": "@fourier-video/sdk",
+    "version": "1.2.0",
+    "abiVersion": 1.2
+  },
+  "playwright": {
+    "version": "1.62.0"
+  },
+  "chromium": {
+    "version": "151.0.7922.34",
+    "revision": "1234"
+  },
+  "project": {
+    "id": "mac-mini-m6-film",
+    "totalFrames": 240,
+    "fps": 60,
+    "executionRevision": "project-wire-v1",
+    "sourceFingerprint": "f0e640306bc4fa567efbf293a6318d4cd5550ef370a05a1b5406afcc388dd6b8"
+  },
+  "output": {
+    "path": "/Users/voidfun/Project/Fourier-Project/ad-apple/review/rendered-15-displays.mp4",
+    "sha256": "4a692bda705fce305f1590753ca6fbb4345afd355815dc26bfe162e54fce07d2"
+  },
+  "profiles": [],
+  "snapshots": []
+}

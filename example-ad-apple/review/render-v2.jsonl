@@ -1,0 +1,4 @@
+{"schemaVersion":1,"type":"start","command":"render","input":{"project":"/Users/voidfun/Project/Fourier-Project/ad-apple/main.tsx","options":{"output":"/Users/voidfun/Project/Fourier-Project/ad-apple/output/Mac-mini-M6-1080p60.mp4","overwrite":true,"validateMedia":true,"keepTemporaryFiles":false,"crf":17,"preset":"medium","frameConcurrency":1,"domPages":1,"tts":{"baseUrl":"http://127.0.0.1:8765"}},"verbose":false}}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"validating","progress":0,"totalFrames":0,"message":"正在编译并校验工程，并生成字幕音频"}
+{"schemaVersion":1,"type":"progress","command":"render","phase":"validating","progress":1,"totalFrames":4800,"message":"工程校验通过"}
+{"schemaVersion":1,"type":"error","command":"render","error":{"code":"DOM_RUNTIME_TIMEOUT","message":"Chromium context initialization 超过 15000ms","details":{"operation":"Chromium context initialization","timeoutMs":15000}},"exitCode":2}

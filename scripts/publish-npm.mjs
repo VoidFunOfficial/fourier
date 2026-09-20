@@ -9,7 +9,9 @@ import { fileURLToPath } from "node:url";
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const REGISTRY = "https://registry.npmjs.org/";
 const NPM = process.platform === "win32" ? "npm.cmd" : "npm";
+const CZ = `${ROOT}/node_modules/.bin/${process.platform === "win32" ? "cz.cmd" : "cz"}`;
 const PACKAGE_DIRS = ["fourier-core", "fourier-sdk", "fourier-render-engine"];
+const GIT_DIRS = ["fourier-core", "fourier-render-engine", "fourier-sdk", "fourier-tools"];
 
 function run(command, args, { cwd = ROOT, capture = false } = {}) {
   const result = spawnSync(command, args, {
@@ -177,7 +179,12 @@ async function main() {
         cwd: `${ROOT}/${dir}`,
       });
     }
-    console.log("\nCore、SDK、Render Engine 已依次发布。请提交版本文件和 bun.lock。");
+
+    console.log("\nCore、SDK、Render Engine 已依次发布，正在启动 Commitizen...");
+    run("git", ["add", "--", ...GIT_DIRS]);
+    rl.close();
+    run(CZ, ["--only", "--", ...GIT_DIRS]);
+    console.log("\n发布和 Git 提交已完成。");
   } finally {
     rl.close();
   }
@@ -185,6 +192,6 @@ async function main() {
 
 if (process.argv.includes("--self-test")) selfTest();
 else main().catch((error) => {
-  console.error(`\n发布终止: ${error.message}`);
+  console.error(`\n发布流程终止: ${error.message}`);
   process.exitCode = 1;
 });

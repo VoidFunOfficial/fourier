@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "width": 1920,
+  "height": 1080,
+  "fps": 60,
+  "frames": 1383,
+  "durationSeconds": 23.05,
+  "independentScenes": 9,
+  "referencePictureDurationSeconds": 19.041666666666668,
+  "appendedCredits": {
+    "source": "ad-apple/templates/ending/scenes/20-credits",
+    "startSeconds": 19.05,
+    "durationSeconds": 4,
+    "audioCorrelation": 0.9999167930544942
+  },
+  "audioSampleRate": 48000,
+  "channels": 2,
+  "audioCorrelation": 0.9999001666140189,
+  "outputPeak": 0.7767115235328674,
+  "sha256": "d054ff77adc1a08ad511b3a7b228c4db3669ccdf6a8f988c92046d5a1f095cac",
+  "comparisonSheets": [
+    "comparison-1.jpg",
+    "comparison-2.jpg",
+    "comparison-3.jpg",
+    "comparison-4.jpg"
+  ],
+  "pixelIdenticalClaim": false
+}

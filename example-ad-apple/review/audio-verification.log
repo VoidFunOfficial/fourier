@@ -1,0 +1,36 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/Users/voidfun/Project/Fourier-Project/ad-apple/output/Mac-mini-M6-1080p60.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.102
+  Duration: 00:01:15.00, start: 0.000000, bitrate: 2383 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709/unknown/unknown, progressive), 1920x1080 [SAR 1:1 DAR 16:9], 2368 kb/s, 60 fps, 60 tbr, 15360 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      encoder         : Lavc62.28.102 libx264
+  Stream #0:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 2 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+[Parsed_volumedetect_0 @ 0x7b0c246c0] n_samples: 0
+Stream mapping:
+  Stream #0:1 -> #0:0 (aac (native) -> pcm_s16le (native))
+Press [q] to stop, [?] for help
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.102
+  Stream #0:0(und): Audio: pcm_s16le, 48000 Hz, stereo, s16, 1536 kb/s (default)
+    Metadata:
+      encoder         : Lavc62.28.102 pcm_s16le
+      handler_name    : SoundHandler
+[Parsed_silencedetect_1 @ 0x7b0c24c00] silence_start: 0
+[Parsed_volumedetect_0 @ 0x7b0c24b40] n_samples: 7200768
+[Parsed_volumedetect_0 @ 0x7b0c24b40] mean_volume: -91.0 dB
+[Parsed_volumedetect_0 @ 0x7b0c24b40] max_volume: -91.0 dB
+[Parsed_volumedetect_0 @ 0x7b0c24b40] histogram_91db: 7200768
+[Parsed_silencedetect_1 @ 0x7b0c24c00] silence_end: 75.008 | silence_duration: 75.008
+[out#0/null @ 0x7b0c243c0] video:0KiB audio:14064KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: unknown
+size=N/A time=00:01:15.00 bitrate=N/A speed=2.74e+03x elapsed=0:00:00.02    

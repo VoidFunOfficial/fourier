@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "engine": {
+    "name": "@fourier-video/render-engine",
+    "version": "2.0.0"
+  },
+  "sdk": {
+    "name": "@fourier-video/sdk",
+    "version": "1.2.0",
+    "abiVersion": 1.2
+  },
+  "playwright": {
+    "version": "1.62.0"
+  },
+  "chromium": {
+    "version": "151.0.7922.34",
+    "revision": "1234"
+  },
+  "project": {
+    "id": "work-play-reference-rebuild",
+    "totalFrames": 1383,
+    "fps": 60,
+    "executionRevision": "project-wire-v1",
+    "sourceFingerprint": "cf0187e3c7fbe432b23e8fd3ff0708904a828dc8053e73fb224e310748c34961"
+  },
+  "output": {
+    "path": "/Users/voidfun/Project/Fourier-Project/ad-clone/sdk-rebuild/output/Work-Play-1080p60.mp4",
+    "sha256": "7d88bd7843a2fb6c7ab5405867804f262a2597e247d38f013765f0166adea67a"
+  },
+  "profiles": [],
+  "snapshots": []
+}
