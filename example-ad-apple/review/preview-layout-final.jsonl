@@ -1,7 +1,0 @@
-{"scene":"02-object","sha256":"271283ca3fa106c1d515610c4d04681ebfa3aee706752d30909bd297b31352a3","deterministic":true,"width":1920,"height":1080}
-{"scene":"03-footprint","sha256":"531c3795dec7749749ff063faa032cf36fe43321a28e64f9da87b2705a7ac466","deterministic":true,"width":1920,"height":1080}
-{"scene":"05-cpu","sha256":"db4f720a5a9cb88f058b63cb99fcf796d925039b994c532269fd9a2ae42e5039","deterministic":true,"width":1920,"height":1080}
-{"scene":"08-memory","sha256":"a38f747955b7e079aeac793dd0ec1bbbf110943a15d233e8be3c0744a1469457","deterministic":true,"width":1920,"height":1080}
-{"scene":"10-media","sha256":"0db5b59a275f71a8c57f47f83bac82e9cca2577abb73d6d2346601e8a6e33e25","deterministic":true,"width":1920,"height":1080}
-{"scene":"15-displays","sha256":"87c9d3ba45a24f0a7a9630beefb19c684f1e30067eafbb58b63846ac689eb8a2","deterministic":true,"width":1920,"height":1080}
-{"scene":"16-continuity","sha256":"b6c6fedde5f8173abbb7530b87a817c36b4eb586f5117b051904c907c7873e35","deterministic":true,"width":1920,"height":1080}

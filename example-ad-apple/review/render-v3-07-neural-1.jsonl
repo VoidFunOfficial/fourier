@@ -1,9 +1,0 @@
-{"schemaVersion":1,"type":"start","command":"render","input":{"project":"/Users/voidfun/Project/Fourier-Project/ad-apple/main.tsx","options":{"output":"/Users/voidfun/Project/Fourier-Project/ad-apple/review/rendered-07-neural.mp4","overwrite":true,"validateMedia":true,"keepTemporaryFiles":false,"crf":17,"preset":"medium","frameConcurrency":1,"domPages":1,"tts":{"baseUrl":"http://127.0.0.1:8765"}},"verbose":false}}
-{"schemaVersion":1,"type":"progress","command":"render","phase":"validating","progress":0,"totalFrames":0,"message":"正在编译并校验工程，并生成字幕音频"}
-{"schemaVersion":1,"type":"progress","command":"render","phase":"validating","progress":1,"totalFrames":240,"message":"工程校验通过"}
-{"schemaVersion":1,"type":"progress","command":"render","phase":"preparing","progress":1,"totalFrames":240,"message":"已准备 Scene shot-07-neural"}
-{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.2,"frame":48,"totalFrames":240,"message":"FFmpeg 已编码 48/240 帧"}
-{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":0.8458333333333333,"frame":203,"totalFrames":240,"message":"FFmpeg 已编码 203/240 帧"}
-{"schemaVersion":1,"type":"progress","command":"render","phase":"encoding","progress":1,"frame":240,"totalFrames":240,"message":"FFmpeg 已编码 240/240 帧"}
-{"schemaVersion":1,"type":"progress","command":"render","phase":"completed","progress":1,"frame":240,"totalFrames":240,"message":"渲染完成"}
-{"schemaVersion":1,"type":"result","command":"render","data":{"output":"/Users/voidfun/Project/Fourier-Project/ad-apple/review/rendered-07-neural.mp4","manifestPath":"/Users/voidfun/Project/Fourier-Project/ad-apple/review/rendered-07-neural.mp4.manifest.json","projectId":"mac-mini-m6-film","totalFrames":240,"durationSeconds":4,"elapsedMs":10816}}

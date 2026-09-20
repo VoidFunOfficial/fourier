@@ -1,9 +1,0 @@
-{
-  "nativeRender": "Work-Play-Fourier-render.mp4",
-  "output": "Work-Play-1080p60.mp4",
-  "videoPacketsIdentical": true,
-  "nativeSha256": "7d88bd7843a2fb6c7ab5405867804f262a2597e247d38f013765f0166adea67a",
-  "outputSha256": "d054ff77adc1a08ad511b3a7b228c4db3669ccdf6a8f988c92046d5a1f095cac",
-  "audioSource": "assets/audio/film-master.wav",
-  "audioProcessing": "Encode PCM directly to AAC 320k, without atempo=1"
-}

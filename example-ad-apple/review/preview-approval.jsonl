@@ -1,5 +1,0 @@
-{"scene":"05-cpu","sha256":"b332c98aafb20a2a0d74e255d9daf0cd23ef17b5fd8311d2d574720aacb7d5b5","deterministic":true,"width":1920,"height":1080}
-{"scene":"06-gpu","sha256":"40388dd246c65b91762c2744ac8a94ed969f37cdd3932e8f96c75877c3ab881b","deterministic":true,"width":1920,"height":1080}
-{"scene":"11-front","sha256":"54eccb936625e8c8baf9fc5cddfc2ee530f99c0c4faf48984c21207c5301d486","deterministic":true,"width":1920,"height":1080}
-{"scene":"12-back","sha256":"cd15f215c579517f067025163f19905dc908c44dd4607f595767d19214672b3c","deterministic":true,"width":1920,"height":1080}
-{"scene":"18-signature","sha256":"476241883e70c71b62b8ae0087ea0eced36b78e5cb0312cd802337c880a5754e","deterministic":true,"width":1920,"height":1080}

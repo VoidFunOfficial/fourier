@@ -1,2 +1,0 @@
-import { Canvas, defineProject, Project, ReactLayer, Timeline } from '@fourier-video/sdk/project';
-export default defineProject(<Project id="work-play-07-work-play" version="1.0" audioSampleRate={48000}><Canvas width={1920} height={1080} fps={60} background="#dfdde0" colorSpace="sRGB"/><Timeline><ReactLayer id="composition" preview at="0f" duration="155f" component="Visual.tsx" x={960} y={540} width={1920} height={1080} layer={1}/></Timeline></Project>);
