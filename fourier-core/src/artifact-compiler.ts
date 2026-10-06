@@ -13,6 +13,7 @@ import { createDomBootstrapSource } from "./dom-bootstrap-source.ts";
 import { hashSeed } from "./deterministic.ts";
 import { CoreError, fail } from "./errors.ts";
 import { imageAssetUrlPlugin, type BundledImageAsset } from "./image-assets.ts";
+import { cubismAssetFiles, cubismAssetPlugin } from "./cubism-assets.ts";
 import { DOM_RENDER_PROFILE, type RenderProfile } from "./render-profile.ts";
 import { SecureExecutionHost } from "./secure-execution-host.ts";
 import {
@@ -268,9 +269,10 @@ async function createImmutableSourceSnapshot(options: CompileVisualArtifactOptio
   }
 
   const collected = new Map<string, SourceGraphEntry>();
+  const expanded = new Set<string>();
   const aliases = new Map<string, string>();
   let totalBytes = 0;
-  const visit = async (path: string): Promise<void> => {
+  const collectFile = async (path: string): Promise<SourceGraphEntry> => {
     const logical = resolve(path);
     const canonical = await realpath(logical).catch(() => undefined);
     if (canonical === undefined) fail("COMPONENT_IMPORT_NOT_FOUND", `artifact 依赖不存在: ${path}`);
@@ -285,7 +287,8 @@ async function createImmutableSourceSnapshot(options: CompileVisualArtifactOptio
       : relative(sourceRoot, logical);
     const canonicalRelative = relative(sourceRoot, canonical);
     if (logicalRelative !== canonicalRelative) aliases.set(logicalRelative, canonicalRelative);
-    if (collected.has(canonical)) return;
+    const existing = collected.get(canonical);
+    if (existing !== undefined) return existing;
     const file = await lstat(canonical);
     if (!file.isFile()) fail("ARTIFACT_SOURCE_OUTSIDE_ROOT", `artifact 依赖不是普通文件: ${canonical}`);
     if (file.size > SOURCE_FILE_BYTES) fail("SECURE_EXECUTION_LIMIT", `artifact 单文件超过 2 MiB: ${canonical}`);
@@ -293,14 +296,30 @@ async function createImmutableSourceSnapshot(options: CompileVisualArtifactOptio
     const bytes = new Uint8Array(await readFile(canonical));
     totalBytes += bytes.byteLength;
     if (totalBytes > SOURCE_TOTAL_BYTES) fail("SECURE_EXECUTION_LIMIT", "artifact 源码总计超过 16 MiB");
-    collected.set(canonical, Object.freeze({
+    const dependency = Object.freeze({
       sourcePath: canonical,
       relativePath: relative(sourceRoot, canonical),
       bytes,
       sha256: digest(bytes),
-    }));
+    });
+    collected.set(canonical, dependency);
+    return dependency;
+  };
+
+  const visit = async (path: string): Promise<void> => {
+    const { sourcePath: canonical, bytes } = await collectFile(path);
+    if (expanded.has(canonical)) return;
+    expanded.add(canonical);
 
     const extension = extname(canonical).toLowerCase();
+    if (extension === ".moc3" || canonical.endsWith(".model3.json")) {
+      const model = await cubismAssetFiles(canonical);
+      // These are resolved resources, not additional model entry points. A
+      // manifest may reference a differently named MOC in a child directory.
+      await collectFile(model.settings); await collectFile(model.moc);
+      for (const texture of model.textures) await visit(texture);
+      return;
+    }
     const source = new TextDecoder().decode(bytes);
     if (extension === ".css") {
       if (/url\(\s*["']?(?:https?:|\/\/)/i.test(source) || /@import\s+["'](?:https?:|\/\/)/i.test(source)) {
@@ -451,7 +470,7 @@ async function inspectorBundle(entryPath: string, integration: ArtifactHostOptio
           build.onResolve({ filter: /^fourier:artifact-inspector$/ }, () => ({ path: "artifact-inspector", namespace: "fourier" }));
           build.onLoad({ filter: /^artifact-inspector$/, namespace: "fourier" }, () => ({ contents: source, loader: "tsx" }));
         },
-      }, imageAssetUrlPlugin("fourier-artifact-inspector-images"), authorRuntimeAliasPlugin(
+      }, cubismAssetPlugin(), imageAssetUrlPlugin("fourier-artifact-inspector-images"), authorRuntimeAliasPlugin(
         "fourier-artifact-inspector-runtime",
         integration.resolveAuthorImport,
       )],
@@ -478,7 +497,7 @@ async function browserBundle(entryPath: string, integration: ArtifactHostOptions
           build.onResolve({ filter: /^fourier:dom-bootstrap$/ }, () => ({ path: "dom-bootstrap", namespace: "fourier" }));
           build.onLoad({ filter: /^dom-bootstrap$/, namespace: "fourier" }, () => ({ contents: source, loader: "tsx" }));
         },
-      }, imageAssetUrlPlugin("fourier-dom-images", (asset) => imageAssets.set(asset.url, asset)), authorRuntimeAliasPlugin(
+      }, cubismAssetPlugin(), imageAssetUrlPlugin("fourier-dom-images", (asset) => imageAssets.set(asset.url, asset)), authorRuntimeAliasPlugin(
         "fourier-dom-author-runtime",
         integration.resolveAuthorImport,
         { reactDom: true },

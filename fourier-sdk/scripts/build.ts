@@ -10,6 +10,7 @@ const result = await Bun.build({
     "./src/universe.ts",
     "./src/universe-3d.ts",
     "./src/phy2d.ts",
+    "./src/avatar.ts",
     "./src/schema.ts",
     "./src/project.ts",
     "./src/design-preview.ts",

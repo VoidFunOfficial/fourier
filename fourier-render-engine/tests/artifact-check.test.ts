@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtemp, realpath, rm, symlink } from "node:fs/promises";
+import { appendFile, cp, mkdir, mkdtemp, realpath, rename, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { SDK_ABI_VERSION } from "@fourier-video/sdk";
@@ -7,6 +7,61 @@ import { checkArtifact } from "../src/artifact-check.ts";
 import { compileVisualArtifact } from "../src/artifact-compiler.ts";
 
 describe("fourier check", () => {
+  test("最新 voidavatar 的 MOC3 导入可通过 render-engine 编译入口", async () => {
+    const root = join(import.meta.dir, "../../fourier-sdk");
+    const artifact = await compileVisualArtifact({ entryPath: join(root, "example/VoidAvatar.tsx"), sourceRoot: root, resourceRoots: [root] });
+    for (const resource of [
+      "cubism/voidavatar.moc3",
+      "cubism/voidavatar.model3.json",
+      "cubism/textures/texture_00.png",
+      "cubism-native/PastelCatgirl-native-lively.moc3",
+      "cubism-native/PastelCatgirl-native-lively.model3.json",
+      "cubism-native/PastelCatgirl-native-lively.4096/texture_00.png",
+      "cubism-native/PastelCatgirl-native-lively.4096/texture_01.png",
+    ]) {
+      expect(artifact.dependencies).toContain(await realpath(join(root, "example/voidavatar", resource)));
+    }
+    const filenames = artifact.bundleSnapshot.imageAssets?.map(asset =>
+      decodeURIComponent(new URL(asset.url).pathname.split("/").at(-1)!));
+    expect(filenames?.toSorted()).toEqual([
+      // The hybrid and native models each contribute their own texture_00.png.
+      "texture_00.png", "texture_00.png", "texture_01.png", "cute-eyes-v2.png", "cute-brows-v2.png",
+      "magicWand.png", "conductorBaton.png", "microphone.png", "bouquet.png",
+      "heartSign.png", "lollipop.png", "coffeeCup.png", "book.png", "paintbrush.png", "foldingFan.png",
+    ].toSorted());
+  });
+  test("model3 可引用不同名且在子目录中的 MOC，纹理改变会更新快照", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "fourier-manifest-reference-"));
+    try {
+      const modelRoot = join(directory, "model");
+      await cp(join(import.meta.dir, "../../fourier-sdk/example/voidavatar/cubism"), modelRoot, { recursive: true });
+      await mkdir(join(modelRoot, "binaries"));
+      const mocPath = join(modelRoot, "binaries/character.moc3");
+      await rename(join(modelRoot, "voidavatar.moc3"), mocPath);
+      const settingsPath = join(modelRoot, "main.model3.json");
+      await rename(join(modelRoot, "voidavatar.model3.json"), settingsPath);
+      await Bun.write(settingsPath, JSON.stringify({
+        Version: 3, FileReferences: { Moc: "binaries/character.moc3", Textures: ["textures/texture_00.png"] },
+      }));
+      const entryPath = join(directory, "Avatar.tsx");
+      await Bun.write(entryPath, `import { Avatar, defineReact } from "@fourier-video/sdk/avatar";
+import model from "./model/main.model3.json";
+export default defineReact({ name: "ManifestReference", schema: {}, component() { return <Avatar model={model}/>; },
+  designPreview() { return { props: {}, composition: { width: 64, height: 64, durationSeconds: 1 } }; } });`);
+      const before = await compileVisualArtifact({ entryPath });
+      const texturePath = join(modelRoot, "textures/texture_00.png");
+      for (const path of [settingsPath, mocPath, texturePath]) {
+        expect(before.dependencies).toContain(await realpath(path));
+      }
+      expect(before.bundleSnapshot.imageAssets).toHaveLength(1);
+      await appendFile(texturePath, new Uint8Array([0]));
+      const after = await compileVisualArtifact({ entryPath });
+      expect(after.dependencyDigest).not.toBe(before.dependencyDigest);
+      expect(after.snapshotId).not.toBe(before.snapshotId);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
   test("ABI v1 显式 .js import 可以解析同名 TypeScript 源文件", async () => {
     const directory = await mkdtemp(join(tmpdir(), "fourier-dom-ts-substitution-"));
     try {
@@ -187,6 +242,23 @@ export default defineReact({
 });`);
       const artifact = await compileVisualArtifact({ entryPath });
       expect(artifact).toMatchObject({ name: "Universe3DPanel", renderer: "dom-timeline" });
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  }, 15_000);
+
+  test("Avatar 通过正式 SDK 子入口编译为 Fourier artifact", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "fourier-avatar-import-"));
+    try {
+      const entryPath = join(directory, "AvatarPanel.tsx");
+      await Bun.write(entryPath, `import { Avatar, defineAvatar, defineReact } from "@fourier-video/sdk/avatar";
+const model = defineAvatar({ version: 1, name: "avatar", canvas: [64, 64], layers: [] });
+export default defineReact({
+  name: "AvatarPanel", schema: {},
+  component() { return <Avatar model={model} />; },
+  designPreview() { return { props: {}, composition: { width: 64, height: 64, durationSeconds: 1 } }; },
+});`);
+      expect(await compileVisualArtifact({ entryPath })).toMatchObject({ name: "AvatarPanel", renderer: "dom-timeline" });
     } finally {
       await rm(directory, { recursive: true, force: true });
     }

@@ -1,0 +1,10 @@
+{
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "voidavatar.moc3",
+    "Textures": [
+      "textures/texture_00.png"
+    ],
+    "DisplayInfo": "voidavatar.cdi3.json"
+  }
+}

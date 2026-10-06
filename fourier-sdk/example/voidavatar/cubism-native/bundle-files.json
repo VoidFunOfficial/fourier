@@ -1,0 +1,90 @@
+{
+  "PastelCatgirl-native-lively.4096/texture_00.png": {
+    "bytes": 3695156,
+    "sha256": "35ca0e3ce55ebf580df028f058dbd380ce193e7b7e21999097b8a7aa65e23843"
+  },
+  "PastelCatgirl-native-lively.4096/texture_01.png": {
+    "bytes": 1472072,
+    "sha256": "aeafbe6cfe02624a1dec320a6520624c56cc4a60860d646edb5547e551b9dcdb"
+  },
+  "PastelCatgirl-native-lively.cdi3.json": {
+    "bytes": 4907,
+    "sha256": "d9e9fa68e334fefe94c18f7e62d5bc029c81d644f3d174a44919190ea133b5f1"
+  },
+  "PastelCatgirl-native-lively.moc3": {
+    "bytes": 230912,
+    "sha256": "95a69b36ec48e63efffa608234d9c72069ce9750bcf8a99574961d457d62f479"
+  },
+  "PastelCatgirl-native-lively.model3.json": {
+    "bytes": 1995,
+    "sha256": "76761c5eb4c6504d0fd5ff57ca4e0a7d1aaf0cfce95a61d3f8736aefaf261814"
+  },
+  "PastelCatgirl-native-lively.physics3.json": {
+    "bytes": 13772,
+    "sha256": "ad5de443a5b41ff8c8694cc9b0aea66550da09af29991b46f4acea8efce19d92"
+  },
+  "expressions/angry.exp3.json": {
+    "bytes": 360,
+    "sha256": "fd51a8d310fcb4e218907a052f7ddc54f1acb982bb759f87fa6eca0febebf264"
+  },
+  "expressions/confident.exp3.json": {
+    "bytes": 360,
+    "sha256": "d101190d1a49cedfb3c1dc92d370094c8e124f8038119be0862215b7c8acd1a0"
+  },
+  "expressions/curious.exp3.json": {
+    "bytes": 363,
+    "sha256": "919a97c12d3339fe13281e7fa181caae1dd95892cf8838af8d3f5457388c94bf"
+  },
+  "expressions/determined.exp3.json": {
+    "bytes": 363,
+    "sha256": "8b86fffc11e47e33e380d732f043cd56849951b4280eb41a122a751019504271"
+  },
+  "expressions/happy.exp3.json": {
+    "bytes": 360,
+    "sha256": "8cc6047950ae52e371c91eb7ffaa307288743fc85496e5c876bc38e71fb21356"
+  },
+  "expressions/manifest.json": {
+    "bytes": 6559,
+    "sha256": "bd56411c8e20e0c09db573670cd3b74297e049abdc9f434bbde9a22348db6f62"
+  },
+  "expressions/mischievous.exp3.json": {
+    "bytes": 363,
+    "sha256": "f32f1030128e940e644dadaeda16fd0532abcee1c2a085b5997477cde2471658"
+  },
+  "expressions/neutral.exp3.json": {
+    "bytes": 360,
+    "sha256": "28869391ef7c0cac9d07672435c8ad2dd83818e8d59f82d15aa7aad5da5e4d1b"
+  },
+  "expressions/sad.exp3.json": {
+    "bytes": 360,
+    "sha256": "aaf46cb6205e1170dc511f381c55264fc567f775c07f232fb837351d62454516"
+  },
+  "expressions/shy.exp3.json": {
+    "bytes": 360,
+    "sha256": "5d1aa37ec85a5307d361437a9c5877c7ce076a3e6f66f74e2546ac5046530f52"
+  },
+  "expressions/sleepy.exp3.json": {
+    "bytes": 360,
+    "sha256": "f32dec0197ba52639579c0e35dccdb357f93c280c5e69b7ba309cdbf38c1aab4"
+  },
+  "expressions/surprised.exp3.json": {
+    "bytes": 360,
+    "sha256": "b866e5ae7e7178f4f60a39d8fbf0abe09b54573206e715d44e1a5a567db61c14"
+  },
+  "expressions/thinking.exp3.json": {
+    "bytes": 360,
+    "sha256": "944098415cb5afe055d9d9ee0708eba65fead73bb88410a017a734332233fdb0"
+  },
+  "expressions/wink.exp3.json": {
+    "bytes": 360,
+    "sha256": "6e7a29081f3a67ccc0756edb238383a312aa9bfb0e2c04fe120379651a6e9c10"
+  },
+  "motions/PastelCatgirl-idle24.motion3.json": {
+    "bytes": 11232,
+    "sha256": "3b4c894966ca69433dd3ff24a2d6dd99dcfc318ff37e2a4af6f2eb6912c2b5e1"
+  },
+  "provenance.json": {
+    "bytes": 2576,
+    "sha256": "a1eb2abc1dc59ab9d2c6b7f05e4d288eb6176df3d08e566ce8488d47419bb2d1"
+  }
+}

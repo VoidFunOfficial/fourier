@@ -1,6 +1,6 @@
 {
   "name": "@fourier-video/sdk",
-  "version": "2.5.0",
+  "version": "4.0.1",
   "type": "module",
   "license": "MIT",
   "description": "Typed TSX project, React, Motion, and Shader authoring SDK for Fourier",
@@ -100,6 +100,12 @@
       "bun": "./src/jsx-dev-runtime.ts",
       "import": "./dist/jsx-dev-runtime.js",
       "default": "./dist/jsx-dev-runtime.js"
+    },
+    "./avatar": {
+      "types": "./dist/avatar.d.ts",
+      "bun": "./src/avatar.ts",
+      "import": "./dist/avatar.js",
+      "default": "./dist/avatar.js"
     }
   },
   "bin": {
@@ -123,7 +129,7 @@
     "prepack": "bun run typecheck && bun test && bun run test:dom && bun run build"
   },
   "dependencies": {
-    "@fourier-video/core": "^1.7.0",
+    "@fourier-video/core": "^3.0.1",
     "@types/react": "^19.2.18",
     "react": "19.2.8",
     "react-dom": "19.2.8",

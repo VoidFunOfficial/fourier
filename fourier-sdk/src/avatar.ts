@@ -1,0 +1,11 @@
+import "./avatar/assets.ts";
+export * from "./react.ts";
+export type * from "./avatar/types.ts";
+export { AVATAR_PARAMETERS, defineAvatar, parameterRanges } from "./avatar/model.ts";
+export { AVATAR_EXPRESSIONS, avatarMotion, compileAvatarTimeline, mixAvatarParameters, sampleAvatarCurve } from "./avatar/timeline.ts";
+export { defineAvatarSpeech, phonemesToSpeech, pcmToSpeech, sampleAvatarSpeech } from "./avatar/lipsync.ts";
+export { createAvatarMeshRig, createLayerAvatar } from "./avatar/rig.ts";
+export { AvatarWebGLRenderer, type AvatarPlacement } from "./avatar/webgl.ts";
+export { Avatar, type AvatarProps } from "./avatar/component.ts";
+export { CUBISM_PARAMETER_MAP, createCubismAvatar, cubismModelReferences, decodeAvatarMoc } from "./avatar/cubism.ts";
+export type { CubismCore, CubismCoreModel, CubismAvatarOptions, CubismAvatarBackend, CubismParameterBinding, CubismAvatarSource } from "./avatar/cubism.ts";

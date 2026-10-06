@@ -521,3 +521,9 @@ ABI v1 preview server 编译 entry 中的 DOM bundle、CSS 和字体资源，浏
 | `DOM_COMPOSITOR_COMMIT_FAILED` | CDP commit/capture 失败 |
 | `CHROMIUM_NOT_INSTALLED` | 固定浏览器缺失 |
 | `CHROMIUM_VERSION_MISMATCH` | Chromium 版本不匹配 |
+
+## Fourier Avatar
+
+`@fourier-video/sdk/avatar` 提供 `Avatar`、`defineAvatar`、`compileAvatarTimeline`、标准参数与动作库、离线 Viseme、PNG/mesh rig、WebGL mask 和 Cubism Core 结构适配器。完整格式、混合顺序、错误条件和 Cubism 边界见 [AVATAR.md](./AVATAR.md)。
+
+`Avatar` 的可选 `rig: AvatarModel` 与低层 `createAvatarMeshRig(backend, rig)` 可按网格 ID 为已有 MOC 网格叠加 Fourier 变换。位置和锚点使用底层画布坐标；`position === anchor` 保持中性形态。rig 仅接收变换节点，保留底层图集、UV、遮罩与混合方式，包装器接管 backend 的释放。示例见 `VoidAvatarActions.tsx`。

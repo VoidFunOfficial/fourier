@@ -1,0 +1,246 @@
+{
+  "schemaVersion": 1,
+  "state": "packaged-with-saved-native-keyforms",
+  "format": "Live2D Cubism exp3.json and motion3.json",
+  "selectorParameterIds": [
+    "ParamEyeStyle",
+    "ParamBrowLStyle",
+    "ParamBrowRStyle"
+  ],
+  "selectorRange": {
+    "minimum": 0,
+    "maximum": 12,
+    "integerValuesOnly": true
+  },
+  "expressionBlend": "Overwrite",
+  "expressionFadeSeconds": {
+    "in": 0,
+    "out": 0
+  },
+  "expressionFadeReason": "Discrete artwork selectors switch immediately to avoid interpolating through unrelated preset indices.",
+  "blinkPolicy": {
+    "untouchedParameterIds": [
+      "ParamEyeLOpen",
+      "ParamEyeROpen"
+    ],
+    "winkHandledByStyleArtwork": true
+  },
+  "expressions": [
+    {
+      "index": 0,
+      "name": "neutral",
+      "label": "日常",
+      "file": "neutral.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 0,
+        "ParamBrowLStyle": 0,
+        "ParamBrowRStyle": 0
+      }
+    },
+    {
+      "index": 1,
+      "name": "happy",
+      "label": "开心",
+      "file": "happy.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 1,
+        "ParamBrowLStyle": 1,
+        "ParamBrowRStyle": 1
+      }
+    },
+    {
+      "index": 2,
+      "name": "confident",
+      "label": "自信",
+      "file": "confident.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 2,
+        "ParamBrowLStyle": 2,
+        "ParamBrowRStyle": 2
+      }
+    },
+    {
+      "index": 3,
+      "name": "thinking",
+      "label": "思考",
+      "file": "thinking.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 3,
+        "ParamBrowLStyle": 3,
+        "ParamBrowRStyle": 3
+      }
+    },
+    {
+      "index": 4,
+      "name": "surprised",
+      "label": "惊讶",
+      "file": "surprised.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 4,
+        "ParamBrowLStyle": 4,
+        "ParamBrowRStyle": 4
+      }
+    },
+    {
+      "index": 5,
+      "name": "wink",
+      "label": "眨眼卖萌",
+      "file": "wink.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 5,
+        "ParamBrowLStyle": 5,
+        "ParamBrowRStyle": 5
+      }
+    },
+    {
+      "index": 6,
+      "name": "shy",
+      "label": "害羞",
+      "file": "shy.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 6,
+        "ParamBrowLStyle": 6,
+        "ParamBrowRStyle": 6
+      }
+    },
+    {
+      "index": 7,
+      "name": "sleepy",
+      "label": "困倦",
+      "file": "sleepy.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 7,
+        "ParamBrowLStyle": 7,
+        "ParamBrowRStyle": 7
+      }
+    },
+    {
+      "index": 8,
+      "name": "angry",
+      "label": "生气",
+      "file": "angry.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 8,
+        "ParamBrowLStyle": 8,
+        "ParamBrowRStyle": 8
+      }
+    },
+    {
+      "index": 9,
+      "name": "sad",
+      "label": "难过",
+      "file": "sad.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 9,
+        "ParamBrowLStyle": 9,
+        "ParamBrowRStyle": 9
+      }
+    },
+    {
+      "index": 10,
+      "name": "mischievous",
+      "label": "俏皮",
+      "file": "mischievous.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 10,
+        "ParamBrowLStyle": 10,
+        "ParamBrowRStyle": 10
+      }
+    },
+    {
+      "index": 11,
+      "name": "curious",
+      "label": "好奇",
+      "file": "curious.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 11,
+        "ParamBrowLStyle": 11,
+        "ParamBrowRStyle": 11
+      }
+    },
+    {
+      "index": 12,
+      "name": "determined",
+      "label": "坚定",
+      "file": "determined.exp3.json",
+      "parameterValues": {
+        "ParamEyeStyle": 12,
+        "ParamBrowLStyle": 12,
+        "ParamBrowRStyle": 12
+      }
+    }
+  ],
+  "idle": {
+    "file": "../motions/PastelCatgirl-idle24.motion3.json",
+    "durationSeconds": 24,
+    "loop": true,
+    "fps": 60,
+    "parameterIds": [
+      "ParamAngleX",
+      "ParamAngleY",
+      "Param_Angle_Rotation2",
+      "ParamBreath",
+      "ParamEyeLOpen",
+      "ParamEyeROpen"
+    ],
+    "construction": "Sparse restricted Bezier head/breath curves plus sparse independent eye-open curves. No frame sampling performed.",
+    "breathPeriodSeconds": 4,
+    "ownsHairOutputParameters": false,
+    "ownsBlinkParameters": true,
+    "curveCount": 6,
+    "authoredValueBounds": {
+      "ParamAngleX": [
+        -6.68096382,
+        6.68096382
+      ],
+      "ParamAngleY": [
+        -2.09682873,
+        3.912438953
+      ],
+      "Param_Angle_Rotation2": [
+        -2.751631249,
+        2.751631249
+      ],
+      "ParamBreath": [
+        0.2,
+        0.76
+      ],
+      "ParamEyeLOpen": [
+        0,
+        1
+      ],
+      "ParamEyeROpen": [
+        0,
+        1
+      ]
+    },
+    "boundsMeaning": "Bounds of values and Bezier control values in the JSON; static inspection only, not sampled motion extrema.",
+    "blinkScheduling": "The idle file authors occasional independent eye-open curves; a compatible host must avoid simultaneously overriding them with a separate blink controller."
+  },
+  "integration": {
+    "nativeSelectorBindingsCompleted": true,
+    "nativeBlinkBindingsCompleted": true,
+    "nativeExpressionFilesImported": false,
+    "runtimeModelJsonModified": true,
+    "packagedWithNativeExport": true,
+    "requiresModelBindings": [],
+    "idleScheduling": "A compatible Cubism host must select the idle motion; the file alone does not schedule playback.",
+    "fourierBehavior": "The isolated source example uses its existing Fourier timeline to drive native keyforms. Fourier does not automatically execute physics3, exp3 or motion3 files.",
+    "playbackVerified": false
+  },
+  "verificationScope": {
+    "formatAndParameterDefinitionChecksOnly": true,
+    "nativeKeyformsConfirmedByEditorReadback": true,
+    "frameChecksPerformed": false,
+    "actionTestsPerformed": false,
+    "playbackPerformed": false
+  },
+  "sources": [
+    "https://docs.live2d.com/en/cubism-sdk-manual/expression-cocos/",
+    "https://docs.live2d.com/cubism-sdk-manual/expression/",
+    "https://raw.githubusercontent.com/Live2D/CubismWebSamples/develop/Samples/Resources/Haru/expressions/F01.exp3.json",
+    "https://raw.githubusercontent.com/Live2D/CubismWebSamples/develop/Samples/Resources/Haru/motions/haru_g_idle.motion3.json",
+    "https://raw.githubusercontent.com/Live2D/CubismWebFramework/develop/src/motion/cubismmotionjson.ts",
+    "https://docs.live2d.com/en/cubism-sdk-manual/reproducibility-motion3-json/"
+  ]
+}

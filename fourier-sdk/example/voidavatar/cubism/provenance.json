@@ -1,0 +1,39 @@
+{
+  "name": "voidavatar",
+  "source": "Cubism Editor 5.3 native head XYZ export",
+  "previousExport": {
+    "source": "/Users/voidfun/Documents/ChatGPT/live/model/voidAvater/PastelCatgirl-imported2.moc3",
+    "mocSha256": "dc673254695ff510153648db3b5f2c922595826ec88c700a34abd0cd0771ef39"
+  },
+  "nativeHeadParameters": [
+    "ParamAngleX",
+    "ParamAngleY",
+    "Param_Angle_Rotation2"
+  ],
+  "files": [
+    {
+      "source": "/Users/voidfun/Documents/ChatGPT/live/model/idle-native-v1/PastelCatgirl-idle.moc3",
+      "file": "voidavatar.moc3",
+      "sha256": "edde2561a1daa8a9f286db0300377c8a94a20cd84376c075a1d0ad2baa86ff06"
+    },
+    {
+      "source": "/Users/voidfun/Documents/ChatGPT/live/model/idle-native-v1/PastelCatgirl-idle.cdi3.json",
+      "file": "voidavatar.cdi3.json",
+      "sha256": "6cdaa60503bfda80d5fa53b3579d1f8eb0075d0faffd636d83b63ced8fcd793c"
+    },
+    {
+      "source": "/Users/voidfun/Documents/ChatGPT/live/model/idle-native-v1/PastelCatgirl-idle.4096/texture_00.png",
+      "file": "textures/texture_00.png",
+      "sha256": "22bf3f54c909ef7860ed62daf942fc80d7cdafc46d52cac62792675a0e8a8ac5"
+    },
+    {
+      "source": "/Users/voidfun/Documents/ChatGPT/live/model/idle-native-v1/PastelCatgirl-idle.model3.json",
+      "file": "voidavatar.model3.json",
+      "sha256": "f7e1fa33b59b6f0f7fefdc8f1e46af8ce7eceb48f7dffd667d1f32f95d06be26",
+      "sourceSha256": "f70d1cecb33a160c1d4f4c63126ecce4e098f97027028c0363bb2e98595d7d91",
+      "note": "Fourier manifest keeps local MOC/texture/display references and intentionally omits external Idle motion references; the SDK uses its absolute-time timeline and does not automatically play motion3.json."
+    }
+  ],
+  "status": "verified-with-limitations",
+  "supersededCandidateMocSha256": "0be0ded525dd4e0fac7770029e62df3d9a7a9d7f5a43d57210cb03565cced7c9"
+}

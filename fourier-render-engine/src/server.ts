@@ -1,10 +1,12 @@
 import { createHash, timingSafeEqual } from "node:crypto";
+import { spawn } from "node:child_process";
 import { lstat, mkdir, mkdtemp, realpath, rm, stat } from "node:fs/promises";
 import { lstatSync, realpathSync, statSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { isIP } from "node:net";
+import type { Readable } from "node:stream";
 import { chromium } from "playwright";
 import { RenderEngineError, toErrorResponse } from "./errors.ts";
 import type { RenderProgress, RenderResult, TtsOptions } from "./types.ts";
@@ -313,7 +315,8 @@ async function runSupervisedJob(
   const playwrightBrowsersPath = registryIndex < 0
     ? dirname(dirname(dirname(chromium.executablePath())))
     : executableParts.slice(0, registryIndex + 1).join(sep) || sep;
-  const child = Bun.spawn([process.execPath, workerPath], {
+  // Node streams reliably deliver EOF even when a worker's stderr stays empty.
+  const child = spawn(process.execPath, [workerPath], {
     cwd: import.meta.dir,
     env: {
       HOME: temporaryHome,
@@ -324,14 +327,17 @@ async function runSupervisedJob(
       LC_ALL: "C.UTF-8",
       PLAYWRIGHT_BROWSERS_PATH: playwrightBrowsersPath,
     },
-    stdin: new Blob([JSON.stringify(request)]),
-    stdout: "pipe",
-    stderr: "pipe",
+    stdio: ["pipe", "pipe", "pipe"],
     detached: process.platform !== "win32",
+  });
+  const exited = new Promise<number | null>((resolve, reject) => {
+    child.once("exit", resolve);
+    child.once("error", reject);
   });
   let timedOut = false;
   let forceKillTimer: ReturnType<typeof setTimeout> | undefined;
   const signalTree = (signalName: "SIGTERM" | "SIGKILL") => {
+    if (child.pid === undefined) return;
     if (process.platform !== "win32") {
       try {
         process.kill(-child.pid, signalName);
@@ -354,9 +360,11 @@ async function runSupervisedJob(
   signal.addEventListener("abort", onAbort, { once: true });
   if (signal.aborted) terminate();
   const timeout = setTimeout(() => { timedOut = true; terminate(); }, timeoutMs);
+  child.stdin.on("error", terminate);
+  child.stdin.end(JSON.stringify(request));
   try {
     const [exitCode, stdout, stderr] = await Promise.all([
-      child.exited,
+      exited,
       readBoundedWorkerOutput(child.stdout, 32 * 1024 * 1024, "stdout", terminate),
       readBoundedWorkerOutput(child.stderr, 1024 * 1024, "stderr", terminate),
     ]);
@@ -380,39 +388,32 @@ async function runSupervisedJob(
       forceKillTimer = undefined;
     }
     signal.removeEventListener("abort", onAbort);
-    if (child.exitCode === null) {
+    if (child.exitCode === null && child.signalCode === null) {
       terminate();
-      await child.exited.catch(() => undefined);
+      await exited.catch(() => undefined);
     }
     await rm(temporaryHome, { recursive: true, force: true });
   }
 }
 
 async function readBoundedWorkerOutput(
-  stream: ReadableStream<Uint8Array>,
+  stream: Readable,
   limit: number,
   label: "stdout" | "stderr",
   terminate: () => void,
 ): Promise<Uint8Array> {
-  const reader = stream.getReader();
   const chunks: Uint8Array[] = [];
   let size = 0;
-  try {
-    for (;;) {
-      const result = await reader.read();
-      if (result.done) break;
-      size += result.value.byteLength;
-      if (size > limit) {
-        terminate();
-        throw new RenderEngineError("SECURE_EXECUTION_LIMIT", `job worker ${label} 输出超限`, {
-          limit,
-          observedBytes: size,
-        });
-      }
-      chunks.push(result.value);
+  for await (const chunk of stream) {
+    size += chunk.byteLength;
+    if (size > limit) {
+      terminate();
+      throw new RenderEngineError("SECURE_EXECUTION_LIMIT", `job worker ${label} 输出超限`, {
+        limit,
+        observedBytes: size,
+      });
     }
-  } finally {
-    reader.releaseLock();
+    chunks.push(chunk);
   }
   const output = new Uint8Array(size);
   let offset = 0;

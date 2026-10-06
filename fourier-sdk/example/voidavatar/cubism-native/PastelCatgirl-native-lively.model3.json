@@ -1,0 +1,90 @@
+{
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "PastelCatgirl-native-lively.moc3",
+    "Textures": [
+      "PastelCatgirl-native-lively.4096/texture_00.png",
+      "PastelCatgirl-native-lively.4096/texture_01.png"
+    ],
+    "Physics": "PastelCatgirl-native-lively.physics3.json",
+    "DisplayInfo": "PastelCatgirl-native-lively.cdi3.json",
+    "Expressions": [
+      {
+        "Name": "neutral",
+        "File": "expressions/neutral.exp3.json"
+      },
+      {
+        "Name": "happy",
+        "File": "expressions/happy.exp3.json"
+      },
+      {
+        "Name": "confident",
+        "File": "expressions/confident.exp3.json"
+      },
+      {
+        "Name": "thinking",
+        "File": "expressions/thinking.exp3.json"
+      },
+      {
+        "Name": "surprised",
+        "File": "expressions/surprised.exp3.json"
+      },
+      {
+        "Name": "wink",
+        "File": "expressions/wink.exp3.json"
+      },
+      {
+        "Name": "shy",
+        "File": "expressions/shy.exp3.json"
+      },
+      {
+        "Name": "sleepy",
+        "File": "expressions/sleepy.exp3.json"
+      },
+      {
+        "Name": "angry",
+        "File": "expressions/angry.exp3.json"
+      },
+      {
+        "Name": "sad",
+        "File": "expressions/sad.exp3.json"
+      },
+      {
+        "Name": "mischievous",
+        "File": "expressions/mischievous.exp3.json"
+      },
+      {
+        "Name": "curious",
+        "File": "expressions/curious.exp3.json"
+      },
+      {
+        "Name": "determined",
+        "File": "expressions/determined.exp3.json"
+      }
+    ],
+    "Motions": {
+      "Idle": [
+        {
+          "File": "motions/PastelCatgirl-idle24.motion3.json",
+          "FadeInTime": 0.8,
+          "FadeOutTime": 0.8
+        }
+      ]
+    }
+  },
+  "Groups": [
+    {
+      "Target": "Parameter",
+      "Name": "EyeBlink",
+      "Ids": [
+        "ParamEyeLOpen",
+        "ParamEyeROpen"
+      ]
+    },
+    {
+      "Target": "Parameter",
+      "Name": "LipSync",
+      "Ids": []
+    }
+  ]
+}

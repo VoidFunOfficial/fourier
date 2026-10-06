@@ -181,3 +181,32 @@ bun run test:dom
 ```
 
 普通测试检查 ABI marker/schema/descriptor；DOM 测试通过 `openArtifact(entryPath)` 对真实示例采样和验证确定性。
+
+## voidavatar
+
+[`VoidAvatar.tsx`](./VoidAvatar.tsx) 是 12 秒主角色示例，只保留八项常用控制：`expression`、`idleAmount`、`catAmount`、`showActions`、`leftProp`、`rightProp`、`scale`、`transparent`。主示例默认右手持魔法棒。
+
+自定义场景从 [`voidavatar/index.ts`](./voidavatar/index.ts) 导入 `VoidAvatar`，用 `animation` 配置动作、独立眉毛和左右手道具，或传入一个自定义 `timeline`；无需手工连接模型、Core、后端与 rig。`createVoidTimeline()` 与 `createVoidBackend()` 提供时间轴和完整后端能力。原生关键形示例使用组件的 `mode="source"`。
+
+`mode="source"` 的资源入口是 `voidavatar/cubism-native-source.ts`，通过现有 Fourier 时间轴驱动原生头部、眨眼、眼眉款式、眉毛升降与九路头发关键形；默认 `natural` 模式及各动作示例继续使用 `cubism-source.ts` 中的既有模型与 Fourier 后端。原生导出更新不会改变默认示例的画稿和动作。当前导入器只加载 MOC 和纹理，不执行清单中的 physics3、exp3 或 motion3 文件。
+
+| 展示入口 | 内容 |
+| --- | --- |
+| [`VoidAvatarActions.tsx`](./VoidAvatarActions.tsx) | 28 秒八段动作，包含双手问好、鞠躬、欢呼和害羞 |
+| [`VoidAvatarProps.tsx`](./VoidAvatarProps.tsx) | 30 秒十种手持道具无文字展示 |
+| [`VoidAvatarShowcase.tsx`](./VoidAvatarShowcase.tsx) | 完整 84 秒演示，设计预览显示前 30 秒 |
+| [`VoidAvatarExpressions.tsx`](./VoidAvatarExpressions.tsx) | 13 种重绘表情与独立眉毛 |
+| [`VoidAvatarHair.tsx`](./VoidAvatarHair.tsx) | 左摆、右摆、散开、内收与回弹五种发梢姿态 |
+| [`VoidAvatarCat.tsx`](./VoidAvatarCat.tsx) | 独立猫咪动作与慢眨眼特写 |
+
+默认模式的女孩眼睛和眉毛使用 `voidavatar/art/` 的独立透明画稿，十种手持道具位于 `art/props/`。该模式的既有 MOC 只负责头部 XYZ，身体、眼眉、发梢、袖子、猫咪与道具由 Fourier 层驱动。独立原生视图使用 `voidavatar/cubism-native/` 的新导出，含新眼眉与头发绑定；完整资源包同时保留供 Cubism SDK 使用的物理、表情与待机文件。
+
+从仓库根目录运行：
+
+```bash
+bun run preview:avatar --demo=props
+bun run verify:avatar --demo=actions
+bun fourier-avatar/scripts/render-video.ts --demo=showcase --output ./fourier-avatar/verification/showcase.mp4
+```
+
+入口、配置、迁移和验证流程见 [VoidAvatar Agent 教程](../../fourier-avatar/AGENT_GUIDE.md)；通用模型与 SDK 合同见 [Avatar API](../docs/AVATAR.md)。

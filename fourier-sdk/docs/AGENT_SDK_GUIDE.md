@@ -92,6 +92,14 @@ ComponentName/
 3. 再运行确定性测试、DOM 测试和构建。
 4. 只有要发布 World 时才运行 dry-run 和真实发布。
 
+### 3.5 Cubism 角色导入
+
+角色组件使用 `@fourier-video/sdk/avatar` 的 `Avatar`，直接 `import model from "./model/voidavatar.moc3"`，保留同目录同名的 model3.json 及其纹理。Core 宿主自动收集这些隐式资源，并在准备阶段装载固定校验值的官方 Cubism Core。运行库由宿主事先安装，不在 artifact 内下载或注入任意脚本。
+
+先运行真实模型检查和乱序采样。导出文件中的参数存在不等于已绑定了动作；检查静态模型时不得把同图帧说成成功眨眼、挥手或说话。完整接入命令和限制见 [Avatar API](./AVATAR.md)。
+
+为未绑定的导出制作示例动作时，可通过 `Avatar` 的 `rig` 属性在原始网格上叠加 Fourier 变换。使用该导出的实际 drawable ID 和画布坐标，检查眼睛及关节衔接，并明确区分 Fourier 动作层与 Cubism 原生绑定。不要用旧切片替换新 MOC 的几何。
+
 ## 4. 所有 artifact 的硬性规则
 
 ### 4.1 Import 只能来自 SDK

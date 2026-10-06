@@ -1,0 +1,520 @@
+{
+  "method": "built-in image_gen; PNG files preserved without pixel edits",
+  "assets": [
+    {
+      "id": "magicWand",
+      "name": "魔法棒",
+      "file": "magicWand.png",
+      "canvas": [
+        1024,
+        1536
+      ],
+      "region": [
+        0.2958984375,
+        0.028645833333333332,
+        0.7041015625,
+        0.9680989583333334
+      ],
+      "grip": [
+        0.4990234375,
+        0.8463541666666666
+      ],
+      "height": 245,
+      "orientation": "upright",
+      "alphaBBoxPx": [
+        65,
+        45,
+        964,
+        1488
+      ],
+      "visibleAlphaBBoxPx": [
+        306,
+        47,
+        718,
+        1484
+      ],
+      "visibleAlphaThreshold": 4,
+      "regionPx": [
+        303,
+        44,
+        721,
+        1487
+      ],
+      "regionPaddingPx": 3,
+      "gripPx": [
+        511,
+        1300
+      ],
+      "gripAlpha": 253,
+      "gripManuallyConfirmed": true,
+      "gripNote": "Lower rose handle, beneath gold ring.",
+      "sizeBytes": 1275078,
+      "sha256": "716271245b7ff03fb64aa1e9ec146597e8e01618eecdbe737f0b1150346413c0",
+      "transparentPixelFraction": 0.8717142740885416,
+      "generator": "built-in image_gen",
+      "generatedSourcePath": "/Users/voidfun/.codex/generated_images/01a101c5-3abe-7a63-80ce-0612ddb4d8ca/exec-3673080f-b995-40ff-b2b6-c59d6d4011bb.png",
+      "imageEdits": "none; byte-for-byte copy preserving generated RGBA",
+      "artifactPath": "./magicWand.png",
+      "prompt": "Use case: stylized-concept. Asset type: transparent PNG hand-held prop sprite for a 2D chibi character rig.\nPrimary request: Draw exactly ONE complete prop, isolated, no hand and no character.\nStyle: softly hand-painted storybook illustration matching a cute dark-brown-haired chibi girl in an ivory hoodie: very fine warm cocoa outlines, matte soft cream, dusty rose, pale lavender and muted sage palette, gentle inner watercolor shading and subtle paper texture only inside the object, no glossy 3D appearance. A clean readable small silhouette.\nComposition: centered upright and front-facing, generous transparent padding on all sides, complete object entirely inside the canvas, never cropped. Grip region must be visible and uncluttered.\nBackground: genuine transparent alpha. The object is opaque except antialiased silhouette edges.\nNo text, letters, symbols that resemble lettering, logos, watermark, other props, hands, people, floor, background, sticker border, detached shadows, glow halo, floating decorations or sparkles.\nSubject: A charming magic wand. At the top is one softly rounded FIVE-POINTED cream-gold star, with a tiny dusty-lavender ribbon tied directly under the star. A straight slim dusty-rose shaft descends vertically from the star to a simple rounded grip end at the bottom. Star and attached ribbon must be part of the single connected wand. The grip is the lower quarter of the straight shaft. No face on the star."
+    },
+    {
+      "id": "conductorBaton",
+      "name": "指挥棒",
+      "file": "conductorBaton.png",
+      "canvas": [
+        1196,
+        1315
+      ],
+      "region": [
+        0.45735785953177255,
+        0.03193916349809886,
+        0.5434782608695652,
+        0.9688212927756654
+      ],
+      "grip": [
+        0.5,
+        0.8669201520912547
+      ],
+      "height": 255,
+      "orientation": "upright",
+      "alphaBBoxPx": [
+        324,
+        45,
+        990,
+        1272
+      ],
+      "visibleAlphaBBoxPx": [
+        550,
+        45,
+        647,
+        1271
+      ],
+      "visibleAlphaThreshold": 4,
+      "regionPx": [
+        547,
+        42,
+        650,
+        1274
+      ],
+      "regionPaddingPx": 3,
+      "gripPx": [
+        598,
+        1140
+      ],
+      "gripAlpha": 253,
+      "gripManuallyConfirmed": true,
+      "gripNote": "Middle of cocoa wooden handle.",
+      "sizeBytes": 144684,
+      "sha256": "f0dd1904ac3d1a4dd5c4506d0d4c65947b6464fc480693459829323ae5aea1b2",
+      "transparentPixelFraction": 0.9690190368401643,
+      "generator": "built-in image_gen",
+      "generatedSourcePath": "/Users/voidfun/.codex/generated_images/01a101c5-3abe-7a63-80ce-0612ddb4d8ca/exec-19dedde6-9fa0-4d7e-86ec-2b9ea5b0c175.png",
+      "imageEdits": "none; byte-for-byte copy preserving generated RGBA",
+      "artifactPath": "./conductorBaton.png",
+      "prompt": "Use case: stylized-concept. Asset type: transparent PNG hand-held prop sprite for a 2D chibi character rig.\nPrimary request: Draw exactly ONE complete prop, isolated, no hand and no character.\nStyle: softly hand-painted storybook illustration matching a cute dark-brown-haired chibi girl in an ivory hoodie: very fine warm cocoa outlines, matte soft cream, dusty rose, pale lavender and muted sage palette, gentle inner watercolor shading and subtle paper texture only inside the object, no glossy 3D appearance. A clean readable small silhouette.\nComposition: centered upright and front-facing, generous transparent padding on all sides, complete object entirely inside the canvas, never cropped. Grip region must be visible and uncluttered.\nBackground: genuine transparent alpha. The object is opaque except antialiased silhouette edges.\nNo text, letters, symbols that resemble lettering, logos, watermark, other props, hands, people, floor, background, sticker border, detached shadows, glow halo, floating decorations or sparkles.\nSubject: A real classical music conductor's baton, clearly different from a magic wand. A very slender long straight ivory tapered rod points vertically up, mounted in a small elongated oval cocoa-wood handle at the bottom. No star, no ribbon, no ornament, no baton ball, no microphone mesh. Softly painted wood-grain shading inside the short lower handle. Length to maximum width ratio approximately 11:1. The grip is the middle of the lower wooden handle."
+    },
+    {
+      "id": "microphone",
+      "name": "麦克风",
+      "file": "microphone.png",
+      "canvas": [
+        1024,
+        1536
+      ],
+      "region": [
+        0.28515625,
+        0.07356770833333333,
+        0.716796875,
+        0.921875
+      ],
+      "grip": [
+        0.5,
+        0.72265625
+      ],
+      "height": 180,
+      "orientation": "upright",
+      "alphaBBoxPx": [
+        65,
+        114,
+        1010,
+        1434
+      ],
+      "visibleAlphaBBoxPx": [
+        295,
+        116,
+        731,
+        1413
+      ],
+      "visibleAlphaThreshold": 4,
+      "regionPx": [
+        292,
+        113,
+        734,
+        1416
+      ],
+      "regionPaddingPx": 3,
+      "gripPx": [
+        512,
+        1110
+      ],
+      "gripAlpha": 254,
+      "gripManuallyConfirmed": true,
+      "gripNote": "Lower straight pink handle.",
+      "sizeBytes": 1542507,
+      "sha256": "d18f50472891a1cdfa11f43e4683a7c7d270b94b824707b7d4c9866c1675d0ce",
+      "transparentPixelFraction": 0.7978852589925131,
+      "generator": "built-in image_gen",
+      "generatedSourcePath": "/Users/voidfun/.codex/generated_images/01a101c5-3abe-7a63-80ce-0612ddb4d8ca/exec-dbf293fd-9839-4433-b18e-4bb575d2fe98.png",
+      "imageEdits": "none; byte-for-byte copy preserving generated RGBA",
+      "artifactPath": "./microphone.png",
+      "prompt": "Use case: stylized-concept. Asset type: transparent PNG hand-held prop sprite for a 2D chibi character rig.\nPrimary request: Draw exactly ONE complete prop, isolated, no hand and no character.\nStyle: softly hand-painted storybook illustration matching a cute dark-brown-haired chibi girl in an ivory hoodie: very fine warm cocoa outlines, matte soft cream, dusty rose, pale lavender and muted sage palette, gentle inner watercolor shading and subtle paper texture only inside the object, no glossy 3D appearance. A clean readable small silhouette.\nComposition: centered upright and front-facing, generous transparent padding on all sides, complete object entirely inside the canvas, never cropped. Grip region must be visible and uncluttered.\nBackground: genuine transparent alpha. The object is opaque except antialiased silhouette edges.\nNo text, letters, symbols that resemble lettering, logos, watermark, other props, hands, people, floor, background, sticker border, detached shadows, glow halo, floating decorations or sparkles.\nSubject: A small cute handheld stage microphone with a rounded warm-gray finely patterned mesh grille on top, a muted lavender short neck ring, and a gently tapered cocoa and dusty-rose handle pointing straight down. No cable. The lower handle has ample plain grip space."
+    },
+    {
+      "id": "bouquet",
+      "name": "小花束",
+      "file": "bouquet.png",
+      "canvas": [
+        1205,
+        1306
+      ],
+      "region": [
+        0.17344398340248962,
+        0.06508422664624809,
+        0.8307053941908714,
+        0.9418070444104135
+      ],
+      "grip": [
+        0.4995850622406639,
+        0.8016845329249617
+      ],
+      "height": 210,
+      "orientation": "upright",
+      "alphaBBoxPx": [
+        0,
+        21,
+        1159,
+        1234
+      ],
+      "visibleAlphaBBoxPx": [
+        212,
+        88,
+        998,
+        1227
+      ],
+      "visibleAlphaThreshold": 4,
+      "regionPx": [
+        209,
+        85,
+        1001,
+        1230
+      ],
+      "regionPaddingPx": 3,
+      "gripPx": [
+        602,
+        1047
+      ],
+      "gripAlpha": 253,
+      "gripManuallyConfirmed": true,
+      "gripNote": "Narrow lavender paper below the bow.",
+      "sizeBytes": 1146404,
+      "sha256": "b32bc54dbcbb1cc839abea8743ba30e1e1b370b9d2edcb4ec1196425bf70ca05",
+      "transparentPixelFraction": 0.6932313675153934,
+      "generator": "built-in image_gen",
+      "generatedSourcePath": "/Users/voidfun/.codex/generated_images/01a101c5-3abe-7a63-80ce-0612ddb4d8ca/exec-f33dc7ca-6ea0-4442-a0fe-cacc6c6f7d94.png",
+      "imageEdits": "none; byte-for-byte copy preserving generated RGBA",
+      "artifactPath": "./bouquet.png",
+      "prompt": "Use case: stylized-concept. Asset type: transparent PNG hand-held prop sprite for a 2D chibi character rig.\nPrimary request: Draw exactly ONE complete prop, isolated, no hand and no character.\nStyle: softly hand-painted storybook illustration matching a cute dark-brown-haired chibi girl in an ivory hoodie: very fine warm cocoa outlines, matte soft cream, dusty rose, pale lavender and muted sage palette, gentle inner watercolor shading and subtle paper texture only inside the object, no glossy 3D appearance. A clean readable small silhouette.\nComposition: centered upright and front-facing, generous transparent padding on all sides, complete object entirely inside the canvas, never cropped. Grip region must be visible and uncluttered.\nBackground: genuine transparent alpha. The object is opaque except antialiased silhouette edges.\nNo text, letters, symbols that resemble lettering, logos, watermark, other props, hands, people, floor, background, sticker border, detached shadows, glow halo, floating decorations or sparkles.\nSubject: One little handheld flower bouquet: three small simple cream and dusty-pink flowers with muted sage leaves in a pale lavender paper wrap, tied with a small dusty-rose ribbon. The bouquet silhouette is compact and upright, the paper wrap tapers downward into a narrow graspable lower point. All petals, leaves and ribbon belong to the connected single bouquet. No scattered petals."
+    },
+    {
+      "id": "heartSign",
+      "name": "爱心手牌",
+      "file": "heartSign.png",
+      "canvas": [
+        1024,
+        1536
+      ],
+      "region": [
+        0.115234375,
+        0.115234375,
+        0.8837890625,
+        0.908203125
+      ],
+      "grip": [
+        0.5,
+        0.7942708333333334
+      ],
+      "height": 205,
+      "orientation": "upright",
+      "alphaBBoxPx": [
+        63,
+        178,
+        944,
+        1493
+      ],
+      "visibleAlphaBBoxPx": [
+        121,
+        180,
+        902,
+        1392
+      ],
+      "visibleAlphaThreshold": 4,
+      "regionPx": [
+        118,
+        177,
+        905,
+        1395
+      ],
+      "regionPaddingPx": 3,
+      "gripPx": [
+        512,
+        1220
+      ],
+      "gripAlpha": 253,
+      "gripManuallyConfirmed": true,
+      "gripNote": "Lower straight cream stick.",
+      "sizeBytes": 1515948,
+      "sha256": "ddb4b62d095095ed5794559a9754eced16ff7df573f874fab0feadbea570a7d8",
+      "transparentPixelFraction": 0.7367038726806641,
+      "generator": "built-in image_gen",
+      "generatedSourcePath": "/Users/voidfun/.codex/generated_images/01a101c5-3abe-7a63-80ce-0612ddb4d8ca/exec-1ad36b60-0de4-4717-89d9-5fa8ba1a7bea.png",
+      "imageEdits": "none; byte-for-byte copy preserving generated RGBA",
+      "artifactPath": "./heartSign.png",
+      "prompt": "Use case: stylized-concept. Asset type: transparent PNG hand-held prop sprite for a 2D chibi character rig.\nPrimary request: Draw exactly ONE complete prop, isolated, no hand and no character.\nStyle: softly hand-painted storybook illustration matching a cute dark-brown-haired chibi girl in an ivory hoodie: very fine warm cocoa outlines, matte soft cream, dusty rose, pale lavender and muted sage palette, gentle inner watercolor shading and subtle paper texture only inside the object, no glossy 3D appearance. A clean readable small silhouette.\nComposition: centered upright and front-facing, generous transparent padding on all sides, complete object entirely inside the canvas, never cropped. Grip region must be visible and uncluttered.\nBackground: genuine transparent alpha. The object is opaque except antialiased silhouette edges.\nNo text, letters, symbols that resemble lettering, logos, watermark, other props, hands, people, floor, background, sticker border, detached shadows, glow halo, floating decorations or sparkles.\nSubject: A small hand-held heart-shaped sign or paddle. One softly rounded dusty-rose pink heart on top, with a fine cocoa edge and a plain subtle lighter-pink inner painted highlight, fixed to a straight slim cream wooden stick pointing down. The bottom third of the stick is clear for holding. Completely blank heart, no words, no face, no smaller floating hearts."
+    },
+    {
+      "id": "lollipop",
+      "name": "棒棒糖",
+      "file": "lollipop.png",
+      "canvas": [
+        1024,
+        1536
+      ],
+      "region": [
+        0.236328125,
+        0.125,
+        0.7626953125,
+        0.916015625
+      ],
+      "grip": [
+        0.5,
+        0.7877604166666666
+      ],
+      "height": 180,
+      "orientation": "upright",
+      "alphaBBoxPx": [
+        65,
+        35,
+        1010,
+        1510
+      ],
+      "visibleAlphaBBoxPx": [
+        245,
+        195,
+        778,
+        1404
+      ],
+      "visibleAlphaThreshold": 4,
+      "regionPx": [
+        242,
+        192,
+        781,
+        1407
+      ],
+      "regionPaddingPx": 3,
+      "gripPx": [
+        512,
+        1210
+      ],
+      "gripAlpha": 253,
+      "gripManuallyConfirmed": true,
+      "gripNote": "Lower straight ivory stick.",
+      "sizeBytes": 1322535,
+      "sha256": "0b86e4293ec9a175c9f30c2d9c55d71574cd7f7bd16d9248ef42c1a1b5ccbc57",
+      "transparentPixelFraction": 0.8332799275716146,
+      "generator": "built-in image_gen",
+      "generatedSourcePath": "/Users/voidfun/.codex/generated_images/01a101c5-3abe-7a63-80ce-0612ddb4d8ca/exec-cd3134b3-2ce7-41e5-a57c-4f93331a3b07.png",
+      "imageEdits": "none; byte-for-byte copy preserving generated RGBA",
+      "artifactPath": "./lollipop.png",
+      "prompt": "Use case: stylized-concept. Asset type: transparent PNG hand-held prop sprite for a 2D chibi character rig.\nPrimary request: Draw exactly ONE complete prop, isolated, no hand and no character.\nStyle: softly hand-painted storybook illustration matching a cute dark-brown-haired chibi girl in an ivory hoodie: very fine warm cocoa outlines, matte soft cream, dusty rose, pale lavender and muted sage palette, gentle inner watercolor shading and subtle paper texture only inside the object, no glossy 3D appearance. A clean readable small silhouette.\nComposition: centered upright and front-facing, generous transparent padding on all sides, complete object entirely inside the canvas, never cropped. Grip region must be visible and uncluttered.\nBackground: genuine transparent alpha. The object is opaque except antialiased silhouette edges.\nNo text, letters, symbols that resemble lettering, logos, watermark, other props, hands, people, floor, background, sticker border, detached shadows, glow halo, floating decorations or sparkles.\nSubject: One cute round lollipop on a straight slender ivory stick. The candy is a compact circle at the top with a softly painted cream and dusty-pink swirl, fine cocoa contour, matte sugar finish, no plastic wrapper, no bow. The stick points straight down with unobstructed lower grip area. No drips, no separate sweets."
+    },
+    {
+      "id": "coffeeCup",
+      "name": "咖啡杯",
+      "file": "coffeeCup.png",
+      "canvas": [
+        1374,
+        1145
+      ],
+      "region": [
+        0.22707423580786026,
+        0.17903930131004367,
+        0.8820960698689956,
+        0.8724890829694323
+      ],
+      "grip": [
+        0.8442503639010189,
+        0.5109170305676856
+      ],
+      "height": 150,
+      "orientation": "upright",
+      "alphaBBoxPx": [
+        0,
+        19,
+        1336,
+        1119
+      ],
+      "visibleAlphaBBoxPx": [
+        315,
+        208,
+        1209,
+        996
+      ],
+      "visibleAlphaThreshold": 4,
+      "regionPx": [
+        312,
+        205,
+        1212,
+        999
+      ],
+      "regionPaddingPx": 3,
+      "gripPx": [
+        1160,
+        585
+      ],
+      "gripAlpha": 253,
+      "gripManuallyConfirmed": true,
+      "gripNote": "Outer middle of the viewer-right D handle.",
+      "sizeBytes": 1044338,
+      "sha256": "a45a0d901c0dcc59dd56aa73fe993a2c71fef675feaebb617c4ec7531533ec5f",
+      "transparentPixelFraction": 0.662119334108808,
+      "generator": "built-in image_gen",
+      "generatedSourcePath": "/Users/voidfun/.codex/generated_images/01a101c5-3abe-7a63-80ce-0612ddb4d8ca/exec-9a06686d-6de4-4cdb-b0ca-7508840942ab.png",
+      "imageEdits": "none; byte-for-byte copy preserving generated RGBA",
+      "artifactPath": "./coffeeCup.png",
+      "prompt": "Use case: stylized-concept. Asset type: transparent PNG hand-held prop sprite for a 2D chibi character rig.\nPrimary request: Draw exactly ONE complete prop, isolated, no hand and no character.\nStyle: softly hand-painted storybook illustration matching a cute dark-brown-haired chibi girl in an ivory hoodie: very fine warm cocoa outlines, matte soft cream, dusty rose, pale lavender and muted sage palette, gentle inner watercolor shading and subtle paper texture only inside the object, no glossy 3D appearance. A clean readable small silhouette.\nComposition: centered upright and front-facing, generous transparent padding on all sides, complete object entirely inside the canvas, never cropped. Grip region must be visible and uncluttered.\nBackground: genuine transparent alpha. The object is opaque except antialiased silhouette edges.\nNo text, letters, symbols that resemble lettering, logos, watermark, other props, hands, people, floor, background, sticker border, detached shadows, glow halo, floating decorations or sparkles.\nSubject: One small cozy cream ceramic coffee mug, upright. View front with a little top ellipse visible showing cocoa-brown coffee. One lavender-tinted rounded D-shaped handle is clearly on the viewer's RIGHT side, with its opening transparent. Rounded mug base, fine warm cocoa contour, very subtle cream watercolor shading. No steam, no saucer, no spoon, no lettering, no face. The right-side handle is the grip."
+    },
+    {
+      "id": "book",
+      "path": "/Users/voidfun/Documents/ChatGPT/live/props-update/fourier-sdk/example/voidavatar/art/props/book.png",
+      "generatedSourcePath": "/Users/voidfun/.codex/generated_images/01a101c5-fa48-7e61-839c-8212830e15ce/exec-2a68a042-f912-4355-9f72-5ded4372afc6.png",
+      "sha256": "b4350279c7e2ff0f85c8d367b73bcb0ddf3f0acf718e29238e101887dbe4b393",
+      "canvas": [
+        1086,
+        1448
+      ],
+      "alphaVisibleThreshold": 4,
+      "visibleBboxPx": [
+        158,
+        208,
+        930,
+        1267
+      ],
+      "region": [
+        0.1427255985267035,
+        0.14157458563535913,
+        0.8591160220994475,
+        0.8770718232044199
+      ],
+      "grip": [
+        0.5119705340699816,
+        0.8314917127071824
+      ],
+      "gripPx": [
+        556,
+        1204
+      ],
+      "height": 150,
+      "mode": "RGBA",
+      "alphaZeroPixels": 807850,
+      "visibleAlphaPixels": 756822,
+      "method": "built-in image_gen, copied without pixel edits",
+      "visualQA": "Single object, complete silhouette, no text or character. RGB glow outside paintbrush/fan silhouette has alpha zero and is not visible when correctly composited.",
+      "prompt": "Use case: stylized-concept. Asset type: a single reusable handheld PNG prop for a pastel chibi Live2D avatar. Style: delicate hand-drawn illustration, very fine muted cocoa-brown outlines, soft cream and dusty lavender/pink with a little pale sage, subtle paper grain inside the painted object, quiet warm diffuse shading. Match a gentle storybook chibi character wearing an oversized cream hoodie; the image must contain only the requested prop, never the character. Transparent background with real alpha, not an illustrated checkerboard. No hands, people, typography, letters, words, numbers, logos, watermark, pedestal, cast shadow, extra objects, floating particles, sparkle effects or white sticker outline. Entire prop fully visible with modest transparent margins, centered, front-facing and easy to identify when small. Primary request: one small CLOSED upright book, dusty lavender cloth cover with softly rounded corners, cream page block, subtle pale sage spine trim. A single small cream crescent moon and tiny star decoration centered on the plain cover; absolutely no text. Slight three-quarter view only enough to see slim page edges. Portrait book proportions about 3:4. Keep the lower quarter of the book simple and undecorated, suitable to be gripped at its bottom-center/side by a small hand. Flat cutout illustration, no hand or background.",
+      "provenancePath": "/Users/voidfun/Documents/ChatGPT/live/props-update/qa/last-three-metadata.json",
+      "artifactPath": "./book.png",
+      "file": "book.png"
+    },
+    {
+      "id": "paintbrush",
+      "path": "/Users/voidfun/Documents/ChatGPT/live/props-update/fourier-sdk/example/voidavatar/art/props/paintbrush.png",
+      "generatedSourcePath": "/Users/voidfun/.codex/generated_images/01a101c5-fa48-7e61-839c-8212830e15ce/exec-5ca01293-24db-49ff-899b-55920d72dd0b.png",
+      "sha256": "2b3a8d5b3148db2f34ef2261bbed68ccfb3831f044cdcfa10fdb162c1fe7dde1",
+      "canvas": [
+        1024,
+        1536
+      ],
+      "alphaVisibleThreshold": 4,
+      "visibleBboxPx": [
+        472,
+        37,
+        556,
+        1483
+      ],
+      "region": [
+        0.4580078125,
+        0.022135416666666668,
+        0.5458984375,
+        0.9674479166666666
+      ],
+      "grip": [
+        0.5,
+        0.78125
+      ],
+      "gripPx": [
+        512,
+        1200
+      ],
+      "height": 220,
+      "mode": "RGBA",
+      "alphaZeroPixels": 1487117,
+      "visibleAlphaPixels": 77551,
+      "method": "built-in image_gen, copied without pixel edits",
+      "visualQA": "Single object, complete silhouette, no text or character. RGB glow outside paintbrush/fan silhouette has alpha zero and is not visible when correctly composited.",
+      "prompt": "Use case: stylized-concept. Asset type: a single reusable handheld PNG prop for a pastel chibi Live2D avatar. Style: delicate hand-drawn illustration, very fine muted cocoa-brown outlines, soft cream and dusty lavender/pink with a little pale sage, subtle paper grain inside the painted object, quiet warm diffuse shading. Match a gentle storybook chibi character wearing an oversized cream hoodie; the image must contain only the requested prop, never the character. Transparent background with real alpha, not an illustrated checkerboard. No hands, people, typography, letters, words, numbers, logos, watermark, pedestal, cast shadow, extra objects, floating particles, sparkle effects or white sticker outline. Entire prop fully visible with modest transparent margins, centered, front-facing and easy to identify when small. Primary request: one slender artist paintbrush held perfectly VERTICAL, tip up, with a warm cocoa wooden handle, a short matte cream metal ferrule, and a tapered brush tip carrying a small amount of dusty lavender paint. No dripping paint or detached paint blobs. Elegant thin silhouette, long handle, no diagonal tilt. Lower handle should remain uninterrupted and narrow for a small hand grip around 80 percent of the object's height from the top. Centered single paintbrush, complete pointed tip and complete rounded handle end, no hand or background.",
+      "provenancePath": "/Users/voidfun/Documents/ChatGPT/live/props-update/qa/last-three-metadata.json",
+      "artifactPath": "./paintbrush.png",
+      "file": "paintbrush.png"
+    },
+    {
+      "id": "foldingFan",
+      "path": "/Users/voidfun/Documents/ChatGPT/live/props-update/fourier-sdk/example/voidavatar/art/props/foldingFan.png",
+      "generatedSourcePath": "/Users/voidfun/.codex/generated_images/01a101c5-fa48-7e61-839c-8212830e15ce/exec-0189614f-2c9e-4780-a80e-363118313993.png",
+      "sha256": "3864892bc420fb75e3b3e7fae5c96174e3e69f1a37458dbe37789a83a59b5c21",
+      "canvas": [
+        1536,
+        1024
+      ],
+      "alphaVisibleThreshold": 4,
+      "visibleBboxPx": [
+        27,
+        75,
+        1509,
+        965
+      ],
+      "region": [
+        0.015625,
+        0.0703125,
+        0.984375,
+        0.9453125
+      ],
+      "grip": [
+        0.5,
+        0.884765625
+      ],
+      "gripPx": [
+        768,
+        906
+      ],
+      "height": 180,
+      "mode": "RGBA",
+      "alphaZeroPixels": 771609,
+      "visibleAlphaPixels": 787544,
+      "method": "built-in image_gen, copied without pixel edits",
+      "visualQA": "Single object, complete silhouette, no text or character. RGB glow outside paintbrush/fan silhouette has alpha zero and is not visible when correctly composited.",
+      "prompt": "Use case: stylized-concept. Asset type: a single reusable handheld PNG prop for a pastel chibi Live2D avatar. Style: delicate hand-drawn illustration, very fine muted cocoa-brown outlines, soft cream and dusty lavender/pink with a little pale sage, subtle paper grain inside the painted object, quiet warm diffuse shading. Match a gentle storybook chibi character wearing an oversized cream hoodie; the image must contain only the requested prop, never the character. Transparent background with real alpha, not an illustrated checkerboard. No hands, people, typography, letters, words, numbers, logos, watermark, pedestal, cast shadow, extra objects, floating particles, sparkle effects or white sticker outline. Entire prop fully visible with modest transparent margins, centered, front-facing and easy to identify when small. Primary request: one OPEN folding hand fan, front view, symmetric broad semicircular cream and pale dusty lavender paper fan panels, subtle muted cocoa ribs and fine cocoa outlines, small pale sage accent near the rim. Simple tasteful hand-painted texture, no letters or ornate emblems. The ribs converge into one clearly visible small cocoa grip/handle at the BOTTOM CENTER, pointing downward. Fan spreads upward, no tassel or separate decorative pieces. Entire open fan and bottom-center grip visible. Single fan cutout, no hand or background.",
+      "provenancePath": "/Users/voidfun/Documents/ChatGPT/live/props-update/qa/last-three-metadata.json",
+      "artifactPath": "./foldingFan.png",
+      "file": "foldingFan.png"
+    }
+  ]
+}

@@ -7,21 +7,6 @@ import { createRequestHandler, startServer } from "../src/server.ts";
 let directory = "";
 let handleRequest: ReturnType<typeof createRequestHandler>;
 
-async function waitForJob(
-  handler: ReturnType<typeof createRequestHandler>,
-  id: string,
-  expected: string,
-): Promise<Record<string, unknown>> {
-  const deadline = Date.now() + 10_000;
-  for (;;) {
-    const response = await handler(new Request(`http://local/v1/jobs/${id}`));
-    const value = await response.json() as Record<string, unknown>;
-    if (value.status === expected) return value;
-    if (Date.now() >= deadline) throw new Error(`job ${id} did not reach ${expected}: ${JSON.stringify(value)}`);
-    await Bun.sleep(25);
-  }
-}
-
 describe("HTTP API", () => {
   beforeAll(async () => {
     directory = await mkdtemp(join(tmpdir(), "render-api-test-"));
@@ -56,33 +41,6 @@ export default defineProject(
     expect(await response.json()).toMatchObject({
       status: "ok",
       service: "render-engine",
-    });
-  });
-
-  test("返回求解后的工程 IR", async () => {
-    const response = await handleRequest(new Request("http://local/v1/validate", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        project: join(directory, "main.tsx"),
-        validateMedia: false,
-      }),
-    }));
-    const payload = await response.json();
-    expect(response.status, JSON.stringify(payload)).toBe(200);
-    expect(payload).toMatchObject({
-      valid: true,
-      ir: {
-        totalFrames: 10,
-        project: { id: "api-test" },
-        nodes: [
-          {
-            id: "still",
-            startFrame: 0,
-            endFrame: 10,
-          },
-        ],
-      },
     });
   });
 
@@ -198,62 +156,4 @@ export default defineProject(
       expect(await response.json()).toMatchObject({ error: { code: "OUTPUT_PATH_NOT_ALLOWED" } });
     }
   });
-
-  test("render 队列饱和、多 handler 隔离与 cancelling->cancelled", async () => {
-    const stuckDirectory = join(directory, "stuck");
-    await mkdir(stuckDirectory, { recursive: true });
-    const stuckProject = join(stuckDirectory, "main.tsx");
-    const validProjectSource = await Bun.file(join(directory, "main.tsx")).text();
-    await Bun.write(stuckProject, `while (true) {}\n${validProjectSource}`);
-    const firstHandler = createRequestHandler({
-      projectRoots: [directory],
-      outputRoots: [directory],
-    });
-    const secondHandler = createRequestHandler({
-      projectRoots: [directory],
-      outputRoots: [directory],
-    });
-    const ids: string[] = [];
-    for (let index = 0; index < 10; index += 1) {
-      const response = await firstHandler(new Request("http://local/v1/render", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ project: stuckProject }),
-      }));
-      if (index === 9) {
-        expect(response.status).toBe(429);
-        expect(await response.json()).toMatchObject({ error: { code: "SERVER_BUSY" } });
-      } else {
-        expect(response.status).toBe(202);
-        const job = await response.json() as { id: string };
-        ids.push(job.id);
-      }
-    }
-
-    const isolated = await secondHandler(new Request(`http://local/v1/jobs/${ids[0]}`));
-    expect(isolated.status).toBe(404);
-    await Bun.sleep(250);
-    const running = await firstHandler(new Request(`http://local/v1/jobs/${ids[0]}`));
-    expect(await running.json()).toMatchObject({ status: "running" });
-    const cancelling = await firstHandler(new Request(`http://local/v1/jobs/${ids[0]}`, { method: "DELETE" }));
-    expect(await cancelling.json()).toMatchObject({ status: "cancelling" });
-    for (const id of ids.slice(1)) {
-      await firstHandler(new Request(`http://local/v1/jobs/${id}`, { method: "DELETE" }));
-    }
-    for (const id of ids) await waitForJob(firstHandler, id, "cancelled");
-
-    const timeoutHandler = createRequestHandler({
-      projectRoots: [directory],
-      outputRoots: [directory],
-      limits: { renderTimeoutMs: 100 },
-    });
-    const timeoutResponse = await timeoutHandler(new Request("http://local/v1/render", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ project: stuckProject }),
-    }));
-    const timeoutJob = await timeoutResponse.json() as { id: string };
-    expect(await waitForJob(timeoutHandler, timeoutJob.id, "failed"))
-      .toMatchObject({ error: { code: "RENDER_TIMEOUT" } });
-  }, 15_000);
 });

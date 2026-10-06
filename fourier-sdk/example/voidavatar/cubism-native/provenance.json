@@ -1,0 +1,47 @@
+{
+  "sourceCmo3": "/Users/voidfun/Documents/ChatGPT/live/model/PastelCatgirl-imported4.cmo3",
+  "sourceCmo3Sha256": "997a06b51e5db062091319deda842cfb5f41602e8f74fb3a8f03e2fc89e7fc7a",
+  "exporter": "Live2D Cubism Editor 5.3.04 native File > Export For Runtime > Export as moc3 file",
+  "mocVersion": "SDK 5.3",
+  "nativeExportFiles": [
+    "Moc",
+    "Textures",
+    "Physics",
+    "DisplayInfo"
+  ],
+  "packagedReferencesAdded": [
+    "Expressions",
+    "Motions.Idle"
+  ],
+  "physicsGroupCount": 9,
+  "expressionCount": 13,
+  "idleDurationSeconds": 24,
+  "idleCurveCount": 6,
+  "idleDescription": "Head XY and actual Z, breathing, occasional independent eye-open curves. Hair output parameters remain driven by physics in a compatible SDK runtime.",
+  "validation": "Native UI field and key value readback, file existence and JSON metadata only. No frame checks, motion tests or playback.",
+  "fourierLimitation": "Current Fourier importer does not execute physics3, exp3 or motion3 automatically.",
+  "visibleRightHandPropsParent": "Arm R Rotation (Rotation4): Sync_HandGrip_R and Sync_Prop_magicWand_R",
+  "fourierIntegration": {
+    "installedAtUtc": "2026-10-04T04:58:54.599664+00:00",
+    "sourceBundle": "/Users/voidfun/Documents/ChatGPT/live/model/native-lively-v2",
+    "sourceBundleManifestSha256": "faf17ef0daf7773879b485b757a5ea02b40c55892749f99a89f9fa8ac888ae57",
+    "sourceProvenanceSha256": "3d55ad5f91c9b7d96851b26b7e3da244a782f52fd6611290ce96d4cec1bf3f4d",
+    "destination": "/Users/voidfun/Project/Fourier-Project/fourier-sdk/example/voidavatar/cubism-native",
+    "mode": "source",
+    "entryModule": "../cubism-native-source.ts",
+    "controlsModule": "../native-controls.ts",
+    "nativeMocSha256": "95a69b36ec48e63efffa608234d9c72069ce9750bcf8a99574961d457d62f479",
+    "defaultHybridBundlePreserved": "../cubism",
+    "defaultHybridMocSha256": "edde2561a1daa8a9f286db0300377c8a94a20cd84376c075a1d0ad2baa86ff06",
+    "parameterDriver": "Existing Fourier absolute-time timeline drives native head, eye-open, expression selectors, brow lift and nine hair keyforms through explicit bounded aliases.",
+    "physics3Executed": false,
+    "exp3Executed": false,
+    "motion3Executed": false,
+    "runtimeFilesCopiedByteForByte": true,
+    "metadataAdjusted": [
+      "provenance.json",
+      "bundle-files.json"
+    ],
+    "validation": "Static file hashes, manifest references, PNG dimensions and native parameter/drawable metadata only; TypeScript checked separately. No model.update, parameter mutation, action tests, frame sampling or rendering."
+  }
+}

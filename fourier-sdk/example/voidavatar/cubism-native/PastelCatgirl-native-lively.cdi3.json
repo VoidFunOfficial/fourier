@@ -1,0 +1,332 @@
+{
+	"Version": 3,
+	"Parameters": [
+		{
+			"Id": "ParamAngleX",
+			"GroupId": "",
+			"Name": "Angle X"
+		},
+		{
+			"Id": "ParamAngleY",
+			"GroupId": "",
+			"Name": "Angle Y"
+		},
+		{
+			"Id": "ParamAngleZ",
+			"GroupId": "",
+			"Name": "Angle Z"
+		},
+		{
+			"Id": "ParamEyeLOpen",
+			"GroupId": "",
+			"Name": "EyeL Open"
+		},
+		{
+			"Id": "ParamEyeLSmile",
+			"GroupId": "",
+			"Name": "EyeL Smile"
+		},
+		{
+			"Id": "ParamEyeROpen",
+			"GroupId": "",
+			"Name": "EyeR Open"
+		},
+		{
+			"Id": "ParamEyeRSmile",
+			"GroupId": "",
+			"Name": "EyeR Smile"
+		},
+		{
+			"Id": "ParamEyeBallX",
+			"GroupId": "",
+			"Name": "Eyeball X"
+		},
+		{
+			"Id": "ParamEyeBallY",
+			"GroupId": "",
+			"Name": "Eyeball Y"
+		},
+		{
+			"Id": "ParamBrowLY",
+			"GroupId": "",
+			"Name": "BrowL Y"
+		},
+		{
+			"Id": "ParamBrowRY",
+			"GroupId": "",
+			"Name": "BrowR Y"
+		},
+		{
+			"Id": "ParamBrowLX",
+			"GroupId": "",
+			"Name": "BrowL X"
+		},
+		{
+			"Id": "ParamBrowRX",
+			"GroupId": "",
+			"Name": "BrowR X"
+		},
+		{
+			"Id": "ParamBrowLAngle",
+			"GroupId": "",
+			"Name": "BrowL Angle"
+		},
+		{
+			"Id": "ParamBrowRAngle",
+			"GroupId": "",
+			"Name": "BrowR Angle"
+		},
+		{
+			"Id": "ParamBrowLForm",
+			"GroupId": "",
+			"Name": "BrowL Form"
+		},
+		{
+			"Id": "ParamBrowRForm",
+			"GroupId": "",
+			"Name": "BrowR Form"
+		},
+		{
+			"Id": "ParamMouthForm",
+			"GroupId": "",
+			"Name": "Mouth Form"
+		},
+		{
+			"Id": "ParamMouthOpenY",
+			"GroupId": "",
+			"Name": "Mouth Open"
+		},
+		{
+			"Id": "ParamCheek",
+			"GroupId": "",
+			"Name": "Cheek"
+		},
+		{
+			"Id": "ParamBodyAngleX",
+			"GroupId": "",
+			"Name": "Body X"
+		},
+		{
+			"Id": "ParamBodyAngleY",
+			"GroupId": "",
+			"Name": "Body Y"
+		},
+		{
+			"Id": "ParamBodyAngleZ",
+			"GroupId": "",
+			"Name": "Body Z"
+		},
+		{
+			"Id": "ParamBreath",
+			"GroupId": "",
+			"Name": "Breath"
+		},
+		{
+			"Id": "ParamHairFront",
+			"GroupId": "",
+			"Name": "Hair Move Front"
+		},
+		{
+			"Id": "ParamHairSide",
+			"GroupId": "",
+			"Name": "Hair Move Side"
+		},
+		{
+			"Id": "ParamHairBack",
+			"GroupId": "",
+			"Name": "Hair Move Back"
+		},
+		{
+			"Id": "Param_Angle_Rotation2",
+			"GroupId": "ParamGroup",
+			"Name": "[0]Face Rotation"
+		},
+		{
+			"Id": "ParamHairSideL",
+			"GroupId": "",
+			"Name": "Hair Outer L"
+		},
+		{
+			"Id": "ParamHairSideR",
+			"GroupId": "",
+			"Name": "Hair Outer R"
+		},
+		{
+			"Id": "ParamHairAhoge",
+			"GroupId": "",
+			"Name": "Hair Ahoge Spring"
+		},
+		{
+			"Id": "ParamHairFlyawayL",
+			"GroupId": "",
+			"Name": "Hair Flyaway L"
+		},
+		{
+			"Id": "ParamHairFlyawayR",
+			"GroupId": "",
+			"Name": "Hair Flyaway R"
+		},
+		{
+			"Id": "ParamHairShineL",
+			"GroupId": "",
+			"Name": "Hair Shine L"
+		},
+		{
+			"Id": "ParamHairShineR",
+			"GroupId": "",
+			"Name": "Hair Shine R"
+		},
+		{
+			"Id": "ParamEyeStyle",
+			"GroupId": "",
+			"Name": "Eye Style"
+		},
+		{
+			"Id": "ParamBrowLStyle",
+			"GroupId": "",
+			"Name": "Brow L Style"
+		},
+		{
+			"Id": "ParamBrowRStyle",
+			"GroupId": "",
+			"Name": "Brow R Style"
+		}
+	],
+	"ParameterGroups": [
+		{
+			"Id": "ParamGroup",
+			"GroupId": "",
+			"Name": "Face Rotation"
+		}
+	],
+	"Parts": [
+		{
+			"Id": "Part23",
+			"Name": "PastelCatgirl-Hair-Detail-Additions.psd"
+		},
+		{
+			"Id": "Part22",
+			"Name": "PastelCatgirl-Hand-Props-Additions.psd"
+		},
+		{
+			"Id": "Part19",
+			"Name": "PastelCatgirl-Latest-Face-Additions.psd"
+		},
+		{
+			"Id": "Part",
+			"Name": "Cat Head"
+		},
+		{
+			"Id": "Part2",
+			"Name": "Cat Body"
+		},
+		{
+			"Id": "Part3",
+			"Name": "Cat Tail"
+		},
+		{
+			"Id": "Part4",
+			"Name": "Hair Clip"
+		},
+		{
+			"Id": "Ahoge",
+			"Name": "Ahoge"
+		},
+		{
+			"Id": "Part5",
+			"Name": "Hair Front"
+		},
+		{
+			"Id": "Part6",
+			"Name": "Hair Side R"
+		},
+		{
+			"Id": "Part7",
+			"Name": "Hair Side L"
+		},
+		{
+			"Id": "Mouth",
+			"Name": "Mouth"
+		},
+		{
+			"Id": "Part8",
+			"Name": "Eye R"
+		},
+		{
+			"Id": "Part9",
+			"Name": "Eye L"
+		},
+		{
+			"Id": "Torso",
+			"Name": "Torso"
+		},
+		{
+			"Id": "Face",
+			"Name": "Face"
+		},
+		{
+			"Id": "Part10",
+			"Name": "Arm R"
+		},
+		{
+			"Id": "Part11",
+			"Name": "Arm L"
+		},
+		{
+			"Id": "Pants",
+			"Name": "Pants"
+		},
+		{
+			"Id": "Part12",
+			"Name": "Slipper R"
+		},
+		{
+			"Id": "Part13",
+			"Name": "Slipper L"
+		},
+		{
+			"Id": "Part14",
+			"Name": "Hair Back"
+		},
+		{
+			"Id": "Addon_HairShine_R",
+			"Name": "Addon_HairShine_R"
+		},
+		{
+			"Id": "Addon_HairShine_L",
+			"Name": "Addon_HairShine_L"
+		},
+		{
+			"Id": "Addon_HairFlyaway_R",
+			"Name": "Addon_HairFlyaway_R"
+		},
+		{
+			"Id": "Addon_HairFlyaway_L",
+			"Name": "Addon_HairFlyaway_L"
+		},
+		{
+			"Id": "Part20",
+			"Name": "Hand Props R"
+		},
+		{
+			"Id": "Part21",
+			"Name": "Hand Props L"
+		},
+		{
+			"Id": "Part15",
+			"Name": "Independent Brows R"
+		},
+		{
+			"Id": "Part16",
+			"Name": "Painted Eyes R"
+		},
+		{
+			"Id": "Part17",
+			"Name": "Independent Brows L"
+		},
+		{
+			"Id": "Part18",
+			"Name": "Painted Eyes L"
+		}
+	]
+}

@@ -1,0 +1,22 @@
+{
+  "Type": "Live2D Expression",
+  "FadeInTime": 0,
+  "FadeOutTime": 0,
+  "Parameters": [
+    {
+      "Id": "ParamEyeStyle",
+      "Value": 8,
+      "Blend": "Overwrite"
+    },
+    {
+      "Id": "ParamBrowLStyle",
+      "Value": 8,
+      "Blend": "Overwrite"
+    },
+    {
+      "Id": "ParamBrowRStyle",
+      "Value": 8,
+      "Blend": "Overwrite"
+    }
+  ]
+}
